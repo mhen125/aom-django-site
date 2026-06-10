@@ -1473,21 +1473,110 @@ select:focus {
 /* Hover tooltip polish. */
 .hover-tooltip {
     border-color: rgba(214, 168, 79, 0.45);
+    min-width: 280px;
+    max-width: min(390px, calc(100vw - 32px));
+    padding: 14px;
     background:
         radial-gradient(circle at top left, rgba(248, 230, 173, 0.07), transparent 10rem),
         linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(7, 11, 18, 0.98));
 }
 
 .tooltip-title {
+    margin-bottom: 4px;
     font-family: "Baskervville", Georgia, serif;
     color: var(--gold-bright);
     font-size: 18px;
+    line-height: 1.15;
 }
 
 .tooltip-host {
     color: #ffffff;
     font-size: 12px;
     font-weight: 900;
+}
+
+.tooltip-meta {
+    gap: 7px;
+    margin: 10px 0 12px;
+}
+
+.tooltip-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 26px;
+    padding: 4px 8px;
+    border: 1px solid rgba(214, 168, 79, 0.24);
+    border-radius: 999px;
+    background: rgba(248, 230, 173, 0.07);
+    color: rgba(247, 243, 232, 0.86);
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.tooltip-chip-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 16px;
+    height: 16px;
+    color: var(--gold-bright);
+    font-size: 12px;
+    line-height: 1;
+}
+
+.tooltip-player-list {
+    display: grid;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.tooltip-player-row {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr);
+    align-items: center;
+    gap: 9px;
+    padding: 7px 8px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 12px;
+    background: rgba(7, 11, 18, 0.42);
+    color: var(--text);
+}
+
+.tooltip-player-row .player-god-icon-wrap,
+.tooltip-player-row .player-god-icon {
+    width: 30px;
+    height: 30px;
+}
+
+.tooltip-player-row .player-god-icon-wrap {
+    border-radius: 999px;
+}
+
+.tooltip-player-main {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+}
+
+.tooltip-player-name {
+    overflow: hidden;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 900;
+    line-height: 1.15;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tooltip-player-meta {
+    overflow: hidden;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 @media (max-width: 1180px) {

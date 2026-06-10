@@ -466,7 +466,7 @@ function buildActiveMatchSearchText(match) {
     .toLowerCase();
 }
 
-function getSortValue(match, key) {
+function getActiveMatchSortValue(match, key) {
   switch (key) {
     case "match":
       return getMatchTitle(match).toLowerCase();
@@ -604,8 +604,8 @@ function sortActiveMatches(instance) {
   const sortKey = instance.sortKey;
 
   instance.filteredMatches.sort((matchA, matchB) => {
-    const valueA = getSortValue(matchA, sortKey);
-    const valueB = getSortValue(matchB, sortKey);
+    const valueA = getActiveMatchSortValue(matchA, sortKey);
+    const valueB = getActiveMatchSortValue(matchB, sortKey);
 
     if (typeof valueA === "number" && typeof valueB === "number") {
       return (valueA - valueB) * directionMultiplier;

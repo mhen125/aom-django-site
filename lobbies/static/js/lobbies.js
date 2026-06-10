@@ -1359,32 +1359,12 @@ function sortLobbies() {
 
 function compareLobbySortValues(a, b, key) {
   let comparison = comparePrimitiveSortValues(
-    getSortValue(a, key),
-    getSortValue(b, key),
+    getLobbySortValue(a, key),
+    getLobbySortValue(b, key),
   );
 
   if (comparison !== 0) {
     return comparison;
-  }
-
-  if (key === "max_players") {
-    comparison = comparePrimitiveSortValues(
-      getOccupiedPlayerSlots(a),
-      getOccupiedPlayerSlots(b),
-    );
-
-    if (comparison !== 0) {
-      return comparison;
-    }
-
-    comparison = comparePrimitiveSortValues(
-      Number(a.open_human_slots || 0),
-      Number(b.open_human_slots || 0),
-    );
-
-    if (comparison !== 0) {
-      return comparison;
-    }
   }
 
   return String(a.name || "").localeCompare(String(b.name || ""), undefined, {
@@ -1411,7 +1391,7 @@ function comparePrimitiveSortValues(aValue, bValue) {
   });
 }
 
-function getSortValue(lobby, key) {
+function getLobbySortValue(lobby, key) {
   if (key === "max_players" || key === "max_player_size" || key === "slots") {
     return getConfiguredPlayerSlots(lobby);
   }
@@ -1457,14 +1437,6 @@ function getSortValue(lobby, key) {
 
 function getOccupiedPlayerSlots(lobby) {
   return Number(lobby.occupied_slots ?? calculateOccupiedSlots(lobby) ?? 0);
-}
-
-function getPlayerSortScore(lobby) {
-  const configuredSlots = getConfiguredPlayerSlots(lobby);
-  const occupiedSlots = getOccupiedPlayerSlots(lobby);
-  const openSlots = Number(lobby.open_human_slots || 0);
-
-  return configuredSlots * 1000000 + occupiedSlots * 1000 + openSlots;
 }
 
 function getConfiguredPlayerSlots(lobby) {
@@ -2461,18 +2433,27 @@ function showTooltip(lobby, event) {
     return;
   }
 
-  const participants = getVisibleParticipants(lobby);
+  const participants = getVisibleParticipants(lobby).filter((participant) => {
+    const type = String(participant?.type || "").trim().toLowerCase();
+    return type && type !== "open" && type !== "closed";
+  });
   const participantRows = participants
     .slice(0, 6)
     .map((participant) => {
-      const name = participant.type === "Open" ? "Open" : participant.name || "Unknown";
-      const god = participant.god || "";
-      const rating = formatRating(participant);
+      const name = participant.name || (participant.type === "AI" ? "AI Player" : "Unknown");
+      const metaItems = getPlayerMetaItems(participant);
 
       return `
         <div class="tooltip-player-row">
-          <span>${escapeHtml(name)}</span>
-          <span>${escapeHtml([god, rating].filter(Boolean).join(" · "))}</span>
+          ${renderGodIcon(participant)}
+          <div class="tooltip-player-main">
+            <span class="tooltip-player-name">${escapeHtml(name)}</span>
+            ${
+              metaItems.length
+                ? `<span class="tooltip-player-meta">${metaItems.map((item) => escapeHtml(item)).join(" · ")}</span>`
+                : ""
+            }
+          </div>
         </div>
       `;
     })
@@ -2485,18 +2466,41 @@ function showTooltip(lobby, event) {
 
   hoverTooltip.innerHTML = `
     <div class="tooltip-title">${escapeHtml(lobby.name || "Unnamed lobby")}</div>
-    <div class="tooltip-host">${escapeHtml(lobby.host || "Unknown")}</div>
+    ${lobby.host ? `<div class="tooltip-host">Hosted by ${escapeHtml(lobby.host)}</div>` : ""}
     <div class="tooltip-meta">
-      <span>${escapeHtml(formatMapName(lobby.map))}</span>
-      <span>${escapeHtml(formatGameType(lobby.game_mode))}</span>
-      <span>${escapeHtml(formatSlots(lobby))}</span>
+      ${tooltipMetaChip("map", formatMapName(lobby.map))}
+      ${tooltipMetaChip("mode", formatGameType(lobby.game_mode))}
+      ${tooltipMetaChip("players", `${formatSlots(lobby)} players`)}
+      ${tooltipMetaChip("region", formatRegion(lobby.region))}
     </div>
-    ${participantRows || `<div class="muted">No participant data available.</div>`}
+    ${participantRows ? `<div class="tooltip-player-list">${participantRows}</div>` : ""}
     ${extraCount}
   `;
 
   hoverTooltip.style.display = "block";
   moveTooltip(event);
+}
+
+function tooltipMetaChip(type, value) {
+  const text = String(value || "").trim();
+
+  if (!text || ["unknown", "open", "unrated", "none"].includes(text.toLowerCase())) {
+    return "";
+  }
+
+  const icons = {
+    map: "🗺",
+    mode: "⚔",
+    players: "👥",
+    region: "◎",
+  };
+
+  return `
+    <span class="tooltip-chip tooltip-chip-${escapeHtml(type)}">
+      <span class="tooltip-chip-icon" aria-hidden="true">${icons[type] || "•"}</span>
+      <span>${escapeHtml(text)}</span>
+    </span>
+  `;
 }
 
 function moveTooltip(event) {
