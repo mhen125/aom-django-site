@@ -2457,6 +2457,12 @@ function renderDetailsSidebar(lobby, options = {}) {
 }
 
 function preserveOrResetSelection() {
+  if (selectedLobbyId === null || selectedLobbyId === undefined) {
+    renderEmptySidebar();
+    renderTableSelection();
+    return;
+  }
+
   const stillVisible = filteredLobbies.find(
     (lobby) => String(lobby.id) === String(selectedLobbyId),
   );
@@ -2467,14 +2473,8 @@ function preserveOrResetSelection() {
     return;
   }
 
-  selectedLobbyId = filteredLobbies[0]?.id ?? null;
-
-  if (selectedLobbyId === null) {
-    renderEmptySidebar();
-    return;
-  }
-
-  renderDetailsSidebar(filteredLobbies[0]);
+  selectedLobbyId = null;
+  renderEmptySidebar();
   renderTableSelection();
 }
 
