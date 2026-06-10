@@ -7,21 +7,16 @@ const ICONS = {
   hunt: optimizedImagePath("hunt.webp"),
   favor: staticPath("assets/images/favor.png"),
   pop: staticPath("assets/images/res_pop.png"),
-  population: staticPath("assets/images/res_pop.png"),
 
   villager: staticPath("assets/images/unit_type_villager.png"),
-  villagers: staticPath("assets/images/unit_type_villager.png"),
 
   gatherer: optimizedImagePath("villager_norse_icon.webp"),
-  gatherers: optimizedImagePath("villager_norse_icon.webp"),
 
   dwarf: optimizedImagePath("villager_dwarf_icon.webp"),
-  dwarves: optimizedImagePath("villager_dwarf_icon.webp"),
 
   ox: optimizedImagePath("ox_cart_icon.webp"),
   cart: optimizedImagePath("ox_cart_icon.webp"),
   ox_cart: optimizedImagePath("eco_builds/ox_cart_icon.webp"),
-  oxcart: optimizedImagePath("eco_builds/ox_cart_icon.webp"),
 
   miko: optimizedImagePath("miko_icon.webp"),
   temple: optimizedImagePath("temple_icon.webp"),
@@ -41,15 +36,12 @@ const ICONS = {
   kuafu_hero: optimizedImagePath("kuafu_hero_icon.webp"),
 
   pickaxe: optimizedImagePath("pickaxe_icon.webp"),
-  pick_axe: optimizedImagePath("pickaxe_icon.webp"),
-  handaxe: optimizedImagePath("hand_axe_icon.webp"),
   hand_axe: optimizedImagePath("hand_axe_icon.webp"),
 
   priest: optimizedImagePath("priest_icon.webp"),
   pharaoh: optimizedImagePath("pharaoh_icon.webp"),
 
   house: optimizedImagePath("house_icon.webp"),
-  houses: optimizedImagePath("house_icon.webp"),
   tree: optimizedImagePath("tree_icon.webp"),
 
   berserk: optimizedImagePath("berserk_icon.webp"),
@@ -82,7 +74,7 @@ const SHORTCODE_ALIASES = {
   hunt: "hunt",
 
   pop: "pop",
-  population: "population",
+  population: "pop",
 
   house: "house",
   houses: "house",
