@@ -3,12 +3,20 @@
 <header class="site-shell-header {% if site_header_variant == 'agora' %}site-shell-header-agora{% endif %}">
   <div class="site-header-inner">
     <a class="site-brand-lockup" href="/" aria-label="Go to Prostagma home page">
-      <img
-        class="site-brand-icon"
-        src="{% static 'assets/images/ui/prostagma_arkantos.png' %}"
-        alt=""
-        loading="eager"
-      />
+      <picture>
+        <source
+          srcset="{% static 'assets/optimized/images/ui/prostagma_arkantos.brand.webp' %}"
+          type="image/webp"
+        >
+        <img
+          class="site-brand-icon"
+          src="{% static 'assets/images/ui/prostagma_arkantos.png' %}"
+          alt=""
+          loading="eager"
+          width="320"
+          height="320"
+        />
+      </picture>
 
       <span class="site-brand-text-wrap">
         <span class="site-brand-wordmark">Prostagma?</span>

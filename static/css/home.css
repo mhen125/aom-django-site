@@ -43,7 +43,10 @@ body {
     sans-serif;
   background:
     linear-gradient(135deg, rgba(5, 6, 13, 0.18), rgba(8, 12, 23, 0.42)),
-    url("../assets/images/Background.png");
+    image-set(
+      url("../assets/optimized/images/Background.webp") type("image/webp"),
+      url("../assets/images/Background.png") type("image/png")
+    );
   background-size: cover;
   background-position: center top;
   background-repeat: no-repeat;

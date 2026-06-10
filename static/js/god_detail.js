@@ -425,6 +425,45 @@ function normalizeStaticAssetPath(path) {
   return staticPath(value.replace(/^(\.\.\/)+/, "").replace(/^\/+/, ""));
 }
 
+function optimizedAssetPath(path, variant = "") {
+  const normalized = normalizeStaticAssetPath(path);
+
+  if (!normalized || !normalized.endsWith(".png")) {
+    return "";
+  }
+
+  const staticPrefix = normalized.startsWith(STATIC_URL) ? STATIC_URL : "/static/";
+  const relativePath = normalized.slice(staticPrefix.length);
+
+  if (!relativePath.startsWith("assets/images/")) {
+    return "";
+  }
+
+  const extensionless = relativePath.replace(/\.png$/i, "");
+  const optimizedPath = extensionless.replace("assets/images/", "assets/optimized/images/");
+
+  return `${staticPrefix}${optimizedPath}${variant}.webp`;
+}
+
+function imageSetValue(fallbackPath, optimizedPath) {
+  const fallback = normalizeStaticAssetPath(fallbackPath);
+
+  if (!fallback) {
+    return "";
+  }
+
+  if (!optimizedPath) {
+    return `url("${fallback}")`;
+  }
+
+  return `image-set(url("${optimizedPath}") type("image/webp"), url("${fallback}") type("image/png"))`;
+}
+
+function themedBackgroundValue(path) {
+  const sourcePath = normalizeStaticAssetPath(path);
+  return imageSetValue(sourcePath, optimizedAssetPath(sourcePath));
+}
+
 function normalizeGodLookupValue(value) {
   return String(value || "")
     .trim()
@@ -478,6 +517,11 @@ function findGod(godId) {
 
 function godHeroPortraitPath(godId) {
   return staticPath(`assets/images/gods/${godId}_breakoutportrait.png`);
+}
+
+function godHeroBackgroundValue(godId) {
+  const sourcePath = godHeroPortraitPath(godId);
+  return imageSetValue(sourcePath, optimizedAssetPath(sourcePath, ".hero"));
 }
 
 function pantheonReturnUrl(pantheon) {
@@ -659,13 +703,13 @@ function renderHero(god, pantheon) {
   const pantheonBackground = normalizeStaticAssetPath(pantheon.background);
 
   if (pantheonBackground) {
-    buildPage.style.setProperty("--pantheon-bg", `url("${pantheonBackground}")`);
+    buildPage.style.setProperty("--pantheon-bg", themedBackgroundValue(pantheonBackground));
   }
 
   pantheonLabel.textContent = `${pantheon.name} Pantheon`;
   godName.textContent = god.name;
   godSummary.textContent = god.subtitle;
-  godHeroArt.style.backgroundImage = `url("${godHeroPortraitPath(god.id)}")`;
+  godHeroArt.style.backgroundImage = godHeroBackgroundValue(god.id);
   buildSectionHeading.textContent = `${god.name} Build Orders`;
 
   updateReturnLinks(pantheon);

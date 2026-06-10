@@ -91,12 +91,83 @@ function staticPath(path) {
   return `${STATIC_URL}${String(path).replace(/^\/+/, "")}`;
 }
 
+function normalizeStaticAssetPath(path) {
+  const value = String(path || "").trim();
+
+  if (!value) {
+    return "";
+  }
+
+  if (value.startsWith("http://") || value.startsWith("https://") || value.startsWith("data:")) {
+    return value;
+  }
+
+  if (value.startsWith(STATIC_URL)) {
+    return value;
+  }
+
+  if (value.startsWith("/static/")) {
+    return value;
+  }
+
+  return staticPath(value);
+}
+
+function optimizedAssetPath(path, variant = "") {
+  const normalized = normalizeStaticAssetPath(path);
+
+  if (!normalized || !normalized.endsWith(".png")) {
+    return "";
+  }
+
+  const staticPrefix = normalized.startsWith(STATIC_URL) ? STATIC_URL : "/static/";
+  const relativePath = normalized.slice(staticPrefix.length);
+
+  if (!relativePath.startsWith("assets/images/")) {
+    return "";
+  }
+
+  const extensionless = relativePath.replace(/\.png$/i, "");
+  const optimizedPath = extensionless.replace("assets/images/", "assets/optimized/images/");
+
+  return `${staticPrefix}${optimizedPath}${variant}.webp`;
+}
+
+function imageSetValue(fallbackPath, optimizedPath) {
+  const fallback = normalizeStaticAssetPath(fallbackPath);
+
+  if (!fallback) {
+    return "";
+  }
+
+  if (!optimizedPath) {
+    return `url("${fallback}")`;
+  }
+
+  return `image-set(url("${optimizedPath}") type("image/webp"), url("${fallback}") type("image/png"))`;
+}
+
 function godCardPortraitPath(godId) {
   return staticPath(`assets/images/gods/${godId}_portrait.png`);
 }
 
 function godHeroPortraitPath(godId) {
   return staticPath(`assets/images/gods/${godId}_breakoutportrait.png`);
+}
+
+function godCardBackgroundValue(godId) {
+  const sourcePath = godCardPortraitPath(godId);
+  return imageSetValue(sourcePath, optimizedAssetPath(sourcePath, ".card"));
+}
+
+function godHeroBackgroundValue(godId) {
+  const sourcePath = godHeroPortraitPath(godId);
+  return imageSetValue(sourcePath, optimizedAssetPath(sourcePath, ".hero"));
+}
+
+function themedBackgroundValue(path) {
+  const sourcePath = normalizeStaticAssetPath(path);
+  return imageSetValue(sourcePath, optimizedAssetPath(sourcePath));
 }
 
 function buildUrl(godId) {
@@ -186,7 +257,7 @@ function createGodCard(god, index) {
 
   card.innerHTML = `
     <div class="god-icon-shell">
-      <div class="god-art" style="background-image: url('${escapeHtml(godCardPortraitPath(godId))}');"></div>
+      <div class="god-art" style="background-image: ${escapeHtml(godCardBackgroundValue(godId))};"></div>
       <div class="god-frame" aria-hidden="true"></div>
     </div>
 
@@ -232,7 +303,7 @@ function updateCarouselState() {
     const backgroundPath = getPantheonBackground(activePantheon);
 
     if (backgroundPath) {
-      selectionSection.style.setProperty("--pantheon-bg", `url("${backgroundPath}")`);
+      selectionSection.style.setProperty("--pantheon-bg", themedBackgroundValue(backgroundPath));
       selectionSection.classList.add("has-pantheon-bg");
     } else {
       selectionSection.style.removeProperty("--pantheon-bg");
@@ -449,7 +520,7 @@ function selectPantheon(pantheonId) {
   const backgroundPath = getPantheonBackground(pantheon);
 
   if (backgroundPath) {
-    selectionSection.style.setProperty("--pantheon-bg", `url("${backgroundPath}")`);
+    selectionSection.style.setProperty("--pantheon-bg", themedBackgroundValue(backgroundPath));
     selectionSection.classList.add("has-pantheon-bg");
   } else {
     selectionSection.style.removeProperty("--pantheon-bg");
