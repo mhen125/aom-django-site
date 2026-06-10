@@ -91,7 +91,14 @@
                 {% endif %}
               </span>
 
-              <img id="goalIcon" src="{{ goal_icon_url }}" alt="Goal icon">
+              {% if goal_icon_webp_url %}
+                <picture>
+                  <source srcset="{{ goal_icon_webp_url }}" type="image/webp">
+                  <img id="goalIcon" src="{{ goal_icon_url }}" alt="Goal icon">
+                </picture>
+              {% else %}
+                <img id="goalIcon" src="{{ goal_icon_url }}" alt="Goal icon">
+              {% endif %}
             </div>
 
             <strong id="goalText">

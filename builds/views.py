@@ -775,6 +775,7 @@ def build_detail(request, build_slug):
         goal_icon = asset_url(build.goal_icon, DEFAULT_GOAL_ICON_PATH)
         hud_ring = god_hud_ring_url(build.major_god)
         build_portrait_webp = optimized_static_asset_url(build_portrait, ".card")
+        goal_icon_webp = optimized_static_asset_url(goal_icon)
         hud_ring_webp = optimized_static_asset_url(hud_ring)
         god_overview_url = f"/gods/{build.major_god.slug}/"
         back_to_builds_url = f"/build_orders/?pantheon={build.major_god.pantheon.slug}"
@@ -788,6 +789,7 @@ def build_detail(request, build_slug):
         goal_icon = asset_url(DEFAULT_GOAL_ICON_PATH)
         hud_ring = god_hud_ring_url(god_slug=requested_god_slug)
         build_portrait_webp = optimized_static_asset_url(build_portrait, ".card")
+        goal_icon_webp = optimized_static_asset_url(goal_icon)
         hud_ring_webp = optimized_static_asset_url(hud_ring)
         god_overview_url = "/build_orders/"
         back_to_builds_url = "/build_orders/"
@@ -806,6 +808,7 @@ def build_detail(request, build_slug):
             "build_portrait_url": build_portrait,
             "build_portrait_webp_url": build_portrait_webp,
             "goal_icon_url": goal_icon,
+            "goal_icon_webp_url": goal_icon_webp,
             "god_hud_ring_url": hud_ring,
             "god_hud_ring_webp_url": hud_ring_webp,
             "god_overview_url": god_overview_url,

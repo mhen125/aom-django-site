@@ -115,6 +115,13 @@ class Command(BaseCommand):
             "quality": 82,
         },
         {
+            "label": "build goal icons",
+            "glob": "assets/images/score_age_*.png",
+            "suffix": ".webp",
+            "max_size": (128, 128),
+            "quality": 82,
+        },
+        {
             "label": "top logo art",
             "glob": "assets/images/Top_Logo.png",
             "suffix": ".webp",
