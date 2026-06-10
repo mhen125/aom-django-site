@@ -1,5 +1,6 @@
 const API_BASE_URL = window.AOM_API_BASE_URL || "";
 const STATIC_URL = window.AOM_STATIC_URL || "/static/";
+const ACTIVE_MATCHES_SCRIPT_URL = window.AOM_ACTIVE_MATCHES_SCRIPT_URL || "";
 
 const MAP_ICON_BASE_PATHS = [`${STATIC_URL}map-icons`];
 
@@ -97,6 +98,7 @@ let sortKey = "max_players";
 let sortDirection = "desc";
 let activeTab = "custom";
 let hoveredLobby = null;
+let activeMatchesScriptPromise = null;
 
 let leaderboardCache = new Map();
 let leaderboardPending = new Map();
@@ -2721,6 +2723,50 @@ function handleSortClick(event) {
   applyFiltersAndRender();
 }
 
+function shouldLoadActiveMatchesForTab(tabName) {
+  return tabName === "inProgressCustom" || tabName === "observable";
+}
+
+function ensureActiveMatchesScriptLoaded() {
+  if (!ACTIVE_MATCHES_SCRIPT_URL || typeof document === "undefined") {
+    return Promise.resolve();
+  }
+
+  if (activeMatchesScriptPromise) {
+    return activeMatchesScriptPromise;
+  }
+
+  const existingScript = Array.from(document.scripts).find((script) => {
+    return script.getAttribute("src") === ACTIVE_MATCHES_SCRIPT_URL;
+  });
+
+  if (existingScript) {
+    activeMatchesScriptPromise = Promise.resolve();
+    return activeMatchesScriptPromise;
+  }
+
+  activeMatchesScriptPromise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = ACTIVE_MATCHES_SCRIPT_URL;
+    script.defer = true;
+    script.onload = resolve;
+    script.onerror = () => reject(new Error("Unable to load active matches."));
+    document.body.appendChild(script);
+  });
+
+  return activeMatchesScriptPromise;
+}
+
+function loadActiveMatchesForTab(tabName) {
+  if (!shouldLoadActiveMatchesForTab(tabName)) {
+    return;
+  }
+
+  ensureActiveMatchesScriptLoaded().catch((error) => {
+    console.error(error);
+  });
+}
+
 function switchTab(tabName) {
   activeTab = tabName;
 
@@ -2737,6 +2783,8 @@ function switchTab(tabName) {
   if (targetPanel) {
     targetPanel.classList.add("active");
   }
+
+  loadActiveMatchesForTab(tabName);
 
   if (tabName === "live" && !liveActivityLoaded) {
     loadLiveActivity().catch((error) => {

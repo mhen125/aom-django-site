@@ -15,6 +15,7 @@
     window.AOM_API_BASE_URL = "";
     window.AOM_ACTIVE_MATCHES_API_URL = "{% url 'lobbies:api_active_matches' %}";
     window.AOM_ACTIVE_CUSTOM_MATCHES_API_URL = "{% url 'lobbies:api_active_custom_matches' %}";
+    window.AOM_ACTIVE_MATCHES_SCRIPT_URL = "{% static 'js/active_matches.js' %}?v=20260610-active-lazy";
   </script>
 {% endblock %}
 
@@ -314,6 +315,5 @@
 {% endblock %}
 
 {% block scripts %}
-  <script src="{% static 'js/lobbies.js' %}?v=20260610-lobby-startup" defer></script>
-  <script src="{% static 'js/active_matches.js' %}?v=20260610-map-icons-2" defer></script>
+  <script src="{% static 'js/lobbies.js' %}?v=20260610-active-lazy" defer></script>
 {% endblock %}
