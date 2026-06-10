@@ -4,6 +4,7 @@ const ICONS = {
   food: staticPath("assets/images/res_Food.png"),
   wood: staticPath("assets/images/res_Wood.png"),
   gold: staticPath("assets/images/gold.png"),
+  hunt: optimizedImagePath("hunt.webp"),
   favor: staticPath("assets/images/favor.png"),
   pop: staticPath("assets/images/res_pop.png"),
   population: staticPath("assets/images/res_pop.png"),
@@ -11,35 +12,47 @@ const ICONS = {
   villager: staticPath("assets/images/unit_type_villager.png"),
   villagers: staticPath("assets/images/unit_type_villager.png"),
 
-  gatherer: staticPath("assets/images/villager_norse_icon.png"),
-  gatherers: staticPath("assets/images/villager_norse_icon.png"),
+  gatherer: optimizedImagePath("villager_norse_icon.webp"),
+  gatherers: optimizedImagePath("villager_norse_icon.webp"),
 
-  dwarf: staticPath("assets/images/villager_dwarf_icon.png"),
-  dwarves: staticPath("assets/images/villager_dwarf_icon.png"),
+  dwarf: optimizedImagePath("villager_dwarf_icon.webp"),
+  dwarves: optimizedImagePath("villager_dwarf_icon.webp"),
 
-  ox: staticPath("assets/images/ox_cart_icon.png"),
-  cart: staticPath("assets/images/ox_cart_icon.png"),
-  ox_cart: staticPath("assets/images/ox_cart_icon.png"),
-  oxcart: staticPath("assets/images/ox_cart_icon.png"),
+  ox: optimizedImagePath("ox_cart_icon.webp"),
+  cart: optimizedImagePath("ox_cart_icon.webp"),
+  ox_cart: optimizedImagePath("ox_cart_icon.webp"),
+  oxcart: optimizedImagePath("ox_cart_icon.webp"),
 
-  miko: staticPath("assets/images/miko_icon.png"),
-  temple: staticPath("assets/images/temple_icon.png"),
-  shrine: staticPath("assets/images/shrine_icon.png"),
-  storehouse: staticPath("assets/images/storehouse_icon.png"),
+  miko: optimizedImagePath("miko_icon.webp"),
+  temple: optimizedImagePath("temple_icon.webp"),
+  shrine: optimizedImagePath("shrine_icon.webp"),
+  storehouse: optimizedImagePath("storehouse_icon.webp"),
 
-  kuafu: staticPath("assets/images/kuafu_icon.png"),
-  kuafu_hero: staticPath("assets/images/kuafu_hero_icon.png"),
+  kuafu: optimizedImagePath("kuafu_icon.webp"),
+  kuafu_hero: optimizedImagePath("kuafu_hero_icon.webp"),
 
-  pickaxe: staticPath("assets/images/pickaxe_icon.png"),
-  pick_axe: staticPath("assets/images/pickaxe_icon.png"),
-  handaxe: staticPath("assets/images/hand_axe_icon.png"),
-  hand_axe: staticPath("assets/images/hand_axe_icon.png"),
+  pickaxe: optimizedImagePath("pickaxe_icon.webp"),
+  pick_axe: optimizedImagePath("pickaxe_icon.webp"),
+  handaxe: optimizedImagePath("hand_axe_icon.webp"),
+  hand_axe: optimizedImagePath("hand_axe_icon.webp"),
 
-  priest: staticPath("assets/images/priest_icon.png"),
-  pharaoh: staticPath("assets/images/pharaoh_icon.png"),
+  priest: optimizedImagePath("priest_icon.webp"),
+  pharaoh: optimizedImagePath("pharaoh_icon.webp"),
 
-  house: staticPath("assets/images/house_icon.png"),
-  houses: staticPath("assets/images/house_icon.png")
+  house: optimizedImagePath("house_icon.webp"),
+  houses: optimizedImagePath("house_icon.webp"),
+  tree: optimizedImagePath("tree_icon.webp"),
+
+  berserk: optimizedImagePath("berserk_icon.webp"),
+  hersir: optimizedImagePath("hersir_icon.webp"),
+
+  // Scout units
+  kataskopos: optimizedImagePath("kataskopos_icon.webp"),
+  kitsune: optimizedImagePath("kitsune_icon.webp"),
+  quimchin_spy: optimizedImagePath("quimchin_spy_icon.webp"),
+  oracle: optimizedImagePath("oracle_icon.webp"),
+  oracle_hero: optimizedImagePath("oracle_hero_icon.webp"),
+  pioneer: optimizedImagePath("pioneer_icon.webp"),
 };
 
 const SHORTCODE_ALIASES = {
@@ -52,12 +65,15 @@ const SHORTCODE_ALIASES = {
   wood: "wood",
   gold: "gold",
   favor: "favor",
+  hunt: "hunt",
 
   pop: "pop",
   population: "population",
 
   house: "house",
   houses: "house",
+  tree: "tree",
+  trees: "tree",
 
   villager: "villager",
   villagers: "villager",
@@ -77,9 +93,14 @@ const SHORTCODE_ALIASES = {
   temple: "temple",
   shrine: "shrine",
   storehouse: "storehouse",
+  silo: "silo",
+  granary: "granary",
+  mining_camp: "mining_camp",
+
 
   kuafu: "kuafu",
   kuafu_hero: "kuafu_hero",
+  chieftain: "kuafu_hero",
 
   pickaxe: "pickaxe",
   pick_axe: "pickaxe",
@@ -87,11 +108,27 @@ const SHORTCODE_ALIASES = {
   hand_axe: "hand_axe",
 
   priest: "priest",
-  pharaoh: "pharaoh"
+  pharaoh: "pharaoh",
+
+  berserk: "berserk",
+  hersir: "hersir",
+
+  // Scout units
+  kataskopos: "kataskopos",
+  kitsune: "kitsune",
+  quimchin_spy: "quimchin_spy",
+  oracle: "oracle",
+  oracle_hero: "oracle_hero",
+  pioneer: "pioneer",
+
 };
 
 function staticPath(path) {
   return `${STATIC_URL}${String(path).replace(/^\/+/, "")}`;
+}
+
+function optimizedImagePath(path) {
+  return staticPath(`assets/optimized/images/${String(path).replace(/^\/+/, "")}`);
 }
 
 function escapeHtml(value) {

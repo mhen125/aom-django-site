@@ -80,6 +80,20 @@ class Command(BaseCommand):
             "quality": 82,
         },
         {
+            "label": "shortcode icons",
+            "glob": "assets/images/*_icon.png",
+            "suffix": ".webp",
+            "max_size": (128, 128),
+            "quality": 82,
+        },
+        {
+            "label": "shortcode hunt icon",
+            "glob": "assets/images/hunt.png",
+            "suffix": ".webp",
+            "max_size": (128, 128),
+            "quality": 82,
+        },
+        {
             "label": "top logo art",
             "glob": "assets/images/Top_Logo.png",
             "suffix": ".webp",
