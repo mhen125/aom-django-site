@@ -80,6 +80,13 @@ class Command(BaseCommand):
             "quality": 82,
         },
         {
+            "label": "navigation image buttons",
+            "glob": "assets/images/ui/*Button_*.png",
+            "suffix": ".webp",
+            "max_size": (128, 128),
+            "quality": 82,
+        },
+        {
             "label": "platform icons",
             "glob": "assets/images/auth/*_icon.png",
             "suffix": ".webp",

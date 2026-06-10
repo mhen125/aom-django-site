@@ -155,15 +155,56 @@ function pictureMarkup({ imagePath, optimizedPath, className, altText }) {
   }
 
   if (!optimizedPath) {
-    return `<img class="${className}" src="${escapeHtml(fallback)}" alt="${escapeHtml(altText)}">`;
+    return `<img class="${className}" src="${escapeHtml(fallback)}" alt="${escapeHtml(altText)}" loading="lazy" decoding="async">`;
   }
 
   return `
     <picture>
       <source srcset="${escapeHtml(optimizedPath)}" type="image/webp">
-      <img class="${className}" src="${escapeHtml(fallback)}" alt="${escapeHtml(altText)}">
+      <img class="${className}" src="${escapeHtml(fallback)}" alt="${escapeHtml(altText)}" loading="lazy" decoding="async">
     </picture>
   `;
+}
+
+function lazyPictureMarkup({ imagePath, optimizedPath, className, altText }) {
+  const fallback = normalizeStaticAssetPath(imagePath);
+
+  if (!fallback) {
+    return "";
+  }
+
+  if (!optimizedPath) {
+    return `<img class="${className}" data-src="${escapeHtml(fallback)}" alt="${escapeHtml(altText)}" loading="lazy" decoding="async">`;
+  }
+
+  return `
+    <picture data-lazy-picture>
+      <source data-srcset="${escapeHtml(optimizedPath)}" type="image/webp">
+      <img class="${className}" data-src="${escapeHtml(fallback)}" alt="${escapeHtml(altText)}" loading="lazy" decoding="async">
+    </picture>
+  `;
+}
+
+function hydrateLazyPicture(container) {
+  const picture = container.querySelector("[data-lazy-picture]");
+  const lazyImage = container.querySelector("img[data-src]");
+
+  if (!lazyImage || lazyImage.src) {
+    return;
+  }
+
+  if (picture) {
+    const source = picture.querySelector("source[data-srcset]");
+
+    if (source) {
+      source.srcset = source.dataset.srcset || "";
+    }
+
+    picture.removeAttribute("data-lazy-picture");
+  }
+
+  lazyImage.src = lazyImage.dataset.src || "";
+  lazyImage.removeAttribute("data-src");
 }
 
 function godCardPortraitPath(god) {
@@ -249,7 +290,7 @@ function createPantheonCard(pantheon, index) {
     <div class="carousel-pantheon-visual">
       ${
         iconPath
-          ? pictureMarkup({
+          ? lazyPictureMarkup({
               imagePath: iconPath,
               optimizedPath: optimizedAssetPath(iconPath, ".emblem"),
               className: "carousel-pantheon-img",
@@ -333,6 +374,10 @@ function updateCarouselState() {
 
     slide.setAttribute("aria-hidden", index === carouselIndex ? "false" : "true");
     slide.tabIndex = index === carouselIndex ? 0 : -1;
+
+    if (distance <= 2) {
+      hydrateLazyPicture(slide);
+    }
   });
 
   const activePantheon = pantheons[carouselIndex];

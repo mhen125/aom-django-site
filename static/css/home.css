@@ -350,7 +350,10 @@ button {
   padding: 0;
   border: none;
   background:
-    url("../assets/images/ui/BackButton_Default.png") center / contain no-repeat;
+    image-set(
+      url("../assets/optimized/images/ui/BackButton_Default.webp") type("image/webp"),
+      url("../assets/images/ui/BackButton_Default.png") type("image/png")
+    ) center / contain no-repeat;
   cursor: pointer;
   filter:
     drop-shadow(0 8px 16px rgba(0, 0, 0, 0.36))
@@ -363,7 +366,10 @@ button {
 }
 
 .back-icon-button:hover {
-  background-image: url("../assets/images/ui/BackButton_Hovered.png");
+  background-image: image-set(
+    url("../assets/optimized/images/ui/BackButton_Hovered.webp") type("image/webp"),
+    url("../assets/images/ui/BackButton_Hovered.png") type("image/png")
+  );
   transform: translateY(-50%) scale(1.08);
   filter:
     drop-shadow(0 10px 20px rgba(0, 0, 0, 0.44))
@@ -1239,12 +1245,18 @@ body.using-carousel .pantheon-carousel-button:active {
 
 body.using-carousel .pantheon-carousel-button-back {
   left: 4px;
-  background-image: url("../assets/images/ui/BackButton_Default.png");
+  background-image: image-set(
+    url("../assets/optimized/images/ui/BackButton_Default.webp") type("image/webp"),
+    url("../assets/images/ui/BackButton_Default.png") type("image/png")
+  );
 }
 
 body.using-carousel .pantheon-carousel-button-forward {
   right: 4px;
-  background-image: url("../assets/images/ui/ForwardButton_Default.png");
+  background-image: image-set(
+    url("../assets/optimized/images/ui/ForwardButton_Default.webp") type("image/webp"),
+    url("../assets/images/ui/ForwardButton_Default.png") type("image/png")
+  );
 }
 
 @media (max-width: 900px) {

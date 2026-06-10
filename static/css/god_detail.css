@@ -50,7 +50,11 @@
   z-index: 20;
   width: 68px;
   height: 68px;
-  background: url("../assets/images/ui/BackButton_Default.png") center / contain no-repeat;
+  background:
+    image-set(
+      url("../assets/optimized/images/ui/BackButton_Default.webp") type("image/webp"),
+      url("../assets/images/ui/BackButton_Default.png") type("image/png")
+    ) center / contain no-repeat;
   filter:
     drop-shadow(0 8px 16px rgba(0, 0, 0, 0.36))
     drop-shadow(0 0 10px rgba(255, 225, 160, 0.08));
@@ -60,7 +64,10 @@
 }
 
 .build-back-button:hover {
-  background-image: url("../assets/images/ui/BackButton_Hovered.png");
+  background-image: image-set(
+    url("../assets/optimized/images/ui/BackButton_Hovered.webp") type("image/webp"),
+    url("../assets/images/ui/BackButton_Hovered.png") type("image/png")
+  );
   transform: scale(1.08);
   filter:
     drop-shadow(0 10px 20px rgba(0, 0, 0, 0.44))
@@ -628,4 +635,3 @@
 .empty-builds p {
   margin: 0;
 }
-
