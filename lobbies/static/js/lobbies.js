@@ -1,22 +1,80 @@
 const API_BASE_URL = window.AOM_API_BASE_URL || "";
 const STATIC_URL = window.AOM_STATIC_URL || "/static/";
 
-const MAP_ICON_BASE_PATHS = [
-  `${STATIC_URL}map-icons`,
-  "/static/map-icons",
-  "/map-icons",
-  "map-icons",
-];
+const MAP_ICON_BASE_PATHS = [`${STATIC_URL}map-icons`];
 
-const OPTIMIZED_MAP_ICON_BASE_PATHS = [
-  `${STATIC_URL}assets/optimized/map-icons`,
-  "/static/assets/optimized/map-icons",
-];
+const OPTIMIZED_MAP_ICON_BASE_PATHS = [`${STATIC_URL}assets/optimized/map-icons`];
 
 const MAP_IMAGE_BASE_PATHS = [
   ...OPTIMIZED_MAP_ICON_BASE_PATHS,
   ...MAP_ICON_BASE_PATHS,
 ];
+
+const AVAILABLE_MAP_ICON_FILENAMES = new Set([
+  "acropolis",
+  "air",
+  "alfheim",
+  "all_maps",
+  "anatolia",
+  "archipelago",
+  "arena",
+  "aso_grasslands",
+  "bamboo_grove",
+  "black_sea",
+  "blood_river_crossing",
+  "blue_lagoon",
+  "cloud_forest",
+  "elysium",
+  "erebus",
+  "ghost_lake",
+  "giza",
+  "gold_rush",
+  "great_wall",
+  "highland",
+  "ironwood",
+  "islands",
+  "jotunheim",
+  "kerlaugar",
+  "kii",
+  "land_nomad",
+  "land_unknown",
+  "MapThumb_Land",
+  "MapThumb_Navy",
+  "MapThumb_Standard",
+  "marsh",
+  "mediterranean",
+  "megalopolis",
+  "midgard",
+  "mirage",
+  "mirkwood",
+  "mount_olympus",
+  "muspellheim",
+  "nile_shallows",
+  "nomad",
+  "oasis",
+  "obsidian_ridge",
+  "okuchichibu",
+  "peach_blossom_land",
+  "qinghai_lake",
+  "river_styx",
+  "savannah",
+  "sea_of_worms",
+  "senjogahara",
+  "setonaikai",
+  "silk_road",
+  "snake_dance",
+  "steppe",
+  "team_migration",
+  "temple_of_the_jaguar",
+  "the_unknown",
+  "tiny",
+  "tundra",
+  "valley_of_kings",
+  "valley_of_the_sun_serpent",
+  "vinlandsaga",
+  "watering_hole",
+  "yellow_river",
+]);
 
 const GOD_ICON_BASE_PATHS = [
   `${STATIC_URL}god-icons`,
@@ -1697,6 +1755,9 @@ function getMapIconFilename(mapName) {
   const normalizedMapName = makeAssetFilename(
     String(mapName || "").replace(/^(rm_|set_)/i, ""),
   );
+  const baseMapName = normalizedMapName
+    .replace(/_locked_teams$/, "")
+    .replace(/_unlocked_teams$/, "");
 
   const specialMapIcons = {
     all_maps: "all_maps",
@@ -1710,7 +1771,12 @@ function getMapIconFilename(mapName) {
     scenarios: "all_maps",
     custom_scenario: "all_maps",
     custom_scenarios: "all_maps",
+    custom: "all_maps",
+    custom_map: "all_maps",
+    custom_maps: "all_maps",
+    custom_random_map: "all_maps",
     tenochtitlans_heart: "all_maps",
+    sun_serpent_valley: "valley_of_the_sun_serpent",
 
     standard: "MapThumb_Standard",
     standardmap: "MapThumb_Standard",
@@ -1760,11 +1826,23 @@ function getMapIconFilename(mapName) {
     return specialMapIcons[normalizedMapName];
   }
 
+  if (specialMapIcons[baseMapName]) {
+    return specialMapIcons[baseMapName];
+  }
+
   if (normalizedMapName.includes("scenario")) {
     return "all_maps";
   }
 
-  return normalizedMapName || "all_maps";
+  if (AVAILABLE_MAP_ICON_FILENAMES.has(normalizedMapName)) {
+    return normalizedMapName;
+  }
+
+  if (AVAILABLE_MAP_ICON_FILENAMES.has(baseMapName)) {
+    return baseMapName;
+  }
+
+  return "all_maps";
 }
 
 function formatMapName(mapName) {
