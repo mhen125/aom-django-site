@@ -811,8 +811,6 @@ function renderNotFound() {
 }
 
 async function initBuildPage() {
-  await loadGameStringTableGodDetails();
-
   const godId = getGodIdFromUrl();
   const result = findGod(godId);
 
