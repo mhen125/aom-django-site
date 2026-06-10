@@ -29,24 +29,28 @@
       <a href="/build_orders/"{% if active_page == "builds" %} aria-current="page"{% endif %}>Build Orders</a>
       <a href="/lobbies/"{% if active_page == "lobbies" %} aria-current="page"{% endif %}>Lobbies</a>
       <a href="/agora/"{% if active_page == "agora" %} aria-current="page"{% endif %}>Agora</a>
-      <a href="/about/"{% if active_page == "about" %} aria-current="page"{% endif %}>About</a>
-    </nav>
 
-    <div class="site-header-actions">
-      {% if show_last_updated %}
-        <div id="lastUpdated" class="last-updated site-last-updated">Last updated: never</div>
-      {% endif %}
-
-      {% if show_refresh_button %}
+      <div class="site-nav-dropdown">
         <button
-          id="refreshButton"
-          class="primary-button site-refresh-button"
+          class="site-nav-dropdown-button"
           type="button"
+          aria-haspopup="true"
+          aria-expanded="false"
+          {% if active_page == "about" or active_page == "faq" %}aria-current="page"{% endif %}
         >
-          {{ refresh_button_label|default:"Refresh" }}
+          Tools
+          <span aria-hidden="true">▾</span>
         </button>
-      {% endif %}
-    </div>
+
+        <div class="site-nav-dropdown-menu" role="menu">
+          <a href="/about/"{% if active_page == "about" %} aria-current="page"{% endif %} role="menuitem">About Prostagma</a>
+          <a href="/faq/"{% if active_page == "faq" %} aria-current="page"{% endif %} role="menuitem">FAQ</a>
+          <span class="site-nav-dropdown-disabled" role="menuitem" aria-disabled="true">Compendium <small>Coming soon</small></span>
+          <span class="site-nav-dropdown-disabled" role="menuitem" aria-disabled="true">Combat Simulator <small>Coming soon</small></span>
+          <span class="site-nav-dropdown-disabled" role="menuitem" aria-disabled="true">Username Styling Tool <small>Coming soon</small></span>
+        </div>
+      </div>
+    </nav>
 
     <div class="site-user-auth" aria-label="User account">
       {% if request.user.is_authenticated %}
@@ -114,19 +118,11 @@
               <a href="{% url 'steam_auth:profile' %}" role="menuitem">
                 Steam Profile
               </a>
-            {% else %}
-              <a href="{% url 'steam_auth:login' %}?next={{ request.path|urlencode }}" role="menuitem">
-                Connect Steam
-              </a>
             {% endif %}
 
             {% if request.user.xbox_profile %}
               <a href="/auth/xbox/profile/" role="menuitem">
                 Xbox Profile
-              </a>
-            {% else %}
-              <a href="/auth/xbox/login/?next={{ request.path|urlencode }}" role="menuitem">
-                Connect Xbox
               </a>
             {% endif %}
 
@@ -136,7 +132,8 @@
               </a>
             {% endif %}
 
-            <a class="site-user-signout" href="/auth/xbox/logout/?next={{ request.path|urlencode }}" role="menuitem">
+
+            <a class="site-user-signout" href="{% url 'steam_auth:logout' %}?next={{ request.path|urlencode }}" role="menuitem">
               Sign out
             </a>
           </div>
@@ -231,28 +228,31 @@
         <a href="/build_orders/"{% if active_page == "builds" %} aria-current="page"{% endif %}>Build Orders</a>
         <a href="/lobbies/"{% if active_page == "lobbies" %} aria-current="page"{% endif %}>Lobbies</a>
         <a href="/agora/"{% if active_page == "agora" %} aria-current="page"{% endif %}>Agora</a>
-        <a href="/about/"{% if active_page == "about" %} aria-current="page"{% endif %}>About</a>
-        <a href="/faq/"{% if active_page == "faq" %} aria-current="page"{% endif %}>FAQ</a>
+
+        <div class="site-mobile-menu-section">
+          <span class="site-mobile-menu-heading">Tools</span>
+          <a href="/about/"{% if active_page == "about" %} aria-current="page"{% endif %}>About Prostagma</a>
+          <a href="/faq/"{% if active_page == "faq" %} aria-current="page"{% endif %}>FAQ</a>
+          <span class="site-mobile-menu-disabled">Compendium <small>Coming soon</small></span>
+          <span class="site-mobile-menu-disabled">Combat Simulator <small>Coming soon</small></span>
+          <span class="site-mobile-menu-disabled">Username Styling Tool <small>Coming soon</small></span>
+        </div>
 
         <div class="site-mobile-account-auth">
           {% if request.user.is_authenticated %}
             {% if request.user.steam_profile %}
               <a href="{% url 'steam_auth:profile' %}">Steam Profile</a>
-            {% else %}
-              <a href="{% url 'steam_auth:login' %}?next={{ request.path|urlencode }}">Connect Steam</a>
             {% endif %}
 
             {% if request.user.xbox_profile %}
               <a href="/auth/xbox/profile/">Xbox Profile</a>
-            {% else %}
-              <a href="/auth/xbox/login/?next={{ request.path|urlencode }}">Connect Xbox</a>
             {% endif %}
 
             {% if request.user.is_staff %}
               <a href="/admin/">Django Admin</a>
             {% endif %}
 
-            <a href="/auth/xbox/logout/?next={{ request.path|urlencode }}">Sign out</a>
+            <a href="{% url 'steam_auth:logout' %}?next={{ request.path|urlencode }}">Sign out</a>
           {% else %}
             <a href="{% url 'steam_auth:login' %}?next={{ request.path|urlencode }}">Sign in with Steam</a>
             <a href="/auth/xbox/login/?next={{ request.path|urlencode }}">Sign in with Xbox</a>

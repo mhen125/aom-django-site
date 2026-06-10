@@ -19,7 +19,7 @@
 {% endblock %}
 
 {% block site_header %}
-  {% include "partials/header.html" with active_page="lobbies" show_game_logo=True show_last_updated=True show_refresh_button=True header_subtitle="Live unofficial custom lobby browser with open lobbies, in-progress custom matches, and ranked games." %}
+  {% include "partials/header.html" with active_page="lobbies" show_game_logo=True header_subtitle="Live unofficial custom lobby browser with open lobbies, in-progress custom matches, and ranked games." %}
 {% endblock %}
 
 {% block content %}
@@ -27,19 +27,34 @@
     <header class="lobby-browser-header-panel">
       <div class="lobby-browser-header-stars" aria-hidden="true"></div>
 
-      <nav class="lobby-panel-tabs" aria-label="Lobby browser sections">
-        <button class="tab-button lobby-panel-tab active" type="button" data-tab="custom">
-          Open Lobbies
-        </button>
+      <div class="lobby-panel-tabs-row">
+        <nav class="lobby-panel-tabs" aria-label="Lobby browser sections">
+          <button class="tab-button lobby-panel-tab active" type="button" data-tab="custom">
+            Open Lobbies
+          </button>
 
-        <button class="tab-button lobby-panel-tab" type="button" data-tab="inProgressCustom">
-          Custom
-        </button>
+          <button class="tab-button lobby-panel-tab" type="button" data-tab="inProgressCustom">
+            Custom
+          </button>
 
-        <button class="tab-button lobby-panel-tab" type="button" data-tab="observable">
-          Ranked
-        </button>
-      </nav>
+          <button class="tab-button lobby-panel-tab" type="button" data-tab="observable">
+            Ranked
+          </button>
+        </nav>
+
+        <div class="lobby-panel-tab-actions" aria-label="Lobby refresh status">
+          <div id="lastUpdated" class="page-last-updated lobby-last-updated" aria-live="polite">
+            Last updated: never
+          </div>
+          <button
+            id="refreshButton"
+            class="primary-button lobby-refresh-button"
+            type="button"
+          >
+            Refresh
+          </button>
+        </div>
+      </div>
     </header>
 
     <section id="customTab" class="tab-panel active">

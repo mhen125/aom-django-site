@@ -29,7 +29,7 @@ body.agora-page .site-shell-header,
   max-width: 1680px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: minmax(420px, max-content) minmax(360px, 1fr) auto auto;
+  grid-template-columns: minmax(420px, max-content) minmax(360px, 1fr) auto;
   align-items: center;
   column-gap: clamp(0.9rem, 1.65vw, 1.85rem);
 }
@@ -131,6 +131,7 @@ body.agora-page .site-brand-tagline,
 }
 
 .site-primary-nav a,
+.site-primary-nav button,
 .site-menu-dropdown a {
   font-family: Baskervville, Georgia, serif !important;
   font-weight: 700 !important;
@@ -139,7 +140,8 @@ body.agora-page .site-brand-tagline,
   text-decoration: none !important;
 }
 
-.site-primary-nav a {
+.site-primary-nav a,
+.site-primary-nav button {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -148,12 +150,19 @@ body.agora-page .site-brand-tagline,
   border-radius: 999px !important;
   color: rgba(244, 229, 184, 0.84) !important;
   font-size: clamp(0.62rem, 0.67vw, 0.74rem) !important;
+  border: 0 !important;
+  background: transparent !important;
+  cursor: pointer !important;
   transition: color 160ms ease, background 160ms ease, box-shadow 160ms ease, transform 160ms ease;
 }
 
 .site-primary-nav a:hover,
 .site-primary-nav a:focus-visible,
-.site-primary-nav a[aria-current="page"] {
+.site-primary-nav a[aria-current="page"],
+.site-primary-nav button:hover,
+.site-primary-nav button:focus-visible,
+.site-primary-nav button[aria-current="page"],
+.site-nav-dropdown:hover .site-nav-dropdown-button {
   color: #fff7d8 !important;
   background:
     radial-gradient(circle at 50% 0%, rgba(255, 230, 150, 0.18), transparent 65%),
@@ -169,26 +178,146 @@ body.agora-page .site-primary-nav,
 }
 
 body.agora-page .site-primary-nav a,
-.site-shell-header-agora .site-primary-nav a {
+body.agora-page .site-primary-nav button,
+.site-shell-header-agora .site-primary-nav a,
+.site-shell-header-agora .site-primary-nav button {
   color: rgba(222, 237, 247, 0.86) !important;
 }
 
 body.agora-page .site-primary-nav a:hover,
 body.agora-page .site-primary-nav a:focus-visible,
 body.agora-page .site-primary-nav a[aria-current="page"],
+body.agora-page .site-primary-nav button:hover,
+body.agora-page .site-primary-nav button:focus-visible,
+body.agora-page .site-primary-nav button[aria-current="page"],
+body.agora-page .site-nav-dropdown:hover .site-nav-dropdown-button,
 .site-shell-header-agora .site-primary-nav a:hover,
 .site-shell-header-agora .site-primary-nav a:focus-visible,
-.site-shell-header-agora .site-primary-nav a[aria-current="page"] {
+.site-shell-header-agora .site-primary-nav a[aria-current="page"],
+.site-shell-header-agora .site-primary-nav button:hover,
+.site-shell-header-agora .site-primary-nav button:focus-visible,
+.site-shell-header-agora .site-primary-nav button[aria-current="page"],
+.site-shell-header-agora .site-nav-dropdown:hover .site-nav-dropdown-button {
   color: #f5fbff !important;
   background: rgba(126, 179, 216, 0.18) !important;
   box-shadow: inset 0 0 0 1px rgba(186, 221, 245, 0.3), 0 0 18px rgba(130, 193, 232, 0.12) !important;
 }
 
-.site-header-actions {
+.site-nav-dropdown {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.site-nav-dropdown-button {
+  gap: 0.35rem;
+}
+
+.site-nav-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 0.54rem);
+  right: 0;
+  z-index: 9000;
+  display: grid;
+  gap: 0.2rem;
+  min-width: 17.5rem;
+  padding: 0.58rem;
+  border: 1px solid rgba(207, 170, 82, 0.38);
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 16% 0%, rgba(231, 193, 99, 0.13), transparent 42%),
+    linear-gradient(180deg, rgba(12, 16, 25, 0.98), rgba(6, 9, 15, 0.98));
+  box-shadow:
+    0 22px 54px rgba(0, 0, 0, 0.44),
+    inset 0 0 0 1px rgba(255, 235, 176, 0.04);
+  opacity: 0;
+  transform: translateY(-6px) scale(0.985);
+  pointer-events: none;
+  transition: opacity 150ms ease, transform 150ms ease;
+}
+
+.site-nav-dropdown:hover .site-nav-dropdown-menu,
+.site-nav-dropdown:focus-within .site-nav-dropdown-menu {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.site-nav-dropdown-menu::before {
+  content: "";
+  position: absolute;
+  inset: -0.62rem 0 auto;
+  height: 0.7rem;
+}
+
+.site-nav-dropdown-menu a,
+.site-nav-dropdown-disabled {
   display: flex !important;
   align-items: center !important;
-  justify-content: flex-end !important;
-  gap: 0.55rem !important;
+  justify-content: space-between !important;
+  gap: 0.75rem !important;
+  min-height: 2.25rem !important;
+  padding: 0.45rem 0.62rem !important;
+  border-radius: 10px !important;
+  color: rgba(244, 229, 184, 0.9) !important;
+  font-family: Baskervville, Georgia, serif !important;
+  font-size: 0.72rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.09em !important;
+  line-height: 1.15 !important;
+  text-transform: uppercase !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+  transition: color 150ms ease, background 150ms ease, transform 150ms ease;
+}
+
+.site-nav-dropdown-menu a:hover,
+.site-nav-dropdown-menu a:focus-visible,
+.site-nav-dropdown-menu a[aria-current="page"] {
+  color: #fff8d8 !important;
+  background: rgba(198, 156, 70, 0.16) !important;
+  transform: translateX(2px);
+}
+
+.site-nav-dropdown-disabled {
+  color: rgba(224, 207, 158, 0.48) !important;
+  cursor: default !important;
+}
+
+.site-nav-dropdown-disabled small,
+.site-mobile-menu-disabled small {
+  color: rgba(224, 207, 158, 0.52);
+  font-size: 0.56rem;
+  letter-spacing: 0.12em;
+}
+
+body.agora-page .site-nav-dropdown-menu,
+.site-shell-header-agora .site-nav-dropdown-menu {
+  border-color: rgba(170, 205, 229, 0.34);
+  background:
+    radial-gradient(circle at 18% 0%, rgba(146, 194, 231, 0.16), transparent 40%),
+    linear-gradient(180deg, rgba(24, 42, 58, 0.98), rgba(14, 27, 39, 0.98));
+}
+
+body.agora-page .site-nav-dropdown-menu a,
+body.agora-page .site-nav-dropdown-disabled,
+.site-shell-header-agora .site-nav-dropdown-menu a,
+.site-shell-header-agora .site-nav-dropdown-disabled {
+  color: rgba(222, 237, 247, 0.88) !important;
+}
+
+body.agora-page .site-nav-dropdown-menu a:hover,
+body.agora-page .site-nav-dropdown-menu a:focus-visible,
+body.agora-page .site-nav-dropdown-menu a[aria-current="page"],
+.site-shell-header-agora .site-nav-dropdown-menu a:hover,
+.site-shell-header-agora .site-nav-dropdown-menu a:focus-visible,
+.site-shell-header-agora .site-nav-dropdown-menu a[aria-current="page"] {
+  background: rgba(126, 179, 216, 0.18) !important;
+}
+
+
+.site-header-actions {
+  display: none !important;
 }
 
 .site-last-updated {
@@ -291,7 +420,9 @@ body.agora-page .site-section-heading p,
   gap: 0.25rem;
 }
 
-.site-menu-dropdown a {
+.site-menu-dropdown a,
+.site-mobile-menu-heading,
+.site-mobile-menu-disabled {
   display: block;
   padding: 0.74rem 0.85rem;
   border-radius: 7px;
@@ -306,6 +437,41 @@ body.agora-page .site-section-heading p,
   background: rgba(198, 156, 70, 0.18);
 }
 
+.site-mobile-menu-section {
+  display: grid;
+  gap: 0.2rem;
+  padding-top: 0.35rem;
+  margin-top: 0.25rem;
+  border-top: 1px solid rgba(210, 180, 98, 0.18);
+}
+
+.site-mobile-menu-heading {
+  padding: 0.48rem 0.85rem 0.22rem;
+  color: rgba(224, 207, 158, 0.66);
+  font-family: Baskervville, Georgia, serif;
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.site-mobile-menu-disabled {
+  padding: 0.62rem 0.85rem;
+  border-radius: 7px;
+  color: rgba(244, 229, 184, 0.48);
+  font-family: Baskervville, Georgia, serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.site-mobile-menu-disabled small {
+  display: block;
+  margin-top: 0.16rem;
+}
+
+
 .site-footer {
   min-height: 2.25rem;
   padding: 1.25rem clamp(1rem, 3vw, 2.5rem);
@@ -318,7 +484,7 @@ body.agora-page .site-section-heading p,
 
 @media (max-width: 1420px) {
   .site-header-inner {
-    grid-template-columns: minmax(340px, max-content) minmax(330px, 1fr) auto auto;
+    grid-template-columns: minmax(340px, max-content) minmax(330px, 1fr) auto;
     column-gap: 0.75rem;
   }
 
@@ -342,8 +508,7 @@ body.agora-page .site-section-heading p,
     grid-template-columns: minmax(0, 1fr) auto;
   }
 
-  .site-primary-nav,
-  .site-header-actions {
+  .site-primary-nav {
     display: none !important;
   }
 

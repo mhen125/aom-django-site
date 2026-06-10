@@ -17,7 +17,7 @@
 {% endblock %}
 
 {% block site_header %}
-  {% include "partials/header.html" with active_page="home" show_game_logo=True show_last_updated=True header_subtitle="Unofficial live activity dashboard for custom matches, ranked queues, open lobbies, and active AoM Retold games." %}
+  {% include "partials/header.html" with active_page="home" show_game_logo=True header_subtitle="Unofficial live activity dashboard for custom matches, ranked queues, open lobbies, and active AoM Retold games." %}
 {% endblock %}
 
 {% block content %}
@@ -37,6 +37,9 @@
       <div class="live-atlas-heading live-atlas-heading-row">
         <div>
           <h1>Global Activity</h1>
+          <div id="lastUpdated" class="page-last-updated live-last-updated" aria-live="polite">
+            Last updated: never
+          </div>
         </div>
 
         <a class="live-ornate-button" href="/lobbies/">View Lobbies</a>
