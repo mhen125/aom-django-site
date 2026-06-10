@@ -8,6 +8,8 @@ app_name = "builds"
 urlpatterns = [
     path("api/builds/save/", views.api_save_build, name="api_save_build"),
     path("api/builds/delete/", views.api_delete_build, name="api_delete_build"),
+    path("data/home.json", views.home_data_json, name="home_data_json"),
+    path("data/gods/<slug:god_slug>.json", views.god_data_json, name="god_data_json"),
     path("data.json", views.data_js, name="data_json"),
     path("", views.home, name="home"),
 

@@ -103,20 +103,53 @@
 
 {% block scripts %}
   <script>
-    fetch("{% url 'builds:data_json' %}")
+    function hasGodData(data) {
+      return Boolean(
+        data &&
+        Array.isArray(data.pantheons) &&
+        data.pantheons.some((pantheon) => {
+          return Array.isArray(pantheon.gods) && pantheon.gods.length > 0;
+        })
+      );
+    }
+
+    function loadGodDetailScript() {
+      const script = document.createElement("script");
+      script.src = "{% static 'js/god_detail.js' %}";
+      document.body.appendChild(script);
+    }
+
+    fetch("{% url 'builds:god_data_json' god_slug %}")
       .then((response) => {
         if (!response.ok) {
-          throw new Error(`Could not load data.json: ${response.status}`);
+          throw new Error(`Could not load god data: ${response.status}`);
         }
 
         return response.json();
       })
       .then((data) => {
-        window.AOM_DATA = data;
+        if (hasGodData(data)) {
+          window.AOM_DATA = data;
+          loadGodDetailScript();
+          return null;
+        }
 
-        const script = document.createElement("script");
-        script.src = "{% static 'js/god_detail.js' %}";
-        document.body.appendChild(script);
+        console.warn(
+          "Django god build-order data returned no god. Falling back to full data.json."
+        );
+
+        return fetch("{% url 'builds:data_json' %}")
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`Could not load data.json: ${response.status}`);
+            }
+
+            return response.json();
+          })
+          .then((fallbackData) => {
+            window.AOM_DATA = fallbackData;
+            loadGodDetailScript();
+          });
       })
       .catch((error) => {
         console.error("Failed to load AOM data.", error);

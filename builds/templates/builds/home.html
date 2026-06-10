@@ -90,10 +90,10 @@
       );
     }
 
-    fetch("{% url 'builds:data_json' %}")
+    fetch("{% url 'builds:home_data_json' %}")
       .then((response) => {
         if (!response.ok) {
-          throw new Error(`Could not load data.json: ${response.status}`);
+          throw new Error(`Could not load home.json: ${response.status}`);
         }
 
         return response.json();
@@ -105,10 +105,29 @@
         }
 
         console.warn(
-          "Django build-order data returned no pantheons. Falling back to static js/data.js."
+          "Django build-order home data returned no pantheons. Falling back to full data.json."
         );
 
-        return loadScript("{% static 'js/data.js' %}");
+        return fetch("{% url 'builds:data_json' %}")
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`Could not load data.json: ${response.status}`);
+            }
+
+            return response.json();
+          })
+          .then((fallbackData) => {
+            if (hasPantheonData(fallbackData)) {
+              window.AOM_DATA = fallbackData;
+              return null;
+            }
+
+            console.warn(
+              "Django full build-order data returned no pantheons. Falling back to static js/data.js."
+            );
+
+            return loadScript("{% static 'js/data.js' %}");
+          });
       })
       .then(() => {
         return loadScript("{% static 'js/home.js' %}");

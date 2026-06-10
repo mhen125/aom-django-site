@@ -961,6 +961,260 @@ def merge_fallback_build_data(pantheons_payload, build_orders_payload):
     return pantheons_payload, build_orders_payload
 
 
+def merge_fallback_pantheon_data(pantheons_payload):
+    fallback_pantheons = FALLBACK_AOM_DATA.get("pantheons") or []
+
+    if not pantheons_payload:
+        fallback_payload = []
+
+        for pantheon in fallback_pantheons:
+            pantheon_slug = pantheon.get("id") or pantheon.get("slug") or ""
+            gods = [
+                normalize_fallback_god(god, god.get("id") or god.get("slug") or "")
+                for god in pantheon.get("gods") or []
+            ]
+            fallback_payload.append(normalize_fallback_pantheon(pantheon, pantheon_slug, gods))
+
+        return fallback_payload
+
+    pantheon_lookup = {pantheon.get("id") or pantheon.get("slug"): pantheon for pantheon in pantheons_payload}
+
+    for fallback_pantheon in fallback_pantheons:
+        pantheon_slug = fallback_pantheon.get("id") or fallback_pantheon.get("slug") or ""
+        existing_pantheon = pantheon_lookup.get(pantheon_slug)
+
+        if not existing_pantheon:
+            gods = [
+                normalize_fallback_god(god, god.get("id") or god.get("slug") or "")
+                for god in fallback_pantheon.get("gods") or []
+            ]
+            pantheons_payload.append(normalize_fallback_pantheon(fallback_pantheon, pantheon_slug, gods))
+            continue
+
+        existing_gods = existing_pantheon.setdefault("gods", [])
+        existing_god_slugs = {god.get("id") or god.get("slug") for god in existing_gods}
+
+        for fallback_god in fallback_pantheon.get("gods") or []:
+            god_slug = fallback_god.get("id") or fallback_god.get("slug") or ""
+
+            if god_slug not in existing_god_slugs:
+                existing_gods.append(normalize_fallback_god(fallback_god, god_slug))
+
+    for pantheon in pantheons_payload:
+        for god in pantheon.get("gods") or []:
+            god_slug = god.get("id") or god.get("slug") or ""
+            god["details"] = merged_details_for_god(god_slug, god.get("details"), god.get("title") or god.get("name") or "")
+
+    return pantheons_payload
+
+
+def god_payload(god):
+    return {
+        "id": god.slug,
+        "slug": god.slug,
+        "name": god.name,
+        "subtitle": god.subtitle,
+        "portrait": static_asset_url(god.portrait),
+        "breakoutPortrait": static_asset_url(god.breakout_portrait),
+        "hudRing": static_asset_url(god.hud_ring),
+        "details": merged_details_for_god(
+            god.slug,
+            {
+                "title": god.title,
+                "focus": god.focus,
+                "bonuses": god.bonuses or [],
+            },
+            god.title,
+        ),
+    }
+
+
+def build_summary_payload(build, god):
+    return {
+        "id": build.slug,
+        "slug": build.slug,
+        "title": build.title,
+        "subtitle": build.subtitle,
+        "detailSubtitle": build.subtitle,
+        "summary": build.summary,
+        "meta": build.meta,
+        "goalLabel": build.goal_label,
+        "goalText": build.goal_text,
+        "goalIcon": static_asset_url(build.goal_icon),
+        "portrait": static_asset_url(build.portrait),
+        "sourceGodId": god.slug,
+        "sourcePantheonId": god.pantheon.slug,
+    }
+
+
+def build_full_payload(build, god):
+    payload = build_summary_payload(build, god)
+    payload["steps"] = [
+        {
+            "type": step.type,
+            "label": step.label,
+            "time": step.time,
+            "food": step.food,
+            "wood": step.wood,
+            "gold": step.gold,
+            "favor": step.favor,
+            "pop": step.pop,
+            "action": step.action,
+            "note": step.note,
+            "split": {
+                "food": step.split_food,
+                "wood": step.split_wood,
+                "gold": step.split_gold,
+                "favor": step.split_favor,
+                "pop": step.split_pop,
+            },
+        }
+        for step in build.steps.all()
+    ]
+    return payload
+
+
+def pantheon_payload(pantheon, gods_payload):
+    return {
+        "id": pantheon.slug,
+        "slug": pantheon.slug,
+        "name": pantheon.name,
+        "description": pantheon.description,
+        "icon": static_asset_url(pantheon.icon),
+        "background": static_asset_url(pantheon.background),
+        "gods": gods_payload,
+    }
+
+
+def ordered_pantheon_queryset(prefetch=None):
+    pantheon_order_lookup = {
+        slug: index
+        for index, slug in enumerate(PANTHEON_ORDER)
+    }
+    queryset = Pantheon.objects.all()
+
+    if prefetch is not None:
+        queryset = queryset.prefetch_related(prefetch)
+
+    return sorted(
+        queryset,
+        key=lambda pantheon: pantheon_order_lookup.get(pantheon.slug, 999),
+    )
+
+
+def ordered_gods_for_pantheon(pantheon):
+    god_order_lookup = {
+        slug: index
+        for index, slug in enumerate(GOD_ORDER.get(pantheon.slug, []))
+    }
+
+    return sorted(
+        getattr(pantheon, "prefetched_major_gods", []),
+        key=lambda god: god_order_lookup.get(god.slug, 999),
+    )
+
+
+def fallback_god_with_pantheon(god_slug):
+    for pantheon in FALLBACK_AOM_DATA.get("pantheons") or []:
+        pantheon_slug = pantheon.get("id") or pantheon.get("slug") or ""
+
+        for god in pantheon.get("gods") or []:
+            if (god.get("id") or god.get("slug")) == god_slug:
+                return pantheon, pantheon_slug, god
+
+    return None, "", None
+
+
+def fallback_build_summaries(god_slug, pantheon_slug):
+    return [
+        {
+            key: value
+            for key, value in normalize_fallback_build(build, god_slug, pantheon_slug).items()
+            if key != "steps"
+        }
+        for build in (FALLBACK_AOM_DATA.get("buildOrders") or {}).get(god_slug, [])
+    ]
+
+
+def home_data_json(request):
+    major_gods = Prefetch(
+        "major_gods",
+        queryset=MajorGod.objects.all(),
+        to_attr="prefetched_major_gods",
+    )
+
+    pantheons_payload = []
+
+    for pantheon in ordered_pantheon_queryset(major_gods):
+        gods_payload = [
+            god_payload(god)
+            for god in ordered_gods_for_pantheon(pantheon)
+        ]
+        pantheons_payload.append(pantheon_payload(pantheon, gods_payload))
+
+    pantheons_payload = merge_fallback_pantheon_data(pantheons_payload)
+
+    return JsonResponse({"pantheons": pantheons_payload})
+
+
+def god_data_json(request, god_slug):
+    resolved_god_slug = normalize_slug(god_slug)
+    published_builds = Prefetch(
+        "build_orders",
+        queryset=(
+            BuildOrder.objects
+            .filter(is_published=True)
+            .order_by("title")
+        ),
+        to_attr="published_build_orders",
+    )
+
+    god = (
+        MajorGod.objects
+        .select_related("pantheon")
+        .prefetch_related(published_builds)
+        .filter(slug=resolved_god_slug)
+        .first()
+    )
+
+    if god:
+        builds_payload = [
+            build_summary_payload(build, god)
+            for build in getattr(god, "published_build_orders", [])
+        ]
+
+        if not builds_payload:
+            builds_payload = fallback_build_summaries(god.slug, god.pantheon.slug)
+
+        return JsonResponse(
+            {
+                "pantheons": [pantheon_payload(god.pantheon, [god_payload(god)])],
+                "buildOrders": {god.slug: builds_payload},
+            }
+        )
+
+    fallback_pantheon, pantheon_slug, fallback_god = fallback_god_with_pantheon(resolved_god_slug)
+
+    if not fallback_god:
+        return JsonResponse({"pantheons": [], "buildOrders": {resolved_god_slug: []}})
+
+    normalized_god = normalize_fallback_god(fallback_god, resolved_god_slug)
+    normalized_pantheon = normalize_fallback_pantheon(
+        fallback_pantheon or {},
+        pantheon_slug,
+        [normalized_god],
+    )
+
+    return JsonResponse(
+        {
+            "pantheons": [normalized_pantheon],
+            "buildOrders": {
+                resolved_god_slug: fallback_build_summaries(resolved_god_slug, pantheon_slug),
+            },
+        }
+    )
+
+
 def data_js(request):
     pantheons_payload = []
     build_orders_payload = {}
@@ -1009,79 +1263,14 @@ def data_js(request):
         )
 
         for god in god_queryset:
-            gods_payload.append(
-                {
-                    "id": god.slug,
-                    "slug": god.slug,
-                    "name": god.name,
-                    "subtitle": god.subtitle,
-                    "portrait": static_asset_url(god.portrait),
-                    "breakoutPortrait": static_asset_url(god.breakout_portrait),
-                    "hudRing": static_asset_url(god.hud_ring),
-                    "details": merged_details_for_god(
-                        god.slug,
-                        {
-                            "title": god.title,
-                            "focus": god.focus,
-                            "bonuses": god.bonuses or [],
-                        },
-                        god.title,
-                    ),
-                }
-            )
+            gods_payload.append(god_payload(god))
 
             build_orders_payload[god.slug] = [
-                {
-                    "id": build.slug,
-                    "slug": build.slug,
-                    "title": build.title,
-                    "subtitle": build.subtitle,
-                    "detailSubtitle": build.subtitle,
-                    "summary": build.summary,
-                    "meta": build.meta,
-                    "goalLabel": build.goal_label,
-                    "goalText": build.goal_text,
-                    "goalIcon": static_asset_url(build.goal_icon),
-                    "portrait": static_asset_url(build.portrait),
-                    "sourceGodId": god.slug,
-                    "sourcePantheonId": pantheon.slug,
-                    "steps": [
-                        {
-                            "type": step.type,
-                            "label": step.label,
-                            "time": step.time,
-                            "food": step.food,
-                            "wood": step.wood,
-                            "gold": step.gold,
-                            "favor": step.favor,
-                            "pop": step.pop,
-                            "action": step.action,
-                            "note": step.note,
-                            "split": {
-                                "food": step.split_food,
-                                "wood": step.split_wood,
-                                "gold": step.split_gold,
-                                "favor": step.split_favor,
-                                "pop": step.split_pop,
-                            },
-                        }
-                        for step in build.steps.all()
-                    ],
-                }
+                build_full_payload(build, god)
                 for build in getattr(god, "published_build_orders", [])
             ]
 
-        pantheons_payload.append(
-            {
-                "id": pantheon.slug,
-                "slug": pantheon.slug,
-                "name": pantheon.name,
-                "description": pantheon.description,
-                "icon": static_asset_url(pantheon.icon),
-                "background": static_asset_url(pantheon.background),
-                "gods": gods_payload,
-            }
-        )
+        pantheons_payload.append(pantheon_payload(pantheon, gods_payload))
 
     pantheons_payload, build_orders_payload = merge_fallback_build_data(
         pantheons_payload,
