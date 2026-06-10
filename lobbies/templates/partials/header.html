@@ -165,12 +165,18 @@
               href="{% url 'steam_auth:login' %}?next={{ request.path|urlencode }}"
               role="menuitem"
             >
-              <img
-                class="site-platform-login-icon"
-                src="{% static 'assets/images/auth/steam_icon.png' %}"
-                alt=""
-                loading="eager"
-              />
+              <picture>
+                <source
+                  srcset="{% static 'assets/optimized/images/auth/steam_icon.webp' %}"
+                  type="image/webp"
+                >
+                <img
+                  class="site-platform-login-icon"
+                  src="{% static 'assets/images/auth/steam_icon.png' %}"
+                  alt=""
+                  loading="eager"
+                />
+              </picture>
               <span>Sign in with Steam</span>
             </a>
 
@@ -179,12 +185,18 @@
               href="/auth/xbox/login/?next={{ request.path|urlencode }}"
               role="menuitem"
             >
-              <img
-                class="site-platform-login-icon"
-                src="{% static 'assets/images/auth/xbox_icon.png' %}"
-                alt=""
-                loading="eager"
-              />
+              <picture>
+                <source
+                  srcset="{% static 'assets/optimized/images/auth/xbox_icon.webp' %}"
+                  type="image/webp"
+                >
+                <img
+                  class="site-platform-login-icon"
+                  src="{% static 'assets/images/auth/xbox_icon.png' %}"
+                  alt=""
+                  loading="eager"
+                />
+              </picture>
               <span>Sign in with Xbox</span>
             </a>
           </div>

@@ -1738,6 +1738,7 @@ function getMapIconFilename(mapName) {
     scenarios: "all_maps",
     custom_scenario: "all_maps",
     custom_scenarios: "all_maps",
+    tenochtitlans_heart: "all_maps",
 
     standard: "MapThumb_Standard",
     standardmap: "MapThumb_Standard",
@@ -2014,19 +2015,27 @@ function getGodIconFilenameCandidates(godName) {
 
   const aliases = {
     random: [
-      "random_icon_round",
       "Gods_List_Random_Icon",
       "Icon_Godicon_Random",
+      "random_icon_round",
       "RandomIcon",
       "GodiconRandom",
     ],
     random_god: [
-      "random_icon_round",
       "Gods_List_Random_Icon",
       "Icon_Godicon_Random",
+      "random_icon_round",
       "RandomIcon",
       "GodiconRandom",
     ],
+    random_custom_pool: [
+      "Gods_List_Random_Icon",
+      "Icon_Godicon_Random",
+      "random_icon_round",
+      "RandomIcon",
+      "GodiconRandom",
+    ],
+    n_wa: ["nuwa_icon_round", "nuwa_icon", "NuwaIcon", "GodiconNuwa"],
   };
 
   if (aliases[normalized]) {
@@ -4452,9 +4461,10 @@ function applyTopLogo() {
   target.innerHTML = `
     <img
       class="top-logo-image"
-      src="${STATIC_URL}assets/images/Top_Logo.png"
+      src="${STATIC_URL}assets/optimized/images/Top_Logo.webp"
       alt="Age of Mythology Retold"
       loading="eager"
+      onerror="this.onerror=null;this.src='${STATIC_URL}assets/images/Top_Logo.png';"
     />
   `;
 }

@@ -147,6 +147,25 @@ function imageSetValue(fallbackPath, optimizedPath) {
   return `image-set(url("${optimizedPath}") type("image/webp"), url("${fallback}") type("image/png"))`;
 }
 
+function pictureMarkup({ imagePath, optimizedPath, className, altText }) {
+  const fallback = normalizeStaticAssetPath(imagePath);
+
+  if (!fallback) {
+    return "";
+  }
+
+  if (!optimizedPath) {
+    return `<img class="${className}" src="${escapeHtml(fallback)}" alt="${escapeHtml(altText)}">`;
+  }
+
+  return `
+    <picture>
+      <source srcset="${escapeHtml(optimizedPath)}" type="image/webp">
+      <img class="${className}" src="${escapeHtml(fallback)}" alt="${escapeHtml(altText)}">
+    </picture>
+  `;
+}
+
 function godCardPortraitPath(godId) {
   return staticPath(`assets/images/gods/${godId}_portrait.png`);
 }
@@ -216,7 +235,12 @@ function createPantheonCard(pantheon, index) {
     <div class="carousel-pantheon-visual">
       ${
         iconPath
-          ? `<img class="carousel-pantheon-img" src="${escapeHtml(iconPath)}" alt="${escapeHtml(pantheonName)} icon">`
+          ? pictureMarkup({
+              imagePath: iconPath,
+              optimizedPath: optimizedAssetPath(iconPath, ".emblem"),
+              className: "carousel-pantheon-img",
+              altText: `${pantheonName} icon`,
+            })
           : `<div class="carousel-pantheon-img carousel-pantheon-img-fallback" aria-hidden="true"></div>`
       }
     </div>
