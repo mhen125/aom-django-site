@@ -548,89 +548,6 @@ button {
   transform: translateY(-7px) scale(1.035);
 }
 
-.pantheon-icon-shell {
-  position: absolute;
-  left: 50%;
-  top: 0;
-  z-index: 1;
-  width: 230px;
-  height: 320px;
-  transform: translateX(-50%);
-  border-radius: 50% / 44%;
-  overflow: hidden;
-  filter:
-    drop-shadow(0 8px 16px rgba(0, 0, 0, 0.26))
-    drop-shadow(0 0 14px rgba(255, 216, 145, 0.07));
-}
-
-.pantheon-icon-shell::before {
-  content: "";
-  position: absolute;
-  inset: 12px;
-  z-index: 2;
-  border-radius: 50% / 44%;
-  background:
-    radial-gradient(circle at 50% 18%, rgba(255, 230, 170, 0.14), transparent 34%),
-    linear-gradient(180deg, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.48));
-  pointer-events: none;
-}
-
-.pantheon-icon-shell::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  border-radius: 50% / 44%;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 50% 16%, rgba(255, 235, 181, 0.22), transparent 25%),
-    radial-gradient(circle at 50% 55%, transparent 64%, rgba(0, 0, 0, 0.12) 78%, rgba(0, 0, 0, 0.42) 100%);
-}
-
-.pantheon-art {
-  position: absolute;
-  inset: 12px;
-  z-index: 1;
-  border-radius: 50% / 44%;
-  background-position: center;
-  background-size: cover;
-  transform: scale(1.03);
-  transition:
-    transform var(--transition-slow),
-    filter var(--transition-med);
-}
-
-.pantheon-card:hover .pantheon-art {
-  transform: scale(1.1);
-  filter: saturate(1.12) contrast(1.04);
-}
-
-.pantheon-frame {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  border-radius: 50% / 44%;
-  background-image: image-set(
-    url("../assets/optimized/images/misc/Party_God_Icon_Frame_Temp.webp") type("image/webp"),
-    url("../assets/images/misc/Party_God_Icon_Frame_Temp.png") type("image/png")
-  );
-  background-size: 100% 100%;
-  background-position: center;
-  background-repeat: no-repeat;
-  pointer-events: none;
-}
-
-.pantheon-nameplate {
-  bottom: 0;
-  width: 310px;
-  min-height: 58px;
-}
-
-.pantheon-nameplate span {
-  font-size: 1.18rem;
-  letter-spacing: 0.14em;
-}
-
 /* ===============================
    Major God Cards
    =============================== */
@@ -927,20 +844,6 @@ button {
     height: 330px;
   }
 
-  .pantheon-icon-shell {
-    width: 205px;
-    height: 285px;
-  }
-
-  .pantheon-nameplate {
-    width: 270px;
-    min-height: 52px;
-  }
-
-  .pantheon-nameplate span {
-    font-size: 1rem;
-  }
-
   .god-card {
     width: 235px;
     height: 315px;
@@ -972,13 +875,6 @@ button {
   }
 }
 
-
-.pantheon-art-fallback {
-  background:
-    radial-gradient(circle at 50% 20%, rgba(255, 225, 160, 0.24), transparent 36%),
-    linear-gradient(135deg, rgba(255, 225, 160, 0.12), rgba(120, 169, 255, 0.08)),
-    rgba(0, 0, 0, 0.28);
-}
 
 /* ===============================
    Pantheon Infinite Carousel
@@ -1491,10 +1387,6 @@ body.using-carousel .god-grid.god-grid-mounted .god-card:hover {
   transform: translateY(-1px);
 }
 
-.build-context-links {
-  margin-top: clamp(1.5rem, 2.5vw, 2.2rem);
-}
-
 @media (max-width: 760px) {
   .build-site-link-strip {
     border-radius: 20px;
@@ -1503,56 +1395,4 @@ body.using-carousel .god-grid.god-grid-mounted .god-card:hover {
   .build-site-link-strip a {
     width: 100%;
   }
-}
-
-/* ===============================
-   Major God Details Panel
-   =============================== */
-.god-details-panel {
-  max-width: 680px;
-  margin: 1rem 0 1.25rem;
-  padding: 1rem 1.15rem 1.05rem;
-  border: 1px solid rgba(215, 178, 104, 0.26);
-  border-radius: 16px;
-  background:
-    linear-gradient(180deg, rgba(255, 225, 160, 0.075), rgba(0, 0, 0, 0.12)),
-    rgba(5, 8, 15, 0.54);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 14px 34px rgba(0, 0, 0, 0.24);
-  backdrop-filter: blur(10px);
-}
-
-.god-details-focus {
-  display: grid;
-  gap: 0.2rem;
-  color: rgba(245, 234, 215, 0.9);
-  line-height: 1.45;
-}
-
-.god-details-focus span {
-  color: var(--gold-bright);
-  font-size: 0.78rem;
-  font-weight: 900;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
-.god-details-focus strong {
-  color: #fff2c5;
-  font-size: clamp(1rem, 1.2vw, 1.15rem);
-  font-weight: 800;
-}
-
-.god-details-list {
-  display: grid;
-  gap: 0.45rem;
-  margin: 0.85rem 0 0;
-  padding-left: 1.25rem;
-  color: rgba(245, 234, 215, 0.84);
-  line-height: 1.48;
-}
-
-.god-details-list li::marker {
-  color: var(--gold-bright);
 }

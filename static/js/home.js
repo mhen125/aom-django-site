@@ -147,25 +147,6 @@ function imageSetValue(fallbackPath, optimizedPath) {
   return `image-set(url("${optimizedPath}") type("image/webp"), url("${fallback}") type("image/png"))`;
 }
 
-function pictureMarkup({ imagePath, optimizedPath, className, altText }) {
-  const fallback = normalizeStaticAssetPath(imagePath);
-
-  if (!fallback) {
-    return "";
-  }
-
-  if (!optimizedPath) {
-    return `<img class="${className}" src="${escapeHtml(fallback)}" alt="${escapeHtml(altText)}" loading="lazy" decoding="async">`;
-  }
-
-  return `
-    <picture>
-      <source srcset="${escapeHtml(optimizedPath)}" type="image/webp">
-      <img class="${className}" src="${escapeHtml(fallback)}" alt="${escapeHtml(altText)}" loading="lazy" decoding="async">
-    </picture>
-  `;
-}
-
 function lazyPictureMarkup({ imagePath, optimizedPath, className, altText }) {
   const fallback = normalizeStaticAssetPath(imagePath);
 
@@ -218,25 +199,9 @@ function godCardPortraitPath(god) {
   return staticPath(`assets/images/gods/${godId}_portrait.png`);
 }
 
-function godHeroPortraitPath(god) {
-  const dataPath = normalizeStaticAssetPath(god?.breakoutPortrait || god?.breakout_portrait || god?.portrait || "");
-
-  if (dataPath) {
-    return dataPath;
-  }
-
-  const godId = getGodId(god);
-  return staticPath(`assets/images/gods/${godId}_breakoutportrait.png`);
-}
-
 function godCardBackgroundValue(god) {
   const sourcePath = godCardPortraitPath(god);
   return imageSetValue(sourcePath, optimizedAssetPath(sourcePath, ".card"));
-}
-
-function godHeroBackgroundValue(god) {
-  const sourcePath = godHeroPortraitPath(god);
-  return imageSetValue(sourcePath, optimizedAssetPath(sourcePath, ".hero"));
 }
 
 function themedBackgroundValue(path) {
@@ -331,7 +296,6 @@ function createGodCard(god, index) {
   card.type = "button";
   card.style.animationDelay = `${index * 75}ms`;
   card.dataset.godId = godId;
-  card.dataset.heroImage = godHeroPortraitPath(god);
   card.setAttribute("aria-label", `View build orders for ${godName}`);
 
   card.innerHTML = `
