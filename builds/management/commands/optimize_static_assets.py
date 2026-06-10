@@ -94,6 +94,13 @@ class Command(BaseCommand):
             "quality": 82,
         },
         {
+            "label": "info footer decorations",
+            "glob": "assets/images/easter_eggs/master_shake*.png",
+            "suffix": ".webp",
+            "max_size": (420, 420),
+            "quality": 82,
+        },
+        {
             "label": "map thumbnails",
             "glob": "map-icons/*.png",
             "suffix": ".webp",
