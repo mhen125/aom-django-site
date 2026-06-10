@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Xbox Sign-in Failed | Prostagma?{% endblock %}
+{% block body_class %}xbox-auth-page{% endblock %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'css/lobbies.css' %}">
+  <link rel="stylesheet" href="{% static 'css/site_auth.css' %}">
+{% endblock %}
+
+{% block content %}
+  <main class="account-auth-shell">
+    <section class="account-auth-card">
+      <p class="account-auth-kicker">Xbox Account</p>
+      <h1>Sign-in Failed</h1>
+      <p>{{ message|default:"Microsoft/Xbox sign-in could not be completed." }}</p>
+      <a class="account-auth-link" href="/">Return Home</a>
+    </section>
+  </main>
+{% endblock %}

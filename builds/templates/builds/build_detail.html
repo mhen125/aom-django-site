@@ -1,0 +1,276 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+  {{ build_title }} | Prostagma?
+{% endblock %}
+
+{% block body_class %}build-detail-page{% endblock %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'css/lobbies.css' %}">
+  <link rel="stylesheet" href="{% static 'css/build_detail.css' %}">
+{% endblock %}
+
+{% block extra_head %}
+  <script>
+    window.AOM_STATIC_URL = "{% static '' %}";
+    window.AOM_GOD_DETAIL_BASE_URL = "/gods/";
+    window.AOM_BUILD_DETAIL_BASE_URL = "/builds/";
+    window.AOM_EDITOR_BASE_URL = "/editor/";
+  </script>
+{% endblock %}
+{% block header %}
+  {% include "partials/header.html" with active_page="builds" show_game_logo=True header_subtitle="Detailed opening order, timings, and villager assignments." %}
+{% endblock %}
+
+{% block content %}
+  <main class="page">
+    <section class="build-card">
+      <header class="build-header">
+        <div class="build-title-side">
+          <a id="godOverviewLink" class="kicker kicker-link" href="{{ god_overview_url }}">
+            {% if build_order %}
+              {{ build_order.major_god.name }}
+            {% else %}
+              Major God
+            {% endif %}
+          </a>
+
+          <h1 id="buildTitle">{{ build_title }}</h1>
+
+          <p id="buildSubtitle">
+            {% if build_order.subtitle %}
+              {{ build_order.subtitle }}
+            {% elif build_order.summary %}
+              {{ build_order.summary }}
+            {% else %}
+              Timings, villager assignments, and notes for this opening.
+            {% endif %}
+          </p>
+        </div>
+
+        <div class="build-portrait-side">
+          <div class="detail-god-crest" aria-hidden="true">
+            <div
+              id="detailGodRing"
+              class="detail-god-ring"
+              style="background-image: url('{{ god_hud_ring_url }}');"
+            ></div>
+
+            {% if build_portrait_url %}
+              <img
+                id="buildPortrait"
+                class="detail-god-icon"
+                src="{{ build_portrait_url }}"
+                alt=""
+              >
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="build-goal-side">
+          <div class="goal-card">
+            <div class="goal-icon-stack">
+              <span id="goalLabel">
+                {% if build_order.goal_label %}
+                  {{ build_order.goal_label }}
+                {% else %}
+                  Goal
+                {% endif %}
+              </span>
+
+              <img id="goalIcon" src="{{ goal_icon_url }}" alt="Goal icon">
+            </div>
+
+            <strong id="goalText">
+              {% if build_order.goal_text %}
+                {{ build_order.goal_text }}
+              {% elif build_order.meta %}
+                {{ build_order.meta }}
+              {% else %}
+                Build Order
+              {% endif %}
+            </strong>
+          </div>
+        </div>
+      </header>
+
+      <section class="build-toolbar">
+        <div class="build-picker-wrap">
+          <label for="buildPickerSelect">Switch Build</label>
+          <select id="buildPickerSelect" class="build-picker">
+            {% if sibling_builds %}
+              {% for sibling_build in sibling_builds %}
+                <option
+                  value="/builds/{{ sibling_build.slug }}/?god={{ sibling_build.major_god.slug }}"
+                  {% if build_order and sibling_build.pk == build_order.pk %}selected{% endif %}
+                >
+                  {{ sibling_build.title }}
+                </option>
+              {% endfor %}
+            {% else %}
+              <option value="">No other builds available</option>
+            {% endif %}
+          </select>
+        </div>
+
+        <div class="toolbar-actions">
+          <a id="backToBuildsLink" class="small-button secondary" href="{{ back_to_builds_url }}">
+            Back to Builds
+          </a>
+
+          {% if request.user.is_staff or request.user.is_superuser %}
+            <a id="editBuildLink" class="small-button" href="{{ editor_url }}">
+              Edit Build
+            </a>
+          {% endif %}
+        </div>
+      </section>
+
+      <section id="buildOrderTable" class="build-order-table">
+        {% if build_order and build_step_rows %}
+          <div class="table-wrap">
+            <table class="build-steps-table">
+              <colgroup>
+                <col class="time-col">
+                <col class="resource-col food-col">
+                <col class="resource-col wood-col">
+                <col class="resource-col gold-col">
+                <col class="resource-col favor-col">
+                <col class="action-col">
+                <col class="distribution-col">
+              </colgroup>
+
+              <thead>
+                <tr>
+                  <th scope="col">Time</th>
+                  <th scope="col">Food</th>
+                  <th scope="col">Wood</th>
+                  <th scope="col">Gold</th>
+                  <th scope="col">Favor</th>
+                  <th scope="col">Action</th>
+                  <th scope="col">Villager Distribution</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {% for row in build_step_rows %}
+                  {% if row.is_milestone %}
+                    <tr class="phase-row {% if row.is_minor_milestone %}phase-row-minor{% endif %}">
+                      <td class="time-cell {% if not row.time %}is-empty{% endif %}" data-label="Time">
+                        {% if row.time %}{{ row.time }}{% endif %}
+                      </td>
+                      <td colspan="6" class="phase-cell">
+                        <span class="phase-label" data-shortcodes>
+                          {% if row.label %}
+                            {{ row.label }}
+                          {% elif row.action %}
+                            {{ row.action }}
+                          {% else %}
+                            Milestone
+                          {% endif %}
+                        </span>
+
+                        {% if row.note %}
+                          <span class="phase-note" data-shortcodes>{{ row.note }}</span>
+                        {% endif %}
+                      </td>
+                    </tr>
+                  {% else %}
+                    <tr class="build-step-row">
+                      <td class="time-cell {% if not row.time %}is-empty{% endif %}" data-label="Time">
+                        {% if row.time %}{{ row.time }}{% endif %}
+                      </td>
+
+                      <td class="resource-cell food-cell {% if not row.food %}is-empty{% endif %}" data-label="Food">
+                        {% if row.food %}
+                          <span class="resource-pill food">
+                            <strong data-shortcodes>{{ row.food }}</strong>
+                          </span>
+                        {% endif %}
+                      </td>
+
+                      <td class="resource-cell wood-cell {% if not row.wood %}is-empty{% endif %}" data-label="Wood">
+                        {% if row.wood %}
+                          <span class="resource-pill wood">
+                            <strong data-shortcodes>{{ row.wood }}</strong>
+                          </span>
+                        {% endif %}
+                      </td>
+
+                      <td class="resource-cell gold-cell {% if not row.gold %}is-empty{% endif %}" data-label="Gold">
+                        {% if row.gold %}
+                          <span class="resource-pill gold">
+                            <strong data-shortcodes>{{ row.gold }}</strong>
+                          </span>
+                        {% endif %}
+                      </td>
+
+                      <td class="resource-cell favor-cell {% if not row.favor %}is-empty{% endif %}" data-label="Favor">
+                        {% if row.favor %}
+                          <span class="resource-pill favor">
+                            <strong data-shortcodes>{{ row.favor }}</strong>
+                          </span>
+                        {% endif %}
+                      </td>
+
+                      <td class="action-cell {% if not row.action and not row.note %}is-empty{% endif %}" data-label="Action">
+                        {% if row.action %}
+                          <div class="action-box">
+                            <span data-shortcodes>{{ row.action }}</span>
+                          </div>
+                        {% endif %}
+
+                        {% if row.note %}
+                          <span class="note" data-shortcodes>{{ row.note }}</span>
+                        {% endif %}
+                      </td>
+
+                      <td class="distribution-cell {% if not row.split_items %}is-empty{% endif %}" data-label="Villager Distribution">
+                        {% if row.split_items %}
+                          <div class="villager-distribution" aria-label="Villager distribution">
+                            {% for split_item in row.split_items %}
+                              <span class="distribution-part distribution-{{ split_item.key }}">
+                                <span class="distribution-value">{{ split_item.value }}</span>
+                                <span class="distribution-icon-token" data-shortcodes>[{{ split_item.key }}]</span>
+                              </span>{% if not forloop.last %}<span class="distribution-divider" aria-hidden="true">/</span>{% endif %}
+                            {% endfor %}
+                          </div>
+                        {% endif %}
+                      </td>
+                    </tr>
+                  {% endif %}
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="empty-detail-state">
+            <h2>Build order not found</h2>
+            <p>
+              This build order is not currently available. Try returning to the build-order library
+              and choosing another opening.
+            </p>
+            <a class="small-button" href="/build_orders/">Back to Build Orders</a>
+          </div>
+        {% endif %}
+      </section>
+
+      <section class="seo-support-copy" aria-label="Build order summary">
+        <p>
+          {% if build_order %}
+            {{ build_order.title }} is a {{ god_name }} build order for Age of Mythology: Retold.
+            Use the timings, villager assignments, and notes above as a structured opening reference.
+          {% else %}
+            View Age of Mythology: Retold build order timings, villager assignments, and opening notes.
+          {% endif %}
+        </p>
+      </section>
+    </section>
+  </main>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'js/build_detail.js' %}"></script>
+{% endblock %}

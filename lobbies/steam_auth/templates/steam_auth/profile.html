@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Steam Profile | Prostagma?{% endblock %}
+{% block meta_description %}Your linked Steam profile on Prostagma.{% endblock %}
+{% block body_class %}steam-auth-page{% endblock %}
+
+{% block content %}
+  <main class="steam-auth-shell">
+    <section class="steam-auth-card">
+      <p class="steam-auth-kicker">Steam Account</p>
+      <h1>{{ request.user.steam_profile.display_name|default:request.user.username }}</h1>
+
+      {% if request.user.steam_profile.avatar_full %}
+        <img class="steam-profile-avatar" src="{{ request.user.steam_profile.avatar_full }}" alt="" loading="lazy">
+      {% endif %}
+
+      <dl class="steam-profile-list">
+        <div>
+          <dt>SteamID</dt>
+          <dd>{{ request.user.steam_profile.steam_id }}</dd>
+        </div>
+        {% if request.user.steam_profile.profile_url %}
+          <div>
+            <dt>Profile</dt>
+            <dd><a href="{{ request.user.steam_profile.profile_url }}" target="_blank" rel="noopener noreferrer">Open Steam profile</a></dd>
+          </div>
+        {% endif %}
+      </dl>
+
+      <a class="steam-auth-button" href="{% url 'steam_auth:logout' %}?next=/">Sign out</a>
+    </section>
+  </main>
+{% endblock %}

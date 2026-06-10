@@ -1,0 +1,256 @@
+{% load static %}
+
+<header class="site-shell-header {% if site_header_variant == 'agora' %}site-shell-header-agora{% endif %}">
+  <div class="site-header-inner">
+    <a class="site-brand-lockup" href="/" aria-label="Go to Prostagma home page">
+      <img
+        class="site-brand-icon"
+        src="{% static 'assets/images/ui/prostagma_arkantos.png' %}"
+        alt=""
+        loading="eager"
+      />
+
+      <span class="site-brand-text-wrap">
+        <span class="site-brand-wordmark">Prostagma?</span>
+        <span class="site-brand-tagline">Age of Mythology: Retold tools</span>
+      </span>
+    </a>
+
+    <nav class="site-primary-nav" aria-label="Primary navigation">
+      <a href="/"{% if active_page == "home" %} aria-current="page"{% endif %}>Global Activity</a>
+      <a href="/build_orders/"{% if active_page == "builds" %} aria-current="page"{% endif %}>Build Orders</a>
+      <a href="/lobbies/"{% if active_page == "lobbies" %} aria-current="page"{% endif %}>Lobbies</a>
+      <a href="/agora/"{% if active_page == "agora" %} aria-current="page"{% endif %}>Agora</a>
+      <a href="/about/"{% if active_page == "about" %} aria-current="page"{% endif %}>About</a>
+    </nav>
+
+    <div class="site-header-actions">
+      {% if show_last_updated %}
+        <div id="lastUpdated" class="last-updated site-last-updated">Last updated: never</div>
+      {% endif %}
+
+      {% if show_refresh_button %}
+        <button
+          id="refreshButton"
+          class="primary-button site-refresh-button"
+          type="button"
+        >
+          {{ refresh_button_label|default:"Refresh" }}
+        </button>
+      {% endif %}
+    </div>
+
+    <div class="site-user-auth" aria-label="User account">
+      {% if request.user.is_authenticated %}
+        <div class="site-user-menu-wrap">
+          <button
+            class="site-user-menu-button"
+            type="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            {% if request.user.steam_profile.avatar %}
+              <img
+                class="site-user-avatar"
+                src="{{ request.user.steam_profile.avatar }}"
+                alt=""
+                loading="lazy"
+              />
+            {% elif request.user.xbox_profile.avatar_url %}
+              <img
+                class="site-user-avatar"
+                src="{{ request.user.xbox_profile.avatar_url }}"
+                alt=""
+                loading="lazy"
+              />
+            {% else %}
+              <span class="site-user-avatar site-user-avatar-fallback" aria-hidden="true">?</span>
+            {% endif %}
+
+            <span class="site-user-name">
+              {% if request.user.steam_profile.aom_alias %}
+                {{ request.user.steam_profile.aom_alias }}
+              {% elif request.user.xbox_profile.aom_alias %}
+                {{ request.user.xbox_profile.aom_alias }}
+              {% elif request.user.steam_profile.display_name %}
+                {{ request.user.steam_profile.display_name }}
+              {% elif request.user.xbox_profile.display_name %}
+                {{ request.user.xbox_profile.display_name }}
+              {% elif request.user.first_name %}
+                {{ request.user.first_name }}
+              {% else %}
+                {{ request.user.username }}
+              {% endif %}
+            </span>
+
+            <span class="site-user-caret" aria-hidden="true">▾</span>
+          </button>
+
+          <div class="site-user-dropdown" role="menu">
+            <div class="site-user-dropdown-heading">
+              <span>Signed in as</span>
+              <strong>
+                {% if request.user.steam_profile.aom_alias %}
+                  {{ request.user.steam_profile.aom_alias }}
+                {% elif request.user.xbox_profile.aom_alias %}
+                  {{ request.user.xbox_profile.aom_alias }}
+                {% elif request.user.first_name %}
+                  {{ request.user.first_name }}
+                {% else %}
+                  {{ request.user.username }}
+                {% endif %}
+              </strong>
+            </div>
+
+            {% if request.user.steam_profile %}
+              <a href="{% url 'steam_auth:profile' %}" role="menuitem">
+                Steam Profile
+              </a>
+            {% else %}
+              <a href="{% url 'steam_auth:login' %}?next={{ request.path|urlencode }}" role="menuitem">
+                Connect Steam
+              </a>
+            {% endif %}
+
+            {% if request.user.xbox_profile %}
+              <a href="/auth/xbox/profile/" role="menuitem">
+                Xbox Profile
+              </a>
+            {% else %}
+              <a href="/auth/xbox/login/?next={{ request.path|urlencode }}" role="menuitem">
+                Connect Xbox
+              </a>
+            {% endif %}
+
+            {% if request.user.is_staff %}
+              <a href="/admin/" role="menuitem">
+                Django Admin
+              </a>
+            {% endif %}
+
+            <a class="site-user-signout" href="/auth/xbox/logout/?next={{ request.path|urlencode }}" role="menuitem">
+              Sign out
+            </a>
+          </div>
+        </div>
+      {% else %}
+        <div class="site-user-menu-wrap site-login-menu-wrap">
+          <button
+            class="site-user-menu-button site-login-menu-button"
+            type="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            <span class="site-user-avatar site-login-avatar" aria-hidden="true">?</span>
+            <span class="site-user-name">Sign in</span>
+            <span class="site-user-caret" aria-hidden="true">▾</span>
+          </button>
+
+          <div class="site-user-dropdown site-login-dropdown" role="menu">
+            <div class="site-user-dropdown-heading">
+              <span>Choose account</span>
+              <strong>Sign in</strong>
+            </div>
+
+            <a
+              class="site-platform-login-link"
+              href="{% url 'steam_auth:login' %}?next={{ request.path|urlencode }}"
+              role="menuitem"
+            >
+              <img
+                class="site-platform-login-icon"
+                src="{% static 'assets/images/auth/steam_icon.png' %}"
+                alt=""
+                loading="eager"
+              />
+              <span>Sign in with Steam</span>
+            </a>
+
+            <a
+              class="site-platform-login-link"
+              href="/auth/xbox/login/?next={{ request.path|urlencode }}"
+              role="menuitem"
+            >
+              <img
+                class="site-platform-login-icon"
+                src="{% static 'assets/images/auth/xbox_icon.png' %}"
+                alt=""
+                loading="eager"
+              />
+              <span>Sign in with Xbox</span>
+            </a>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="site-menu site-mobile-menu">
+      <button
+        class="site-menu-button"
+        type="button"
+        aria-label="Open site menu"
+        aria-expanded="false"
+        aria-controls="siteMenuDropdown"
+        data-site-menu-button
+      >
+        <img
+          class="site-menu-icon"
+          src="{% static 'assets/images/ui/Hamburger_On.png' %}"
+          alt=""
+          loading="eager"
+        />
+      </button>
+
+      <nav
+        id="siteMenuDropdown"
+        class="site-menu-dropdown"
+        aria-label="Site menu"
+        data-site-menu-dropdown
+      >
+        <a href="/"{% if active_page == "home" %} aria-current="page"{% endif %}>Global Activity</a>
+        <a href="/build_orders/"{% if active_page == "builds" %} aria-current="page"{% endif %}>Build Orders</a>
+        <a href="/lobbies/"{% if active_page == "lobbies" %} aria-current="page"{% endif %}>Lobbies</a>
+        <a href="/agora/"{% if active_page == "agora" %} aria-current="page"{% endif %}>Agora</a>
+        <a href="/about/"{% if active_page == "about" %} aria-current="page"{% endif %}>About</a>
+        <a href="/faq/"{% if active_page == "faq" %} aria-current="page"{% endif %}>FAQ</a>
+
+        <div class="site-mobile-account-auth">
+          {% if request.user.is_authenticated %}
+            {% if request.user.steam_profile %}
+              <a href="{% url 'steam_auth:profile' %}">Steam Profile</a>
+            {% else %}
+              <a href="{% url 'steam_auth:login' %}?next={{ request.path|urlencode }}">Connect Steam</a>
+            {% endif %}
+
+            {% if request.user.xbox_profile %}
+              <a href="/auth/xbox/profile/">Xbox Profile</a>
+            {% else %}
+              <a href="/auth/xbox/login/?next={{ request.path|urlencode }}">Connect Xbox</a>
+            {% endif %}
+
+            {% if request.user.is_staff %}
+              <a href="/admin/">Django Admin</a>
+            {% endif %}
+
+            <a href="/auth/xbox/logout/?next={{ request.path|urlencode }}">Sign out</a>
+          {% else %}
+            <a href="{% url 'steam_auth:login' %}?next={{ request.path|urlencode }}">Sign in with Steam</a>
+            <a href="/auth/xbox/login/?next={{ request.path|urlencode }}">Sign in with Xbox</a>
+          {% endif %}
+        </div>
+      </nav>
+    </div>
+  </div>
+
+  {% if header_title or header_subtitle %}
+    <div class="site-section-heading">
+      {% if header_title %}
+        <h1>{{ header_title }}</h1>
+      {% endif %}
+
+      {% if header_subtitle %}
+        <p>{{ header_subtitle }}</p>
+      {% endif %}
+    </div>
+  {% endif %}
+</header>

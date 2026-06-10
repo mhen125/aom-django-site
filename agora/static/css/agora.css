@@ -1,0 +1,428 @@
+body.agora-page {
+  min-height: 100vh;
+  color: #edf6ff;
+  background-image: url("/static/assets/images/backgrounds/background_japanese.png");
+  background-size: 165% auto;
+  background-position: center center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
+body.agora-page .site-header {
+  background: rgba(8, 18, 27, 0.72);
+  border-bottom-color: rgba(151, 187, 218, 0.28);
+}
+
+body.agora-page .site-brand-wordmark,
+body.agora-page .site-brand-subtitle,
+body.agora-page .site-header-subtitle {
+  color: #e9f5ff;
+  text-shadow: 0 0 18px rgba(106, 176, 230, 0.18);
+}
+
+body.agora-page .site-nav,
+body.agora-page .site-menu-dropdown {
+  border-color: rgba(151, 187, 218, 0.35);
+  background: rgba(23, 43, 61, 0.9);
+  box-shadow: 0 18px 38px rgba(1, 8, 14, 0.36);
+}
+
+body.agora-page .site-nav a,
+body.agora-page .site-menu-dropdown a {
+  color: #dcecff;
+}
+
+body.agora-page .site-nav a:hover,
+body.agora-page .site-nav a:focus-visible,
+body.agora-page .site-nav a.is-active,
+body.agora-page .site-nav a[aria-current="page"],
+body.agora-page .site-menu-dropdown a:hover,
+body.agora-page .site-menu-dropdown a:focus-visible,
+body.agora-page .site-menu-dropdown a[aria-current="page"] {
+  color: #ffffff;
+  background: rgba(94, 143, 184, 0.34);
+}
+
+.agora-shell {
+  width: min(1500px, calc(100% - 3rem));
+  margin: clamp(2rem, 5vw, 4rem) auto clamp(3rem, 6vw, 5rem);
+}
+
+.agora-main-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+  gap: clamp(1.4rem, 2.4vw, 2rem);
+  align-items: start;
+}
+
+.agora-chat-panel,
+.agora-side-card {
+  border: 1px solid rgba(177, 207, 232, 0.27);
+  border-radius: 12px;
+  background: rgba(25, 44, 60, 0.79);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 26px 60px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(4px);
+}
+
+.agora-chat-panel {
+  padding: clamp(1.35rem, 2vw, 2rem);
+}
+
+.agora-chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 1rem;
+  padding-bottom: 1.1rem;
+  border-bottom: 1px solid rgba(181, 211, 236, 0.2);
+}
+
+.agora-eyebrow,
+.agora-name-row label,
+.agora-side-card h2 {
+  margin: 0;
+  font-family: Baskervville, Baskerville, Georgia, serif;
+  color: #a8d7ff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.23em;
+  text-transform: uppercase;
+}
+
+.agora-chat-header h1 {
+  margin: 0.35rem 0 0;
+  font-family: Baskervville, Baskerville, Georgia, serif;
+  color: #f3f8ff;
+  font-size: clamp(2.15rem, 4vw, 4rem);
+  font-weight: 650;
+  letter-spacing: 0.06em;
+}
+
+.agora-messages {
+  height: clamp(320px, 42vh, 620px);
+  margin-top: 1rem;
+  padding: 0.85rem;
+  overflow-y: auto;
+  border: 1px solid rgba(181, 211, 236, 0.2);
+  border-radius: 10px;
+  background: rgba(14, 30, 43, 0.54);
+}
+
+.agora-empty-state {
+  padding: 1rem;
+  color: #aebfce;
+}
+
+.agora-message {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: 0.75rem;
+  padding: 0.82rem 0.9rem;
+  border: 1px solid rgba(170, 203, 230, 0.18);
+  border-radius: 10px;
+  background: rgba(42, 63, 82, 0.72);
+}
+
+.agora-message + .agora-message {
+  margin-top: 0.7rem;
+}
+
+.agora-message.is-steam-user {
+  border-color: rgba(121, 184, 233, 0.34);
+  background: rgba(43, 72, 96, 0.78);
+}
+
+.agora-message-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(167, 215, 255, 0.45);
+  background: rgba(6, 17, 28, 0.6);
+}
+
+.agora-message-avatar-fallback {
+  display: grid;
+  place-items: center;
+  color: #e7f4ff;
+  font-weight: 800;
+}
+
+.agora-message-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 0.34rem;
+}
+
+.agora-message-meta strong {
+  color: #b9dfff;
+  font-weight: 800;
+}
+
+.agora-message-meta time {
+  color: #a7b7c5;
+  font-size: 0.82rem;
+}
+
+.agora-message-body {
+  color: #f0f6ff;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.agora-steam-badge,
+.agora-filtered-badge {
+  padding: 0.13rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.agora-steam-badge {
+  color: #e6f4ff;
+  background: rgba(69, 133, 184, 0.42);
+  border: 1px solid rgba(122, 184, 233, 0.35);
+}
+
+.agora-filtered-badge {
+  color: #ffd9df;
+  background: rgba(128, 51, 67, 0.46);
+  border: 1px solid rgba(236, 129, 145, 0.35);
+}
+
+.agora-form {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(181, 211, 236, 0.2);
+}
+
+.agora-name-row {
+  display: grid;
+  gap: 0.45rem;
+  margin-bottom: 0.85rem;
+}
+
+.agora-guest-identity,
+.agora-steam-identity {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.agora-steam-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(167, 215, 255, 0.5);
+}
+
+.agora-name-row input,
+.agora-message-row textarea {
+  width: 100%;
+  color: #eef7ff;
+  border: 1px solid rgba(169, 204, 232, 0.28);
+  border-radius: 8px;
+  background: rgba(13, 28, 41, 0.72);
+  outline: none;
+}
+
+.agora-name-row input {
+  max-width: 290px;
+  padding: 0.68rem 0.8rem;
+}
+
+.agora-name-row input[readonly] {
+  cursor: default;
+  border-color: rgba(124, 190, 242, 0.38);
+  background: rgba(20, 43, 62, 0.75);
+}
+
+.agora-steam-identity-note {
+  color: #8fd0ff;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.agora-steam-inline-login {
+  display: inline-flex;
+  align-items: center;
+  line-height: 0;
+  opacity: 0.92;
+}
+
+.agora-steam-inline-login:hover,
+.agora-steam-inline-login:focus-visible {
+  opacity: 1;
+}
+
+.agora-steam-inline-login img {
+  display: block;
+  height: 24px;
+  width: auto;
+}
+
+.agora-message-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.7rem;
+  align-items: end;
+}
+
+.agora-message-row textarea {
+  min-height: 84px;
+  resize: vertical;
+  padding: 0.85rem 0.95rem;
+}
+
+.agora-send-button,
+.agora-small-button,
+.agora-link-list a {
+  border: 1px solid rgba(156, 201, 236, 0.45);
+  border-radius: 8px;
+  color: #f3f9ff;
+  background: rgba(72, 118, 154, 0.78);
+  font-weight: 800;
+  text-decoration: none;
+  transition: transform 150ms ease, background 150ms ease, border-color 150ms ease;
+}
+
+.agora-send-button {
+  min-width: 84px;
+  padding: 0.75rem 1rem;
+}
+
+.agora-send-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.agora-send-button:hover:not(:disabled),
+.agora-small-button:hover,
+.agora-link-list a:hover {
+  transform: translateY(-1px);
+  border-color: rgba(188, 224, 252, 0.68);
+  background: rgba(91, 145, 187, 0.9);
+}
+
+.agora-form-footer {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: 0.5rem;
+  color: #aabccc;
+  font-size: 0.82rem;
+}
+
+.agora-form-hint {
+  text-align: center;
+}
+
+#agoraFormStatus[data-status-type="error"] {
+  color: #ffc0c8;
+}
+
+#agoraFormStatus[data-status-type="success"] {
+  color: #bff3c8;
+}
+
+#agoraFormStatus[data-status-type="pending"] {
+  color: #d9e9ff;
+}
+
+.agora-side-panel {
+  display: grid;
+  gap: 1rem;
+}
+
+.agora-side-card {
+  padding: 1.2rem 1.25rem;
+}
+
+.agora-side-card h2 {
+  margin-bottom: 0.8rem;
+  color: #d6f0ff;
+}
+
+.agora-side-card ul {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+  padding-left: 1.1rem;
+  color: #e1edf8;
+}
+
+.agora-side-card li::marker {
+  color: #8dffb3;
+}
+
+.agora-link-list {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.agora-link-list a {
+  display: block;
+  padding: 0.65rem 0.8rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 960px) {
+  .agora-main-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .agora-message-row {
+    grid-template-columns: 1fr;
+  }
+
+  .agora-send-button {
+    width: fit-content;
+    justify-self: end;
+  }
+}
+
+@media (max-width: 640px) {
+  .agora-shell {
+    width: min(100% - 1rem, 1500px);
+  }
+
+  .agora-chat-panel,
+  .agora-side-card {
+    border-radius: 9px;
+  }
+
+  .agora-guest-identity,
+  .agora-steam-identity {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .agora-form-footer {
+    grid-template-columns: 1fr;
+  }
+
+  .agora-form-hint {
+    text-align: left;
+  }
+}

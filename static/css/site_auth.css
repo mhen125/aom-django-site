@@ -1,0 +1,451 @@
+/* =========================================================
+   Prostagma account menu / platform sign-in
+   ========================================================= */
+
+.site-user-auth {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  z-index: 6600;
+}
+
+.site-login-stack {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+}
+
+.site-steam-image-login,
+.site-xbox-login,
+.site-user-menu-button,
+.site-user-dropdown a {
+  font-family: Baskervville, Georgia, serif;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.site-steam-image-login {
+  display: inline-flex;
+  align-items: center;
+  line-height: 0;
+  opacity: 0.9;
+  transition: opacity 160ms ease, transform 160ms ease, filter 160ms ease;
+}
+
+.site-steam-image-login:hover,
+.site-steam-image-login:focus-visible {
+  opacity: 1;
+  transform: translateY(-1px);
+  filter: drop-shadow(0 0 12px rgba(124, 173, 219, 0.22));
+}
+
+.site-steam-image-login img {
+  display: block;
+  width: auto;
+  height: 24px;
+}
+
+.site-xbox-login {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.55rem;
+  padding: 0.28rem 0.68rem;
+  border: 1px solid rgba(127, 214, 88, 0.34);
+  border-radius: 4px;
+  color: #eaffdf;
+  background:
+    linear-gradient(180deg, rgba(31, 118, 36, 0.68), rgba(13, 70, 26, 0.84));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    0 0 16px rgba(64, 184, 72, 0.1);
+  font-size: clamp(0.58rem, 0.62vw, 0.7rem);
+  white-space: nowrap;
+  transition: transform 160ms ease, filter 160ms ease, border-color 160ms ease;
+}
+
+.site-xbox-login:hover,
+.site-xbox-login:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(159, 244, 112, 0.58);
+  filter: brightness(1.06);
+}
+
+.site-user-menu-wrap {
+  position: relative;
+}
+
+.site-user-menu-button {
+  display: inline-flex;
+  align-items: center;
+  max-width: 17rem;
+  min-height: 2.3rem;
+  gap: 0.5rem;
+  padding: 0.28rem 0.58rem 0.28rem 0.34rem;
+  border: 1px solid rgba(207, 170, 82, 0.34);
+  border-radius: 999px;
+  color: #f8e9bd;
+  background:
+    linear-gradient(180deg, rgba(255, 225, 160, 0.075), rgba(0, 0, 0, 0.16)),
+    rgba(8, 11, 17, 0.58);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 235, 176, 0.035),
+    0 12px 24px rgba(0, 0, 0, 0.22);
+  cursor: pointer;
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+}
+
+.site-user-menu-button:hover,
+.site-user-menu-button:focus-visible,
+.site-user-menu-wrap:focus-within .site-user-menu-button,
+.site-user-menu-wrap:hover .site-user-menu-button {
+  transform: translateY(-1px);
+  border-color: rgba(255, 225, 160, 0.58);
+  background:
+    linear-gradient(180deg, rgba(255, 225, 160, 0.12), rgba(0, 0, 0, 0.14)),
+    rgba(18, 21, 29, 0.72);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 235, 176, 0.055),
+    0 0 20px rgba(214, 171, 82, 0.13);
+}
+
+.site-user-avatar {
+  display: inline-grid;
+  place-items: center;
+  width: 1.65rem;
+  height: 1.65rem;
+  flex: 0 0 auto;
+  border: 1px solid rgba(229, 199, 112, 0.42);
+  border-radius: 999px;
+  object-fit: cover;
+  background: rgba(0, 0, 0, 0.24);
+  color: #f7e7b8;
+  font-size: 0.72rem;
+}
+
+.site-user-name {
+  min-width: 0;
+  max-width: 10.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #f8e9bd;
+  font-size: clamp(0.62rem, 0.68vw, 0.78rem);
+  white-space: nowrap;
+}
+
+.site-user-caret {
+  color: rgba(255, 225, 160, 0.78);
+  font-size: 0.72rem;
+  transform: translateY(-1px);
+}
+
+.site-user-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.52rem);
+  z-index: 9000;
+  display: grid;
+  gap: 0.22rem;
+  min-width: 15.5rem;
+  padding: 0.58rem;
+  border: 1px solid rgba(207, 170, 82, 0.34);
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(231, 193, 99, 0.13), transparent 40%),
+    linear-gradient(180deg, rgba(12, 16, 25, 0.98), rgba(6, 9, 15, 0.98));
+  box-shadow:
+    0 22px 54px rgba(0, 0, 0, 0.44),
+    inset 0 0 0 1px rgba(255, 235, 176, 0.04);
+  opacity: 0;
+  transform: translateY(-6px) scale(0.985);
+  pointer-events: none;
+  transition: opacity 150ms ease, transform 150ms ease;
+}
+
+.site-user-menu-wrap:hover .site-user-dropdown,
+.site-user-menu-wrap:focus-within .site-user-dropdown {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.site-user-dropdown::before {
+  content: "";
+  position: absolute;
+  inset: -0.6rem 0 auto;
+  height: 0.7rem;
+}
+
+.site-user-dropdown-heading {
+  display: grid;
+  gap: 0.12rem;
+  padding: 0.5rem 0.62rem 0.55rem;
+  border-bottom: 1px solid rgba(210, 180, 98, 0.18);
+  margin-bottom: 0.2rem;
+}
+
+.site-user-dropdown-heading span {
+  color: rgba(224, 207, 158, 0.7);
+  font-family: Baskervville, Georgia, serif;
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.site-user-dropdown-heading strong {
+  min-width: 0;
+  overflow: hidden;
+  color: #fff0bf;
+  font-size: 0.98rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.site-user-dropdown a {
+  display: flex;
+  align-items: center;
+  min-height: 2.25rem;
+  padding: 0.45rem 0.62rem;
+  border-radius: 10px;
+  color: rgba(244, 229, 184, 0.9);
+  font-size: 0.72rem;
+  transition: color 150ms ease, background 150ms ease, transform 150ms ease;
+}
+
+.site-user-dropdown a:hover,
+.site-user-dropdown a:focus-visible {
+  color: #fff8d8;
+  background: rgba(198, 156, 70, 0.16);
+  transform: translateX(2px);
+}
+
+.site-user-dropdown a.site-user-signout {
+  color: rgba(255, 202, 207, 0.92);
+}
+
+.site-mobile-account-auth {
+  margin-top: 0.25rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid rgba(210, 180, 98, 0.18);
+}
+
+.site-mobile-account-auth a {
+  color: rgba(218, 238, 255, 0.95);
+}
+
+body.agora-page .site-user-menu-button,
+.site-shell-header-agora .site-user-menu-button {
+  border-color: rgba(170, 205, 229, 0.34);
+  color: #e9f7ff;
+  background:
+    linear-gradient(180deg, rgba(170, 215, 244, 0.09), rgba(0, 0, 0, 0.12)),
+    rgba(24, 42, 58, 0.64);
+}
+
+body.agora-page .site-user-name,
+.site-shell-header-agora .site-user-name {
+  color: #e9f7ff;
+}
+
+body.agora-page .site-user-dropdown,
+.site-shell-header-agora .site-user-dropdown {
+  border-color: rgba(170, 205, 229, 0.34);
+  background:
+    radial-gradient(circle at 18% 0%, rgba(146, 194, 231, 0.16), transparent 40%),
+    linear-gradient(180deg, rgba(24, 42, 58, 0.98), rgba(14, 27, 39, 0.98));
+}
+
+@media (max-width: 1360px) {
+  .site-user-auth {
+    display: none;
+  }
+}
+
+/* Shared account profile pages */
+.account-auth-shell {
+  width: min(960px, calc(100% - 2rem));
+  margin: clamp(2rem, 7vw, 6rem) auto;
+}
+
+.account-auth-card {
+  border: 1px solid rgba(201, 163, 82, 0.34);
+  border-radius: 14px;
+  padding: clamp(1.4rem, 3vw, 2.4rem);
+  background:
+    radial-gradient(circle at 18% 0%, rgba(224, 189, 92, 0.1), transparent 34%),
+    rgba(7, 11, 18, 0.78);
+  box-shadow: 0 26px 70px rgba(0, 0, 0, 0.34);
+  color: #f2ead3;
+}
+
+.account-auth-kicker {
+  margin: 0 0 0.35rem;
+  color: #dcc47e;
+  font-family: Baskervville, Georgia, serif;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.account-auth-card h1 {
+  margin: 0 0 0.8rem;
+  font-family: Baskervville, Georgia, serif;
+  font-size: clamp(2rem, 5vw, 4rem);
+}
+
+.account-profile-avatar {
+  width: 104px;
+  height: 104px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin: 1rem 0;
+  border: 2px solid rgba(230, 199, 110, 0.5);
+}
+
+.account-profile-list {
+  display: grid;
+  gap: 0.7rem;
+  margin: 1.2rem 0;
+}
+
+.account-profile-list div {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.account-profile-list dt {
+  color: #dcc47e;
+  font-weight: 800;
+}
+
+.account-profile-list dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.account-auth-button,
+.account-auth-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.4rem;
+  margin-right: 0.55rem;
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  text-decoration: none;
+}
+
+.account-auth-button {
+  border: 1px solid rgba(207, 170, 82, 0.52);
+  color: #fff5cf;
+  background: rgba(154, 118, 43, 0.42);
+}
+
+.account-auth-link {
+  color: #dceafa;
+}
+
+
+
+/* Account controls stay compact inside the shared header. */
+.site-login-stack {
+  position: relative;
+  z-index: 2;
+  flex-wrap: nowrap;
+}
+
+.site-login-stack a {
+  pointer-events: auto;
+}
+
+.site-user-auth {
+  width: max-content;
+  flex: 0 0 auto;
+}
+
+@media (min-width: 1181px) and (max-width: 1580px) {
+  .site-steam-image-login img {
+    height: 22px;
+  }
+
+  .site-xbox-login {
+    min-height: 1.48rem;
+    padding: 0.24rem 0.58rem;
+    font-size: 0.59rem;
+    letter-spacing: 0.075em;
+  }
+}
+
+@media (max-width: 1180px) {
+  .site-user-auth {
+    display: none !important;
+  }
+}
+
+/* =========================================================
+   Header auth restore v3
+   Auth controls stack; desktop nav remains a nav.
+   ========================================================= */
+
+.site-user-auth {
+  justify-self: end !important;
+  align-self: center !important;
+  display: flex !important;
+  align-items: center !important;
+  width: max-content !important;
+  max-width: 18rem !important;
+  min-width: 0 !important;
+  z-index: 6600;
+}
+
+.site-login-stack {
+  display: grid !important;
+  justify-items: end !important;
+  align-items: center !important;
+  gap: 0.26rem !important;
+  min-width: 0 !important;
+}
+
+.site-steam-image-login img {
+  display: block !important;
+  width: auto !important;
+  height: 20px !important;
+}
+
+.site-xbox-login {
+  min-height: 1.45rem !important;
+  padding: 0.22rem 0.62rem !important;
+  font-size: 0.58rem !important;
+  letter-spacing: 0.08em !important;
+  white-space: nowrap !important;
+  pointer-events: auto !important;
+}
+
+.site-user-menu-wrap {
+  position: relative !important;
+}
+
+.site-user-menu-button {
+  max-width: 18rem !important;
+  min-height: 2rem !important;
+  padding: 0.24rem 0.62rem !important;
+}
+
+.site-user-dropdown {
+  right: 0 !important;
+  z-index: 9999 !important;
+}
+
+@media (max-width: 1120px) {
+  .site-user-auth {
+    display: none !important;
+  }
+}

@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Age of Mythology Retold Build Orders | Prostagma?{% endblock %}
+{% block meta_description %}Browse Age of Mythology: Retold build orders by pantheon and major god, including openings, timings, transitions, and strategy notes.{% endblock %}
+{% block body_class %}build-orders-page{% endblock %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'css/lobbies.css' %}">
+  <link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block extra_head %}
+  <script>
+    window.AOM_STATIC_URL = "{% static '' %}";
+    window.AOM_GOD_DETAIL_BASE_URL = "/gods/";
+    window.AOM_BUILD_DETAIL_BASE_URL = "/builds/";
+    window.AOM_EDITOR_BASE_URL = "/editor/";
+  </script>
+{% endblock %}
+
+{% block site_header %}
+  {% include "partials/header.html" with active_page="builds" show_game_logo=True %}
+{% endblock %}
+
+{% block content %}
+  <div class="page-shell">
+    <div class="background-overlay"></div>
+    <div class="background-orb orb-one"></div>
+    <div class="background-orb orb-two"></div>
+    <div class="background-orb orb-three"></div>
+
+    <header class="hero-header compact-hero-header">
+      <div class="eyebrow">Age of Mythology: Retold</div>
+      <h1>Build Order Archives</h1>
+    </header>
+
+    <main>
+      <section id="selectionSection" class="selection-section" aria-labelledby="selection-heading">
+        <button
+          id="resetSelectionButton"
+          class="back-icon-button hidden"
+          type="button"
+          aria-label="Back to Pantheons"
+        ></button>
+
+        <div class="section-title-row">
+          <div>
+            <div id="selectionEyebrow" class="selected-label">Pantheon Selection</div>
+            <h2 id="selection-heading">Choose a Pantheon</h2>
+            <p id="selectionDescription">
+              Select a pantheon to reveal its major gods.
+            </p>
+          </div>
+        </div>
+
+        <div class="selection-stage">
+          <div id="pantheonGrid" class="pantheon-grid"></div>
+          <div id="godGrid" class="god-grid hidden"></div>
+        </div>
+      </section>
+
+      <nav class="build-site-link-strip" aria-label="Build order related links">
+        <a href="/lobbies/">View Live Lobbies</a>
+        <a href="/agora/">Discuss in Agora</a>
+        {% if request.user.is_staff or request.user.is_superuser %}
+          <a href="/editor/">Open Editor</a>
+        {% endif %}
+      </nav>
+    </main>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    function loadScript(src) {
+      return new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = src;
+        script.onload = resolve;
+        script.onerror = () => reject(new Error(`Could not load script: ${src}`));
+        document.body.appendChild(script);
+      });
+    }
+
+    function hasPantheonData(data) {
+      return Boolean(
+        data &&
+        Array.isArray(data.pantheons) &&
+        data.pantheons.length > 0
+      );
+    }
+
+    fetch("{% url 'builds:data_json' %}")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Could not load data.json: ${response.status}`);
+        }
+
+        return response.json();
+      })
+      .then((data) => {
+        if (hasPantheonData(data)) {
+          window.AOM_DATA = data;
+          return null;
+        }
+
+        console.warn(
+          "Django build-order data returned no pantheons. Falling back to static js/data.js."
+        );
+
+        return loadScript("{% static 'js/data.js' %}");
+      })
+      .then(() => {
+        return loadScript("{% static 'js/home.js' %}");
+      })
+      .catch((error) => {
+        console.error("Failed to load AOM data.", error);
+      });
+  </script>
+{% endblock %}

@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if god %}{{ god.name }} Build Orders | Age of Mythology Retold | Prostagma?{% else %}Major God Build Orders | Prostagma?{% endif %}{% endblock %}
+{% block meta_description %}{{ meta_description }}{% endblock %}
+{% block body_class %}build-orders-page god-detail-page{% endblock %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'css/lobbies.css' %}">
+  <link rel="stylesheet" href="{% static 'css/home.css' %}">
+  <link rel="stylesheet" href="{% static 'css/god_detail.css' %}">
+{% endblock %}
+
+{% block extra_head %}
+  <script>
+    window.AOM_STATIC_URL = "{% static '' %}";
+    window.AOM_GOD_DETAIL_BASE_URL = "/gods/";
+    window.AOM_BUILD_DETAIL_BASE_URL = "/builds/";
+    window.AOM_EDITOR_BASE_URL = "/editor/";
+    window.AOM_HOME_URL = "/build_orders/";
+  </script>
+{% endblock %}
+
+{% block site_header %}
+  {% include "partials/header.html" with active_page="builds" show_game_logo=True header_subtitle="Major god build orders, opening timings, and strategic transitions." %}
+{% endblock %}
+
+{% block content %}
+  <div class="page-shell build-page-shell">
+    <div class="background-overlay"></div>
+    <div class="background-orb orb-one"></div>
+    <div class="background-orb orb-two"></div>
+    <div class="background-orb orb-three"></div>
+
+    <main>
+      <section id="buildPage" class="build-page">
+        <a
+          class="build-back-button"
+          href="{% url 'builds:home' %}"
+          aria-label="Back to Pantheon Selection"
+        ></a>
+
+        <div class="build-hero">
+          <div class="build-hero-content">
+            <div id="pantheonLabel" class="build-eyebrow">Pantheon</div>
+
+            <h1 id="godName">Major God</h1>
+
+            <p id="godSummary">
+              Select a major god from the homepage to view build orders.
+            </p>
+
+            <section
+              id="godDetailsPanel"
+              class="god-details-panel hidden"
+              aria-label="Major god details"
+            ></section>
+
+            <div class="build-hero-actions">
+              <a class="primary-link-button" href="{% url 'builds:home' %}">
+                Choose Another God
+              </a>
+</div>
+          </div>
+
+          <div class="build-hero-art-wrap">
+            <div id="godHeroArt" class="build-hero-art"></div>
+          </div>
+        </div>
+
+        <div class="build-section-title">
+          <div>
+            <div class="selected-label">Build Order Library</div>
+            <h2 id="buildSectionHeading">Available Build Orders</h2>
+          </div>
+        </div>
+
+        <div id="buildGrid" class="build-grid"></div>
+
+        {% if request.user.is_staff or request.user.is_superuser %}
+          <section id="buildAuthorActions" class="build-author-actions" aria-label="Build order authoring">
+            <a id="addBuildOrderBottomLink" class="build-add-own-button" href="/editor/?new=true">
+              <img src="{% static 'assets/images/ui/add.png' %}" alt="" aria-hidden="true">
+              <span>Add Build Order</span>
+            </a>
+          </section>
+        {% endif %}
+<section class="seo-support-copy" aria-label="Page summary">
+          <p>
+            {% if god %}
+              Browse {{ god.name }} build orders for Age of Mythology: Retold, including published openings,
+              timing windows, economy plans, and strategy notes.
+            {% else %}
+              Browse major god build orders for Age of Mythology: Retold.
+            {% endif %}
+          </p>
+        </section>
+<section class="bottom-build-actions" aria-label="Build order management">
+</section>
+      </section>
+    </main>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    fetch("{% url 'builds:data_json' %}")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Could not load data.json: ${response.status}`);
+        }
+
+        return response.json();
+      })
+      .then((data) => {
+        window.AOM_DATA = data;
+
+        const script = document.createElement("script");
+        script.src = "{% static 'js/god_detail.js' %}";
+        document.body.appendChild(script);
+      })
+      .catch((error) => {
+        console.error("Failed to load AOM data.", error);
+      });
+  </script>
+{% endblock %}

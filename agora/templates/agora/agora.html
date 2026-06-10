@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Agora Chat Browser | Prostagma?{% endblock %}
+{% block meta_description %}A relaxed public chat room for Age of Mythology: Retold build orders, lobby talk, strategy, and Prostagma community chatter.{% endblock %}
+{% block body_class %}agora-page{% endblock %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'css/lobbies.css' %}">
+  <link rel="stylesheet" href="{% static 'css/agora.css' %}">
+{% endblock %}
+
+{% block extra_head %}
+  <script>
+    window.AOM_AGORA_MESSAGES_URL = "{% url 'agora:api_messages' %}";
+    window.AOM_AGORA_POST_URL = "{% url 'agora:api_post_message' %}";
+    window.AOM_STATIC_URL = "{% static '' %}";
+    window.AOM_AGORA_USER = {
+      isAuthenticated: {{ request.user.is_authenticated|yesno:"true,false" }},
+      displayName: "{% if request.user.is_authenticated %}{{ request.user.steam_profile.persona_name|default:request.user.username|escapejs }}{% endif %}",
+      avatarUrl: "{% if request.user.is_authenticated and request.user.steam_profile.avatar_url %}{{ request.user.steam_profile.avatar_url|escapejs }}{% endif %}"
+    };
+  </script>
+{% endblock %}
+
+{% block site_header %}
+  {% include "partials/header.html" with active_page="agora" header_subtitle="Agora Chat Browser" %}
+{% endblock %}
+
+{% block content %}
+  <main class="agora-shell">
+    <section class="agora-main-panel" aria-label="Agora chat">
+      <section class="agora-chat-panel">
+        <header class="agora-chat-header">
+          <div>
+            <p class="agora-eyebrow">Live Room</p>
+            <h1>Global Agora</h1>
+          </div>
+        </header>
+
+        <div id="agoraMessages" class="agora-messages" aria-live="polite">
+          <div class="agora-empty-state">Loading messages...</div>
+        </div>
+
+        <form id="agoraForm" class="agora-form" autocomplete="off">
+          {% csrf_token %}
+
+          <div class="agora-name-row">
+            <label for="agoraDisplayName">Display Name</label>
+
+            {% if request.user.is_authenticated %}
+              <div class="agora-steam-identity">
+                {% if request.user.steam_profile.avatar_url %}
+                  <img class="agora-steam-avatar" src="{{ request.user.steam_profile.avatar_url }}" alt="" loading="lazy">
+                {% endif %}
+                <input
+                  id="agoraDisplayName"
+                  name="displayName"
+                  type="text"
+                  maxlength="32"
+                  value="{{ request.user.steam_profile.persona_name|default:request.user.username }}"
+                  readonly
+                  data-steam-locked="true"
+                />
+                <span class="agora-steam-identity-note">Steam identity</span>
+              </div>
+            {% else %}
+              <div class="agora-guest-identity">
+                <input id="agoraDisplayName" name="displayName" type="text" maxlength="32" placeholder="Random AoM name" />
+                <a class="agora-steam-inline-login" href="/auth/steam/login/" aria-label="Sign in through Steam">
+                  <img src="{% static 'assets/images/auth/steam_sign_in.png' %}" alt="Sign in through Steam" loading="lazy">
+                </a>
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="agora-message-row">
+            <label class="sr-only" for="agoraMessageBody">Message</label>
+            <textarea id="agoraMessageBody" name="body" maxlength="500" rows="3" placeholder="Send a message to the Agora..." required></textarea>
+            <button id="agoraSendButton" class="agora-send-button" type="submit">Send</button>
+          </div>
+
+          <div class="agora-form-footer">
+            <span id="agoraCharacterCount">0 / 500</span>
+            <span class="agora-form-hint">⌘ + Return / Ctrl + Enter to send</span>
+            <span id="agoraFormStatus"></span>
+          </div>
+        </form>
+      </section>
+
+      <aside class="agora-side-panel">
+        <section class="agora-side-card">
+          <h2>Room Notes</h2>
+          <ul>
+            <li>Keep it useful for AoM Retold players.</li>
+            <li>No spam, harassment, or impersonation.</li>
+            <li>Display name changes are limited to once per hour.</li>
+            <li>Severe slurs and spam trigger temporary posting restrictions.</li>
+            <li>Messages are public and may be moderated.</li>
+            <li>Use Cmd + Return or Ctrl + Enter to send.</li>
+          </ul>
+        </section>
+
+        <section class="agora-side-card">
+          <h2>Quick Links</h2>
+          <div class="agora-link-list">
+            <a href="/lobbies/">Open Lobbies</a>
+            <a href="/build_orders/">Build Orders</a>
+            <a href="/">Global Activity</a>
+          </div>
+        </section>
+      </aside>
+    </section>
+  </main>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'js/agora_random_names.js' %}"></script>
+  <script src="{% static 'js/agora.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,265 @@
+.info-page-body {
+  min-height: 100vh;
+}
+
+.info-page {
+  position: relative;
+  z-index: 1;
+  width: min(1040px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 34px 0 24px;
+}
+
+.info-hero,
+.info-panel {
+  border: 1px solid rgba(207, 170, 82, 0.28);
+  box-shadow:
+    0 22px 48px rgba(0, 0, 0, 0.28),
+    inset 0 0 0 1px rgba(255, 235, 180, 0.035);
+  backdrop-filter: blur(10px);
+}
+
+.info-hero {
+  margin-bottom: 18px;
+  padding: clamp(1.35rem, 3vw, 2rem);
+  border-radius: 22px;
+  background:
+    linear-gradient(135deg, rgba(20, 29, 49, 0.94), rgba(10, 14, 24, 0.86)),
+    rgba(10, 14, 24, 0.84);
+}
+
+.info-eyebrow {
+  margin: 0 0 0.55rem;
+  color: rgba(250, 204, 21, 0.86);
+  font-family: Cinzel, Baskervville, Georgia, serif;
+  font-size: 0.76rem;
+  font-weight: 850;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.info-hero h1 {
+  max-width: 780px;
+  margin: 0;
+  color: #fff7d7;
+  font-family: Cinzel, Baskervville, Georgia, serif;
+  font-size: clamp(2rem, 4vw, 3.35rem);
+  line-height: 1.02;
+  letter-spacing: 0.01em;
+  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.42);
+}
+
+.info-hero p,
+.info-panel p {
+  max-width: 820px;
+  color: rgba(244, 229, 184, 0.82);
+  font-size: 1rem;
+  line-height: 1.72;
+}
+
+.info-hero p {
+  margin: 1rem 0 0;
+}
+
+.info-panel {
+  margin-top: 14px;
+  padding: clamp(1.15rem, 2.5vw, 1.6rem);
+  border-radius: 18px;
+  background: rgba(11, 16, 28, 0.76);
+}
+
+.info-panel h2 {
+  margin: 0 0 0.55rem;
+  color: #f8fafc;
+  font-family: Cinzel, Baskervville, Georgia, serif;
+  font-size: 1.18rem;
+  letter-spacing: 0.02em;
+}
+
+.info-panel p {
+  margin: 0;
+}
+
+.info-panel p + p {
+  margin-top: 0.8rem;
+}
+
+/* Info-page footer + Shake decoration */
+
+.info-page-body .site-footer {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  min-height: clamp(118px, 12vw, 155px);
+  margin-top: 6px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.info-page-body .site-footer-inner {
+  position: relative;
+  z-index: 5;
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.6rem 1rem;
+  max-width: min(1040px, calc(100% - 32px));
+  margin: 0 auto;
+  padding-bottom: 12px;
+  align-self: flex-end;
+}
+
+.info-page-body .site-footer-links {
+  display: inline-flex;
+  gap: 0.7rem;
+  align-items: center;
+}
+
+.info-page-body .site-footer-links a {
+  color: rgba(255, 239, 190, 0.74);
+  text-decoration: none;
+}
+
+.info-page-body .site-footer-links a:hover,
+.info-page-body .site-footer-links a:focus-visible {
+  color: #fff6d3;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+.info-page-body .site-shake-deco {
+  position: absolute;
+  z-index: 1;
+  display: block;
+  width: clamp(48px, 7.5vw, 115px);
+  height: auto;
+  max-width: none;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.9;
+  filter: drop-shadow(0 14px 24px rgba(0, 0, 0, 0.36));
+}
+
+.info-page-body .site-shake-global {
+  left: clamp(18px, 5vw, 92px);
+  bottom: 20px;
+  width: clamp(43px, 5.5vw, 80px);
+  opacity: 0.76;
+}
+
+.info-page-body .site-shake-lobbies {
+  left: clamp(150px, 20vw, 390px);
+  bottom: 20px;
+  width: clamp(47px, 6vw, 85px);
+  opacity: 0.84;
+}
+
+.info-page-body .site-shake-builds {
+  left: 50%;
+  bottom: 44px;
+  transform: translateX(-50%);
+  width: clamp(65px, 9.5vw, 143px);
+  opacity: 0.92;
+}
+
+.info-page-body .site-shake-detail {
+  right: clamp(150px, 16vw, 300px);
+  bottom: 20px;
+  width: clamp(50px, 7vw, 105px);
+  opacity: 0.86;
+}
+
+.info-page-body .site-shake-agora {
+  right: clamp(34px, 6vw, 110px);
+  bottom: 24px;
+  width: clamp(37px, 4.5vw, 68px);
+  opacity: 0.78;
+}
+
+@media (max-width: 760px) {
+  .info-page {
+    width: min(100% - 24px, 1040px);
+    padding-top: 24px;
+    padding-bottom: 18px;
+  }
+
+  .info-page-body .site-footer {
+    min-height: 112px;
+    margin-top: 4px;
+  }
+
+  .info-page-body .site-footer-inner {
+    display: grid;
+    gap: 0.45rem;
+    padding-bottom: 12px;
+    text-align: center;
+  }
+
+  .info-page-body .site-footer-links {
+    justify-content: center;
+  }
+
+  .info-page-body .site-shake-global,
+  .info-page-body .site-shake-lobbies {
+    display: none;
+  }
+
+.info-page-body .site-shake-builds {
+  left: 50%;
+  bottom: 28px;
+  width: 75px;
+}
+
+  .info-page-body .site-shake-detail {
+    right: 18px;
+    bottom: 18px;
+    width: 47px;
+  }
+
+  .info-page-body .site-shake-agora {
+    left: 18px;
+    right: auto;
+    bottom: 22px;
+    width: 39px;
+  }
+}
+
+/* Give Shake decoration room above the footer so it does not tuck under the info page */
+
+.info-page-body .site-footer {
+  margin-top: 42px;
+  padding-top: 38px;
+  min-height: clamp(150px, 15vw, 190px);
+  overflow: visible;
+}
+
+.info-page-body .site-shake-deco {
+  margin-top: 28px;
+}
+
+.info-page-body .site-shake-builds {
+  bottom: 30px;
+}
+
+.info-page-body .site-footer-inner {
+  padding-bottom: 12px;
+}
+
+@media (max-width: 760px) {
+  .info-page-body .site-footer {
+    margin-top: 32px;
+    padding-top: 28px;
+    min-height: 135px;
+  }
+
+  .info-page-body .site-shake-deco {
+    margin-top: 20px;
+  }
+
+  .info-page-body .site-shake-builds {
+    bottom: 24px;
+  }
+}

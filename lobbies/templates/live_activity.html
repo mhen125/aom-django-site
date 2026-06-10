@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Global Activity | Prostagma Live{% endblock %}
+{% block body_class %}global-activity-page{% endblock %}
+{% block body_attrs %}data-page="live-activity"{% endblock %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'css/lobbies.css' %}">
+{% endblock %}
+
+{% block extra_head %}
+  <script>
+    window.AOM_STATIC_URL = "{% static '' %}";
+    window.AOM_API_BASE_URL = "";
+  </script>
+{% endblock %}
+
+{% block site_header %}
+  {% include "partials/header.html" with active_page="home" show_game_logo=True show_last_updated=True header_subtitle="Unofficial live activity dashboard for custom matches, ranked queues, open lobbies, and active AoM Retold games." %}
+{% endblock %}
+
+{% block content %}
+  <main class="app-shell live-atlas-shell">
+    <section class="live-atlas-stage">
+      <div class="widget-frame-ornaments" aria-hidden="true">
+        <span class="widget-corner widget-corner-tl"></span>
+        <span class="widget-corner widget-corner-tr"></span>
+        <span class="widget-corner widget-corner-bl"></span>
+        <span class="widget-corner widget-corner-br"></span>
+        <span class="widget-edge widget-edge-top"></span>
+        <span class="widget-edge widget-edge-bottom"></span>
+        <span class="widget-edge-side widget-edge-left"></span>
+        <span class="widget-edge-side widget-edge-right"></span>
+      </div>
+
+      <div class="live-atlas-heading live-atlas-heading-row">
+        <div>
+          <h1>Global Activity</h1>
+        </div>
+
+        <a class="live-ornate-button" href="/lobbies/">View Lobbies</a>
+      </div>
+
+      <section class="live-world-panel" aria-label="Global activity map">
+        <div class="live-activity-scoreboard" aria-label="Live activity summary">
+          <div class="live-online-panel">
+            <span class="live-eyebrow"><span class="live-dot" aria-hidden="true"></span> Steam activity</span>
+            <div id="liveBusynessLabel" class="live-primary-number">-</div>
+          </div>
+
+          <div id="liveBusynessDetail" class="live-match-panel live-primary-caption">
+            Loading live match data...
+          </div>
+        </div>
+
+        <div class="live-map-frame" aria-label="Static earth activity beacon map">
+          <div class="widget-frame-ornaments" aria-hidden="true">
+            <span class="widget-corner widget-corner-tl"></span>
+            <span class="widget-corner widget-corner-tr"></span>
+            <span class="widget-corner widget-corner-bl"></span>
+            <span class="widget-corner widget-corner-br"></span>
+            <span class="widget-edge widget-edge-top"></span>
+            <span class="widget-edge widget-edge-bottom"></span>
+            <span class="widget-edge-side widget-edge-left"></span>
+            <span class="widget-edge-side widget-edge-right"></span>
+          </div>
+
+          <div id="liveActivityMap" class="live-activity-map live-night-map">
+            <img
+              id="liveEarthNightImage"
+              class="live-earth-night-image"
+              src="{% static 'assets/images/live/earth_beacon_base_map.png' %}"
+              alt=""
+              aria-hidden="true"
+            />
+            <canvas id="liveActivityCanvas" class="live-activity-canvas" aria-hidden="true"></canvas>
+            <div class="live-map-vignette" aria-hidden="true"></div>
+          </div>
+
+          <aside id="liveMapDevPanel" class="live-map-dev-panel" aria-label="Live map developer tools" hidden>
+            <button id="liveMapDevToggle" class="live-map-dev-toggle" type="button" aria-expanded="false">
+              Map Dev
+            </button>
+
+            <div class="live-map-dev-body">
+              <div class="live-map-dev-head">
+                <strong>Beacon debugger</strong>
+                <span id="liveMapDevSource">waiting</span>
+              </div>
+
+              <div class="live-map-dev-grid" aria-label="Beacon count summary">
+                <div>
+                  <span>Expected</span>
+                  <strong id="liveMapDevExpected">-</strong>
+                </div>
+                <div>
+                  <span>Drawn</span>
+                  <strong id="liveMapDevDrawn">-</strong>
+                </div>
+                <div>
+                  <span>Visible players</span>
+                  <strong id="liveMapDevTracked">-</strong>
+                </div>
+                <div>
+                  <span>Steam online</span>
+                  <strong id="liveMapDevSteam">-</strong>
+                </div>
+                <div>
+                  <span>Land locked</span>
+                  <strong id="liveMapDevLand">-</strong>
+                </div>
+                <div>
+                  <span>Blue pixels</span>
+                  <strong id="liveMapDevWater">-</strong>
+                </div>
+              </div>
+
+              <div id="liveMapDevRegions" class="live-map-dev-regions">
+                <div class="muted">Waiting for map data...</div>
+              </div>
+
+              <div class="live-map-dev-controls" aria-label="Beacon and regional glow style controls">
+                <h3>Beacon style</h3>
+                <label>
+                  <span>Intensity</span>
+                  <output id="liveMapBeaconIntensityValue" class="live-map-dev-control-value">0.40</output>
+                  <input id="liveMapBeaconIntensity" type="range" min="0.25" max="2.5" step="0.05" value="0.40">
+                </label>
+                <label>
+                  <span>Size</span>
+                  <output id="liveMapBeaconSizeValue" class="live-map-dev-control-value">1.50</output>
+                  <input id="liveMapBeaconSize" type="range" min="0.35" max="2.2" step="0.05" value="1.50">
+                </label>
+                <label>
+                  <span>Spread</span>
+                  <output id="liveMapBeaconSpreadValue" class="live-map-dev-control-value">1.10</output>
+                  <input id="liveMapBeaconSpread" type="range" min="0.35" max="2.2" step="0.05" value="1.10">
+                </label>
+                <label>
+                  <span>Land bias</span>
+                  <output id="liveMapBeaconLandBiasValue" class="live-map-dev-control-value">1.00</output>
+                  <input id="liveMapBeaconLandBias" type="range" min="0" max="1" step="0.05" value="1.00">
+                </label>
+                <label>
+                  <span>Pop bias</span>
+                  <output id="liveMapBeaconPopulationBiasValue" class="live-map-dev-control-value">0.55</output>
+                  <input id="liveMapBeaconPopulationBias" type="range" min="0" max="1" step="0.05" value="0.55">
+                </label>
+                <label>
+                  <span>Color</span>
+                  <output id="liveMapBeaconColorValue" class="live-map-dev-control-value live-map-dev-color-value">#98EFFF</output>
+                  <input id="liveMapBeaconColor" type="color" value="#98efff">
+                </label>
+
+                <h3>Region glow</h3>
+                <label>
+                  <span>Glow</span>
+                  <output id="liveMapRegionGlowIntensityValue" class="live-map-dev-control-value">1.00</output>
+                  <input id="liveMapRegionGlowIntensity" type="range" min="0" max="1.5" step="0.05" value="1.00">
+                </label>
+                <label>
+                  <span>Glow size</span>
+                  <output id="liveMapRegionGlowSizeValue" class="live-map-dev-control-value">0.80</output>
+                  <input id="liveMapRegionGlowSize" type="range" min="0.35" max="2.5" step="0.05" value="0.80">
+                </label>
+                <label>
+                  <span>Glow color</span>
+                  <output id="liveMapRegionGlowColorValue" class="live-map-dev-control-value live-map-dev-color-value">#5BDCFF</output>
+                  <input id="liveMapRegionGlowColor" type="color" value="#5bdcff">
+                </label>
+              </div>
+
+              <div class="live-map-dev-actions">
+                <button id="liveMapBeaconReset" type="button">Reset style</button>
+                <button id="liveMapBeaconReroll" type="button">Reroll positions</button>
+              </div>
+            </div>
+          </aside>
+        </div>
+
+        <section class="live-region-strip" aria-label="Most active server regions">
+          <h2>Most active server regions</h2>
+          <div id="liveRegionsList" class="live-list live-region-list">
+            <div class="muted">Loading region activity...</div>
+          </div>
+        </section>
+      </section>
+    </section>
+
+    <section class="live-rune-grid" aria-label="Live activity figures">
+      <article class="live-rune-card">
+        <span>Ranked</span>
+        <div><strong id="liveRankedLobbies">-</strong><small>players</small></div>
+      </article>
+
+      <article class="live-rune-card">
+        <span>Custom</span>
+        <div><strong id="liveCustomLobbies">-</strong><small>players</small></div>
+      </article>
+
+      <article class="live-rune-card">
+        <span>In Lobbies</span>
+        <div><strong id="liveJoinableLobbies">-</strong><small>players</small></div>
+      </article>
+    </section>
+
+    <section class="live-ledger-grid live-queue-grid" aria-label="Queue activity breakdown">
+      <section class="live-ledger-card live-queue-card">
+        <h2>Players in queue</h2>
+        <div id="liveModesList" class="live-list live-queue-list">
+          <div class="muted">Loading queue data...</div>
+        </div>
+      </section>
+    </section>
+
+    <div id="livePublicLobbies" hidden></div>
+    <div id="livePlayersInLobbies" hidden></div>
+    <div id="liveSteamOnline" hidden></div>
+    <div id="liveTopRegion" hidden></div>
+  </main>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'js/lobbies.js' %}" defer></script>
+{% endblock %}

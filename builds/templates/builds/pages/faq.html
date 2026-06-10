@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}FAQ | Prostagma?{% endblock %}
+{% block body_class %}info-page-body{% endblock %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'css/lobbies.css' %}">
+  <link rel="stylesheet" href="{% static 'css/site_info.css' %}">
+{% endblock %}
+
+{% block site_header %}
+  {% include "partials/header.html" with active_page="faq" show_game_logo=True header_subtitle="Quick answers about build orders, sources, and site status." %}
+{% endblock %}
+
+{% block content %}
+  <main class="info-page" aria-labelledby="faq-title">
+    <section class="info-hero">
+      <p class="info-eyebrow">FAQ</p>
+      <h1 id="faq-title">Frequently asked questions</h1>
+      <p>
+        A short launch FAQ for the build-order archive and related Prostagma? tools.
+      </p>
+    </section>
+
+    <section class="info-panel">
+      <h2>What is a build order?</h2>
+      <p>
+        A build order is an opening plan for the early game. It usually tells you what to
+        gather, when to build key structures, and what timing or strategic transition the
+        opening is aiming for.
+      </p>
+    </section>
+
+    <section class="info-panel">
+      <h2>Are these builds beginner friendly?</h2>
+      <p>
+        Some are beginner friendly, while others assume you already understand basic AoM
+        mechanics. The site focuses on making each build easier to read, even when the
+        strategy itself is advanced.
+      </p>
+    </section>
+
+    <section class="info-panel">
+      <h2>Where do the builds come from?</h2>
+      <p>
+        The current library is based on public community resources, including the DoD
+        build-order collection. The pages have been imported and reformatted so they are
+        easier to browse by pantheon, major god, and opening type.
+      </p>
+    </section>
+
+    <section class="info-panel">
+      <h2>Why do some gods have more builds than others?</h2>
+      <p>
+        The available public build-order library is uneven. Some gods have many documented
+        openings, while others have fewer public examples. The site reflects what is
+        available and will improve as more good builds are added.
+      </p>
+    </section>
+
+    <section class="info-panel">
+      <h2>Can I submit a build order?</h2>
+      <p>
+        Public submissions are planned, but the launch version is curated first so the
+        build library starts from a stable foundation.
+      </p>
+    </section>
+
+    <section class="info-panel">
+      <h2>Is Prostagma? official?</h2>
+      <p>
+        No. Prostagma? is an independent fan project and is not affiliated with Microsoft,
+        World’s Edge, Forgotten Empires, Xbox Game Studios, or the official Age of Empires
+        / Age of Mythology teams.
+      </p>
+    </section>
+  </main>
+{% endblock %}
+
+{% block site_footer %}
+  {% include "partials/footer.html" %}
+{% endblock %}

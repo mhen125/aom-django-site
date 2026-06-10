@@ -1,0 +1,393 @@
+/* =========================================================
+   Prostagma shared brand/header
+   Loaded after page styles so legacy page CSS cannot break
+   the global header lockup.
+   ========================================================= */
+
+.site-shell-header {
+  position: relative;
+  z-index: 5000;
+  padding: clamp(0.7rem, 1.25vw, 1.05rem) clamp(1rem, 2.4vw, 2.1rem) clamp(0.58rem, 1.05vw, 0.9rem);
+  border-bottom: 1px solid rgba(194, 157, 79, 0.24);
+  background:
+    radial-gradient(circle at 14% 10%, rgba(218, 181, 91, 0.09), transparent 28%),
+    linear-gradient(180deg, rgba(3, 7, 14, 0.96), rgba(4, 8, 15, 0.84));
+  box-shadow: 0 14px 38px rgba(0, 0, 0, 0.28);
+}
+
+body.agora-page .site-shell-header,
+.site-shell-header-agora {
+  border-bottom-color: rgba(157, 188, 214, 0.34);
+  background:
+    radial-gradient(circle at 14% 8%, rgba(146, 194, 231, 0.12), transparent 30%),
+    linear-gradient(180deg, rgba(27, 46, 62, 0.86), rgba(21, 36, 50, 0.76));
+  box-shadow: 0 16px 34px rgba(13, 24, 34, 0.24);
+}
+
+.site-header-inner {
+  width: 100%;
+  max-width: 1680px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(420px, max-content) minmax(360px, 1fr) auto auto;
+  align-items: center;
+  column-gap: clamp(0.9rem, 1.65vw, 1.85rem);
+}
+
+.site-brand-lockup {
+  all: revert;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-self: start !important;
+  min-width: 0 !important;
+  width: max-content !important;
+  max-width: 100% !important;
+  gap: clamp(0.55rem, 1vw, 0.9rem) !important;
+  color: inherit !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+}
+
+.site-brand-icon {
+  display: block !important;
+  flex: 0 0 auto !important;
+  width: clamp(48px, 4.8vw, 74px) !important;
+  height: clamp(48px, 4.8vw, 74px) !important;
+  object-fit: contain !important;
+  image-rendering: auto;
+  transform: translateY(1px);
+  filter:
+    drop-shadow(0 0 7px rgba(230, 190, 88, 0.2))
+    drop-shadow(0 8px 14px rgba(0, 0, 0, 0.44));
+}
+
+.site-brand-text-wrap {
+  display: grid !important;
+  align-content: center !important;
+  gap: 0.08rem !important;
+  min-width: 0 !important;
+  width: max-content !important;
+}
+
+.site-brand-wordmark {
+  display: block !important;
+  width: max-content !important;
+  white-space: nowrap !important;
+  font-family: Cinzel, Baskervville, Georgia, serif !important;
+  font-size: clamp(1.75rem, 3.45vw, 3.45rem) !important;
+  font-weight: 800 !important;
+  line-height: 0.88 !important;
+  letter-spacing: -0.035em !important;
+  color: #071125 !important;
+  -webkit-text-stroke: clamp(0.65px, 0.065vw, 1px) rgba(237, 201, 99, 0.96) !important;
+  text-shadow:
+    0 1px 0 #fff0be,
+    0 2px 0 rgba(124, 80, 25, 0.9),
+    0 0 7px rgba(238, 199, 96, 0.28),
+    0 7px 15px rgba(0, 0, 0, 0.66) !important;
+}
+
+body.agora-page .site-brand-wordmark,
+.site-shell-header-agora .site-brand-wordmark {
+  color: #112538 !important;
+  -webkit-text-stroke-color: rgba(214, 233, 248, 0.92) !important;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.72),
+    0 0 10px rgba(138, 196, 236, 0.32),
+    0 8px 18px rgba(13, 25, 35, 0.38) !important;
+}
+
+.site-brand-tagline {
+  display: block !important;
+  width: max-content !important;
+  margin-top: 0.12rem !important;
+  white-space: nowrap !important;
+  font-family: Baskervville, Georgia, serif !important;
+  font-size: clamp(0.55rem, 0.75vw, 0.72rem) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.2em !important;
+  text-transform: uppercase !important;
+  color: rgba(232, 210, 154, 0.8) !important;
+  text-shadow: 0 2px 7px rgba(0, 0, 0, 0.5) !important;
+}
+
+body.agora-page .site-brand-tagline,
+.site-shell-header-agora .site-brand-tagline {
+  color: rgba(217, 235, 247, 0.78) !important;
+}
+
+.site-primary-nav {
+  justify-self: center !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.24rem !important;
+  padding: 0.26rem !important;
+  border: 1px solid rgba(201, 163, 82, 0.34) !important;
+  border-radius: 999px !important;
+  background:
+    linear-gradient(180deg, rgba(255, 235, 170, 0.035), rgba(0, 0, 0, 0.12)),
+    rgba(0, 0, 0, 0.22) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 235, 176, 0.04) !important;
+}
+
+.site-primary-nav a,
+.site-menu-dropdown a {
+  font-family: Baskervville, Georgia, serif !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.105em !important;
+  text-transform: uppercase !important;
+  text-decoration: none !important;
+}
+
+.site-primary-nav a {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 2.05rem !important;
+  padding: 0.34rem 0.78rem !important;
+  border-radius: 999px !important;
+  color: rgba(244, 229, 184, 0.84) !important;
+  font-size: clamp(0.62rem, 0.67vw, 0.74rem) !important;
+  transition: color 160ms ease, background 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.site-primary-nav a:hover,
+.site-primary-nav a:focus-visible,
+.site-primary-nav a[aria-current="page"] {
+  color: #fff7d8 !important;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 230, 150, 0.18), transparent 65%),
+    rgba(186, 145, 61, 0.22) !important;
+  box-shadow: inset 0 0 0 1px rgba(239, 205, 122, 0.3), 0 0 18px rgba(214, 168, 74, 0.13) !important;
+  transform: translateY(-1px);
+}
+
+body.agora-page .site-primary-nav,
+.site-shell-header-agora .site-primary-nav {
+  border-color: rgba(170, 205, 229, 0.3) !important;
+  background: rgba(22, 38, 54, 0.36) !important;
+}
+
+body.agora-page .site-primary-nav a,
+.site-shell-header-agora .site-primary-nav a {
+  color: rgba(222, 237, 247, 0.86) !important;
+}
+
+body.agora-page .site-primary-nav a:hover,
+body.agora-page .site-primary-nav a:focus-visible,
+body.agora-page .site-primary-nav a[aria-current="page"],
+.site-shell-header-agora .site-primary-nav a:hover,
+.site-shell-header-agora .site-primary-nav a:focus-visible,
+.site-shell-header-agora .site-primary-nav a[aria-current="page"] {
+  color: #f5fbff !important;
+  background: rgba(126, 179, 216, 0.18) !important;
+  box-shadow: inset 0 0 0 1px rgba(186, 221, 245, 0.3), 0 0 18px rgba(130, 193, 232, 0.12) !important;
+}
+
+.site-header-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 0.55rem !important;
+}
+
+.site-last-updated {
+  font-size: 0.75rem !important;
+  color: rgba(237, 230, 204, 0.72) !important;
+  white-space: nowrap !important;
+}
+
+.site-refresh-button {
+  min-height: 2rem !important;
+  padding: 0.35rem 1.1rem !important;
+  font-size: 0.82rem !important;
+  white-space: nowrap !important;
+}
+
+.site-section-heading {
+  max-width: 1680px;
+  margin: clamp(0.45rem, 0.9vw, 0.75rem) auto 0;
+  padding-left: clamp(59px, 5.8vw, 90px);
+}
+
+.site-section-heading h1 {
+  margin: 0;
+  font-family: Baskervville, Georgia, serif;
+  color: #f4ead0;
+  font-size: clamp(0.98rem, 1.4vw, 1.45rem);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-shadow: 0 5px 16px rgba(0, 0, 0, 0.38);
+}
+
+.site-section-heading p {
+  max-width: 700px;
+  margin: 0.2rem 0 0;
+  color: rgba(237, 233, 220, 0.84);
+  font-size: clamp(0.86rem, 0.94vw, 1rem);
+  line-height: 1.45;
+}
+
+body.agora-page .site-section-heading h1,
+.site-shell-header-agora .site-section-heading h1 {
+  color: #eef7ff;
+}
+
+body.agora-page .site-section-heading p,
+.site-shell-header-agora .site-section-heading p {
+  color: rgba(229, 240, 248, 0.82);
+}
+
+.site-mobile-menu {
+  position: relative;
+  display: none !important;
+  justify-self: end;
+  z-index: 6500;
+}
+
+.site-menu-button {
+  display: inline-grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(207, 170, 82, 0.54);
+  border-radius: 8px;
+  background: rgba(8, 10, 14, 0.52);
+  cursor: pointer;
+  transition: transform 160ms ease, background 160ms ease, box-shadow 160ms ease;
+}
+
+.site-menu-button:hover,
+.site-menu-button:focus-visible,
+.site-menu.is-open .site-menu-button {
+  transform: translateY(-1px);
+  background: rgba(46, 38, 19, 0.78);
+  box-shadow: 0 0 16px rgba(214, 171, 82, 0.18);
+}
+
+.site-menu-icon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.site-menu-dropdown {
+  position: absolute;
+  top: calc(100% + 0.6rem);
+  right: 0;
+  display: none;
+  min-width: 230px;
+  padding: 0.55rem;
+  border: 1px solid rgba(207, 170, 82, 0.56);
+  border-radius: 10px;
+  background: rgba(8, 10, 14, 0.96);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.48), inset 0 0 0 1px rgba(255, 235, 180, 0.04);
+  z-index: 9999;
+}
+
+.site-menu.is-open .site-menu-dropdown,
+.site-menu-dropdown.is-open {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.site-menu-dropdown a {
+  display: block;
+  padding: 0.74rem 0.85rem;
+  border-radius: 7px;
+  color: rgba(244, 229, 184, 0.9);
+  font-size: 0.82rem;
+}
+
+.site-menu-dropdown a:hover,
+.site-menu-dropdown a:focus-visible,
+.site-menu-dropdown a[aria-current="page"] {
+  color: #fff6d3;
+  background: rgba(198, 156, 70, 0.18);
+}
+
+.site-footer {
+  min-height: 2.25rem;
+  padding: 1.25rem clamp(1rem, 3vw, 2.5rem);
+  color: rgba(231, 218, 182, 0.62);
+  font-family: Baskervville, Georgia, serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+
+@media (max-width: 1420px) {
+  .site-header-inner {
+    grid-template-columns: minmax(340px, max-content) minmax(330px, 1fr) auto auto;
+    column-gap: 0.75rem;
+  }
+
+  .site-brand-icon {
+    width: 58px !important;
+    height: 58px !important;
+  }
+
+  .site-brand-wordmark {
+    font-size: clamp(1.8rem, 3vw, 2.9rem) !important;
+  }
+
+  .site-primary-nav a {
+    padding-inline: 0.6rem !important;
+    font-size: 0.62rem !important;
+  }
+}
+
+@media (max-width: 1120px) {
+  .site-header-inner {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .site-primary-nav,
+  .site-header-actions {
+    display: none !important;
+  }
+
+  .site-mobile-menu {
+    display: block !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .site-shell-header {
+    padding: 0.75rem 0.95rem;
+  }
+
+  .site-brand-lockup {
+    width: auto !important;
+    white-space: normal !important;
+    gap: 0.55rem !important;
+  }
+
+  .site-brand-icon {
+    width: 50px !important;
+    height: 50px !important;
+  }
+
+  .site-brand-text-wrap {
+    width: auto !important;
+    min-width: 0 !important;
+  }
+
+  .site-brand-wordmark {
+    width: auto !important;
+    font-size: clamp(1.55rem, 7.2vw, 2.35rem) !important;
+    white-space: nowrap !important;
+  }
+
+  .site-brand-tagline {
+    width: auto !important;
+    max-width: 17rem !important;
+    font-size: 0.52rem !important;
+    letter-spacing: 0.12em !important;
+    white-space: normal !important;
+  }
+
+  .site-section-heading {
+    padding-left: 0;
+  }
+}

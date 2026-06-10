@@ -1,0 +1,56 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>{% block title %}Prostagma?{% endblock %}</title>
+
+  {% if meta_description %}
+    <meta name="description" content="{{ meta_description }}">
+  {% endif %}
+
+  {% if meta_robots %}
+    <meta name="robots" content="{{ meta_robots }}">
+  {% endif %}
+
+  {% if canonical_url %}
+    <link rel="canonical" href="{{ canonical_url }}">
+  {% endif %}
+
+  <link rel="icon" href="{% static 'assets/images/ui/favicon/favicon.ico' %}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'assets/images/ui/favicon/favicon-32x32.png' %}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'assets/images/ui/favicon/favicon-16x16.png' %}">
+  <link rel="apple-touch-icon" href="{% static 'assets/images/ui/favicon/apple-touch-icon.png' %}">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Baskervville:ital,wght@0,400..700;1,400..700&family=Cinzel:wght@400..900&display=swap"
+    rel="stylesheet"
+  >
+
+  {# Page CSS loads first so the shared header/account CSS can always win. #}
+  {% block styles %}{% endblock %}
+  <link rel="stylesheet" href="{% static 'css/site_brand.css' %}">
+  <link rel="stylesheet" href="{% static 'css/site_auth.css' %}">
+  <link rel="stylesheet" href="{% static 'css/site_auth_append.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+
+<body class="{% block body_class %}{% endblock %}" {% block body_attrs %}{% endblock %}>
+  {% block site_header %}
+    {% include "partials/header.html" %}
+  {% endblock %}
+
+  {% block content %}{% endblock %}
+
+  {% block site_footer %}{% endblock %}
+
+  <script src="{% static 'js/site_menu.js' %}" defer></script>
+  {% block scripts %}{% endblock %}
+</body>
+
+</html>

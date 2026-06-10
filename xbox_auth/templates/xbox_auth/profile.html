@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Xbox Profile | Prostagma?{% endblock %}
+{% block body_class %}xbox-auth-page{% endblock %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'css/lobbies.css' %}">
+  <link rel="stylesheet" href="{% static 'css/site_auth.css' %}">
+{% endblock %}
+
+{% block content %}
+  <main class="account-auth-shell">
+    <section class="account-auth-card">
+      <p class="account-auth-kicker">Xbox Account</p>
+      <h1>{{ request.user.xbox_profile.display_name|default:request.user.username }}</h1>
+
+      {% if request.user.xbox_profile.avatar_url %}
+        <img class="account-profile-avatar" src="{{ request.user.xbox_profile.avatar_url }}" alt="" loading="lazy">
+      {% endif %}
+
+      <dl class="account-profile-list">
+        <div>
+          <dt>Username</dt>
+          <dd>{{ request.user.username }}</dd>
+        </div>
+        <div>
+          <dt>AoM Alias</dt>
+          <dd>{{ request.user.xbox_profile.aom_alias|default:"Not resolved yet" }}</dd>
+        </div>
+        <div>
+          <dt>AoM Profile ID</dt>
+          <dd>{{ request.user.xbox_profile.aom_profile_id|default:"Not resolved yet" }}</dd>
+        </div>
+        <div>
+          <dt>Gamertag</dt>
+          <dd>{{ request.user.xbox_profile.gamertag|default:"Not returned" }}</dd>
+        </div>
+        <div>
+          <dt>XUID</dt>
+          <dd>{{ request.user.xbox_profile.xuid|default:"Not returned" }}</dd>
+        </div>
+        <div>
+          <dt>Email</dt>
+          <dd>{{ request.user.xbox_profile.microsoft_email|default:"Not returned" }}</dd>
+        </div>
+      </dl>
+
+      <a class="account-auth-link" href="/">Return Home</a>
+      <a class="account-auth-button" href="{% url 'xbox_auth:logout' %}">Sign out</a>
+    </section>
+  </main>
+{% endblock %}

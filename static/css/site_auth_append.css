@@ -1,0 +1,78 @@
+/* =========================================================
+   Signed-out account menu + platform icon buttons
+   Append to static/css/site_auth.css
+   ========================================================= */
+
+.site-auth-menu-wrap .site-user-menu-button {
+  min-height: 2.25rem;
+  padding: 0.3rem 0.7rem 0.3rem 0.42rem;
+}
+
+.site-auth-menu-icon-stack {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 0.12rem;
+}
+
+.site-auth-menu-icon-stack img {
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 999px;
+  object-fit: cover;
+  border: 1px solid rgba(229, 199, 112, 0.34);
+  background: rgba(0, 0, 0, 0.22);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28);
+}
+
+.site-auth-menu-icon-stack img + img {
+  margin-left: -0.42rem;
+}
+
+.site-platform-login-link {
+  gap: 0.55rem;
+}
+
+.site-platform-login-icon {
+  width: 1.45rem;
+  height: 1.45rem;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  object-fit: cover;
+  border: 1px solid rgba(229, 199, 112, 0.34);
+  background: rgba(0, 0, 0, 0.22);
+  box-shadow: 0 3px 9px rgba(0, 0, 0, 0.26);
+}
+
+.site-platform-login-copy {
+  display: grid;
+  gap: 0.05rem;
+  min-width: 0;
+}
+
+.site-platform-login-copy strong,
+.site-platform-login-copy span {
+  display: block;
+  line-height: 1.05;
+}
+
+.site-platform-login-copy strong {
+  color: inherit;
+  font-size: 0.74rem;
+}
+
+.site-platform-login-copy span {
+  color: rgba(224, 207, 158, 0.68);
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+}
+
+.site-platform-login-link.is-disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Hide the older side-by-side signed-out stack if it still exists somewhere. */
+.site-login-stack {
+  display: none;
+}

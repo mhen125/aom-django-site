@@ -1,0 +1,168 @@
+/* =========================================================
+   Steam auth / account UI
+   ========================================================= */
+
+.site-steam-auth {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  justify-content: flex-end;
+  white-space: nowrap;
+}
+
+.site-steam-login,
+.site-steam-profile,
+.site-steam-logout {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.05rem;
+  padding: 0.35rem 0.78rem;
+  border: 1px solid rgba(124, 167, 208, 0.42);
+  border-radius: 999px;
+  color: #e8f5ff;
+  background: rgba(33, 59, 83, 0.42);
+  font-family: Baskervville, Georgia, serif;
+  font-size: clamp(0.62rem, 0.67vw, 0.74rem);
+  font-weight: 700;
+  letter-spacing: 0.105em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: transform 160ms ease, background 160ms ease, color 160ms ease, box-shadow 160ms ease;
+}
+
+.site-steam-login:hover,
+.site-steam-login:focus-visible,
+.site-steam-profile:hover,
+.site-steam-profile:focus-visible,
+.site-steam-logout:hover,
+.site-steam-logout:focus-visible {
+  transform: translateY(-1px);
+  color: #ffffff;
+  background: rgba(63, 104, 139, 0.56);
+  box-shadow: 0 0 18px rgba(112, 177, 228, 0.16);
+}
+
+.site-steam-profile {
+  padding-left: 0.42rem;
+}
+
+.site-steam-avatar {
+  width: 1.45rem;
+  height: 1.45rem;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(229, 242, 255, 0.38);
+}
+
+.site-steam-name {
+  max-width: 12rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.site-steam-logout {
+  opacity: 0.78;
+  padding-inline: 0.65rem;
+}
+
+.site-menu-dropdown .site-mobile-steam-auth {
+  margin-top: 0.25rem;
+  border-top: 1px solid rgba(210, 180, 98, 0.18);
+  padding-top: 0.35rem;
+}
+
+.site-menu-dropdown .site-mobile-steam-auth a {
+  color: rgba(218, 238, 255, 0.95);
+}
+
+.steam-auth-shell {
+  width: min(960px, calc(100% - 2rem));
+  margin: clamp(2rem, 7vw, 6rem) auto;
+}
+
+.steam-auth-card {
+  border: 1px solid rgba(201, 163, 82, 0.34);
+  border-radius: 14px;
+  padding: clamp(1.4rem, 3vw, 2.4rem);
+  background:
+    radial-gradient(circle at 18% 0%, rgba(224, 189, 92, 0.1), transparent 34%),
+    rgba(7, 11, 18, 0.78);
+  box-shadow: 0 26px 70px rgba(0, 0, 0, 0.34);
+  color: #f2ead3;
+}
+
+.steam-auth-kicker {
+  margin: 0 0 0.35rem;
+  color: #dcc47e;
+  font-family: Baskervville, Georgia, serif;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.steam-auth-card h1 {
+  margin: 0 0 0.8rem;
+  font-family: Baskervville, Georgia, serif;
+  font-size: clamp(2rem, 5vw, 4rem);
+}
+
+.steam-profile-avatar {
+  width: 104px;
+  height: 104px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin: 1rem 0;
+  border: 2px solid rgba(230, 199, 110, 0.5);
+}
+
+.steam-profile-list {
+  display: grid;
+  gap: 0.7rem;
+  margin: 1.2rem 0;
+}
+
+.steam-profile-list div {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.steam-profile-list dt {
+  color: #dcc47e;
+  font-weight: 700;
+}
+
+.steam-profile-list dd {
+  margin: 0;
+}
+
+.steam-auth-button,
+.steam-auth-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.4rem;
+  margin-right: 0.55rem;
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  text-decoration: none;
+}
+
+.steam-auth-button {
+  border: 1px solid rgba(207, 170, 82, 0.52);
+  color: #fff5cf;
+  background: rgba(154, 118, 43, 0.42);
+}
+
+.steam-auth-link {
+  color: #dceafa;
+}
+
+@media (max-width: 1360px) {
+  .site-steam-auth {
+    display: none;
+  }
+}

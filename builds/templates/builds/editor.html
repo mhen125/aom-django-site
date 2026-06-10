@@ -1,0 +1,324 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Build Order Editor | Prostagma?{% endblock %}
+{% block meta_description %}Create and manage Age of Mythology: Retold build orders for Prostagma?.{% endblock %}
+{% block body_class %}build-editor-page{% endblock %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'css/lobbies.css' %}">
+  <link rel="stylesheet" href="{% static 'css/home.css' %}">
+  <link rel="stylesheet" href="{% static 'css/editor.css' %}">
+{% endblock %}
+
+{% block extra_head %}
+  <script>
+    window.AOM_STATIC_URL = "{% static '' %}";
+    window.AOM_GOD_DETAIL_BASE_URL = "/gods/";
+    window.AOM_BUILD_DETAIL_BASE_URL = "/builds/";
+    window.AOM_EDITOR_BASE_URL = "/editor/";
+    window.AOM_SAVE_BUILD_URL = "{% url 'builds:api_save_build' %}";
+    window.AOM_DELETE_BUILD_URL = "{% url 'builds:api_delete_build' %}";
+  </script>
+{% endblock %}
+
+{% block site_header %}
+  {% include "partials/header.html" with active_page="builds" show_game_logo=True header_subtitle="Create, duplicate, edit, and manage build orders." %}
+{% endblock %}
+
+{% block content %}
+<main class="page">
+    <section class="build-card editor-shell">
+
+      <header class="editor-topbar">
+        <div class="editor-topbar-copy">
+          <div class="editor-eyebrow">Build Order Tools</div>
+          <h1>Build Order Editor</h1>
+          <p>Create the build one row at a time, then save it to the display page.</p>
+        </div>
+
+        <div class="editor-topbar-actions editor-actions-card">
+          <div class="editor-action-main-row">
+            <label class="editor-picker-label editor-picker-shell">
+              <span>Editing Build</span>
+              <select id="editorBuildPickerSelect" class="editor-build-picker">
+                <option value="">Loading...</option>
+              </select>
+            </label>
+
+            <div class="editor-save-shell">
+              <span class="editor-action-label">Primary</span>
+              <button id="saveBuildButton" class="small-button primary editor-save-button" type="button">Save Build</button>
+            </div>
+          </div>
+
+          <div class="editor-action-clusters">
+            <div class="editor-action-cluster navigation-actions">
+              <div class="editor-action-label">Navigate</div>
+              <div class="editor-action-group">
+                <a id="backToGodBuildsLink" class="small-button secondary" href="/build_orders/">God Builds</a>
+                <a id="backToDisplayLink" class="small-button secondary" href="/build_orders/">Display Page</a>
+              </div>
+            </div>
+
+            <div class="editor-action-cluster management-actions">
+              <div class="editor-action-label">Build Actions</div>
+              <div class="editor-action-group">
+                <button id="newBuildButton" class="small-button secondary" type="button">New</button>
+                <button id="duplicateBuildButton" class="small-button secondary" type="button">Duplicate</button>
+                <button id="deleteBuildButton" class="small-button danger" type="button">Delete</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <section class="editor-panel build-info-panel collapsed-info-panel">
+        <details class="collapsible-editor-panel">
+          <summary class="collapsible-summary">
+            <div>
+              <h2>Build Info</h2>
+              <p>Start here with a clear title, subtitle, card text, and age-up goal.</p>
+            </div>
+
+            <span class="collapse-indicator" aria-hidden="true"></span>
+          </summary>
+
+          <div class="collapsible-content">
+            <div class="build-info-grid">
+              <label class="field">
+                <span>Title</span>
+                <input id="titleInput" type="text" placeholder="3:30 Athena Rush">
+              </label>
+
+              <label class="field">
+                <span>Subtitle</span>
+                <input id="subtitleInput" type="text" placeholder="Fast Classical pressure into early military production.">
+              </label>
+
+              <label class="field">
+                <span>Card Meta</span>
+                <input id="metaInput" type="text" placeholder="Land · Standard · 3:30 Age Up">
+              </label>
+
+              <label class="field">
+                <span>Card Summary</span>
+                <input id="summaryInput" type="text" placeholder="Optional. If blank, the card uses Subtitle.">
+              </label>
+
+              <label class="field">
+                <span>Goal Text</span>
+                <input id="goalTextInput" type="text" placeholder="3:30 Age Up">
+              </label>
+            </div>
+
+            <input id="goalLabelInput" type="hidden" value="Goal">
+            <input id="portraitInput" type="hidden" value="">
+            <input id="goalIconInput" type="hidden" value="">
+          </div>
+        </details>
+      </section>
+
+      <section class="editor-panel composer-panel">
+        <div class="panel-heading">
+          <h2>Add a Row</h2>
+          <p>Add either a normal build step or a milestone divider line.</p>
+        </div>
+
+        <div class="row-type-toggle">
+          <button id="stepModeButton" class="toggle-button active" type="button">Build Step</button>
+          <button id="milestoneModeButton" class="toggle-button" type="button">Milestone Text Line</button>
+        </div>
+
+        <div id="stepComposer" class="composer-card">
+          <div class="composer-section-title">Step Details</div>
+
+          <div class="composer-grid">
+            <label class="field tiny">
+              <span>Time</span>
+              <input id="rowTimeInput" type="text" placeholder="0:00">
+            </label>
+
+            <label class="field">
+              <span>Food</span>
+              <input id="rowFoodInput" type="text" placeholder="4 - Hunt">
+            </label>
+
+            <label class="field">
+              <span>Wood</span>
+              <input id="rowWoodInput" type="text" placeholder="1 - Wood">
+            </label>
+
+            <label class="field">
+              <span>Gold</span>
+              <input id="rowGoldInput" type="text" placeholder="1 - Gold">
+            </label>
+
+            <label class="field">
+              <span>Favor</span>
+              <input id="rowFavorInput" type="text" placeholder="Miko - Shrine">
+            </label>
+
+
+            <label class="field wide">
+              <span>Action / Description</span>
+              <input id="rowActionInput" type="text" placeholder="Miko builds Shrine">
+            </label>
+
+            <label class="field wide">
+              <span>Optional Note</span>
+              <input
+                id="rowNoteInput"
+                type="text"
+                placeholder="This starts favor generation while the economy continues."
+              >
+            </label>
+          </div>
+
+          <div class="composer-section-title split-title">Villager Distribution After This Step</div>
+
+          <div class="split-input-grid">
+            <label class="field compact">
+              <span>Food</span>
+              <input id="splitFoodInput" type="number" min="0" step="1" value="0">
+            </label>
+
+            <label class="field compact">
+              <span>Wood</span>
+              <input id="splitWoodInput" type="number" min="0" step="1" value="0">
+            </label>
+
+            <label class="field compact">
+              <span>Gold</span>
+              <input id="splitGoldInput" type="number" min="0" step="1" value="0">
+            </label>
+
+            <label class="field compact">
+              <span>Favor</span>
+              <input id="splitFavorInput" type="number" min="0" step="1" value="0">
+            </label>
+
+          </div>
+        </div>
+
+        <div id="milestoneComposer" class="composer-card hidden">
+          <div class="composer-section-title">Milestone Line</div>
+
+          <div class="milestone-composer-grid">
+            <label class="field tiny">
+              <span>Time</span>
+              <input id="milestoneTimeInput" type="text" placeholder="3:30">
+            </label>
+
+            <label class="field compact">
+              <span>Emphasis</span>
+              <select id="milestoneStyleInput">
+                <option value="phase">Major milestone</option>
+                <option value="minor-phase">Minor milestone</option>
+              </select>
+            </label>
+
+            <label class="field milestone-field">
+              <span>Milestone Text</span>
+              <input id="milestoneTextInput" type="text" placeholder="Age-Up Window">
+            </label>
+          </div>
+        </div>
+
+        <div class="composer-actions">
+          <button id="addRowButton" class="large-add-button" type="button">Add Row</button>
+          <button id="clearComposerButton" class="small-button secondary" type="button">Clear Fields</button>
+        </div>
+      </section>
+
+      <section class="editor-panel rows-panel">
+        <div class="panel-heading row-list-heading">
+          <div>
+            <h2>Current Build Rows</h2>
+            <p>Rows are rendered in this order. Move, edit, duplicate, or delete them as needed.</p>
+          </div>
+
+          <div class="section-actions">
+            <button id="clearRowsButton" class="small-button danger" type="button">Clear Rows</button>
+          </div>
+        </div>
+
+        <div id="rowsList" class="rows-list"></div>
+      </section>
+
+      <section class="editor-panel json-panel">
+        <div class="panel-heading row-list-heading">
+          <div>
+            <h2>Export / Import JSON</h2>
+            <p>Use this to copy builds between browsers or save reusable build-order presets.</p>
+          </div>
+
+          <div class="section-actions">
+            <button id="exportJsonButton" class="small-button secondary" type="button">Export JSON</button>
+            <button id="importJsonButton" class="small-button secondary" type="button">Import JSON</button>
+            <button id="resetButton" class="small-button danger" type="button">Reset Default</button>
+          </div>
+        </div>
+
+        <textarea
+          id="jsonBox"
+          class="json-box"
+          placeholder="Exported JSON will appear here. You can also paste JSON here and click Import JSON."
+        ></textarea>
+      </section>
+
+    </section>
+  </main>
+
+
+  <div id="editorConfirmModal" class="editor-confirm-modal hidden" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="editorConfirmTitle">
+    <div class="editor-confirm-backdrop" data-editor-confirm-cancel></div>
+
+    <div class="editor-confirm-panel" role="document">
+      <div class="editor-confirm-strip-stack">
+        <div class="editor-confirm-strip editor-confirm-strip-glow" aria-hidden="true"></div>
+        <div class="editor-confirm-strip editor-confirm-strip-base" aria-hidden="true"></div>
+
+        <div class="editor-confirm-strip-copy">
+          <div class="editor-confirm-eyebrow">Build Order Editor</div>
+          <h2 id="editorConfirmTitle">Unsaved Build Order</h2>
+          <p id="editorConfirmMessage">
+            You have unsaved changes. Save first, stay here, or continue without saving.
+          </p>
+        </div>
+      </div>
+
+      <div class="editor-confirm-actions-shell">
+        <div class="editor-confirm-actions">
+          <button id="editorConfirmCancel" class="small-button secondary" type="button">Stay Here</button>
+          <button id="editorConfirmDiscard" class="small-button danger" type="button">Leave Without Saving</button>
+          <button id="editorConfirmSave" class="small-button primary" type="button">Save First</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    fetch("{% url 'builds:data_json' %}")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Could not load data.json: ${response.status}`);
+        }
+
+        return response.json();
+      })
+      .then((data) => {
+        window.AOM_DATA = data;
+
+        const script = document.createElement("script");
+        script.src = "{% static 'js/editor.js' %}";
+        document.body.appendChild(script);
+      })
+      .catch((error) => {
+        console.error("Failed to load AOM data.", error);
+      });
+  </script>
+{% endblock %}

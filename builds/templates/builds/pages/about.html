@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}About | Prostagma?{% endblock %}
+{% block body_class %}info-page-body{% endblock %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'css/lobbies.css' %}">
+  <link rel="stylesheet" href="{% static 'css/site_info.css' %}">
+{% endblock %}
+
+{% block site_header %}
+  {% include "partials/header.html" with active_page="about" show_game_logo=True header_subtitle="An unofficial Age of Mythology: Retold build-order archive and live tools project." %}
+{% endblock %}
+
+{% block content %}
+  <main class="info-page" aria-labelledby="about-title">
+    <section class="info-hero">
+      <p class="info-eyebrow">About Prostagma?</p>
+      <h1 id="about-title">Age of Mythology build orders, preserved and made readable.</h1>
+      <p>
+        Prostagma? is an unofficial Age of Mythology: Retold resource for build orders,
+        live activity tools, lobby browsing, and community-focused game information.
+      </p>
+    </section>
+
+    <section class="info-panel">
+      <h2>Why this exists</h2>
+      <p>
+        AoM has a lot of useful community knowledge, but much of it is scattered across
+        fragile pages, Discord posts, videos, spreadsheets, and older resources that are
+        not always easy to browse or preserve.
+      </p>
+      <p>
+        The goal of Prostagma? is simple: make useful openings easier to find, easier to
+        read, and less dependent on links that can disappear without warning.
+      </p>
+    </section>
+
+    <section class="info-panel">
+      <h2>Build order sources</h2>
+      <p>
+        The launch build library is based on public community build orders, including the
+        DoD build-order collection and other credited community resources. The builds are
+        imported, organized by major god, and reformatted for readability.
+      </p>
+      <p>
+        Original strategy credit belongs to the players and communities who created those
+        openings. Prostagma? exists to preserve and improve access to that knowledge.
+      </p>
+    </section>
+
+    <section class="info-panel">
+      <h2>Unofficial project</h2>
+      <p>
+        Prostagma? is an independent fan project. It is not affiliated with, endorsed by,
+        or sponsored by Microsoft, World’s Edge, Forgotten Empires, Xbox Game Studios, or
+        the official Age of Empires / Age of Mythology teams.
+      </p>
+    </section>
+  </main>
+{% endblock %}
+
+{% block site_footer %}
+  {% include "partials/footer.html" %}
+{% endblock %}

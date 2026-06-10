@@ -1,0 +1,448 @@
+(() => {
+  const pantheonData = [
+    {
+      id: "greek",
+      name: "Greek",
+      image: "/static/assets/images/pantheons/UI_god_pantheon_Greek.png",
+      background: "/static/assets/images/backgrounds/background_greek.png",
+      subtitle: "Olympian pantheon",
+      gods: [
+        { id: "zeus", name: "Zeus", subtitle: "Lightning, pressure, and strong heroic timings." },
+        { id: "hades", name: "Hades", subtitle: "Defense, archers, and powerful scaling." },
+        { id: "poseidon", name: "Poseidon", subtitle: "Cavalry tempo, raids, and map control." },
+        { id: "demeter", name: "Demeter", subtitle: "Economy, myth support, and stable scaling." }
+      ]
+    },
+    {
+      id: "norse",
+      name: "Norse",
+      image: "/static/assets/images/pantheons/UI_god_pantheon_Norse.png",
+      background: "/static/assets/images/backgrounds/background_norse.png",
+      subtitle: "Northern pantheon",
+      gods: [
+        { id: "odin", name: "Odin", subtitle: "Raiding, map control, and durable armies." },
+        { id: "thor", name: "Thor", subtitle: "Dwarven economy and powerful armory timing." },
+        { id: "loki", name: "Loki", subtitle: "Chaos pressure, myth tempo, and disruption." },
+        { id: "freyr", name: "Freyr", subtitle: "Fortified economy and strong late transitions." }
+      ]
+    },
+    {
+      id: "egyptian",
+      name: "Egyptian",
+      image: "/static/assets/images/pantheons/UI_god_pantheon_egyptian.png",
+      background: "/static/assets/images/backgrounds/background_egyptian.png",
+      subtitle: "Desert pantheon",
+      gods: [
+        { id: "ra", name: "Ra", subtitle: "Empowered economy, priests, and scaling." },
+        { id: "isis", name: "Isis", subtitle: "Protection, monuments, and safe timings." },
+        { id: "set", name: "Set", subtitle: "Disruption, animals, and early pressure." }
+      ]
+    },
+    {
+      id: "atlantean",
+      name: "Atlantean",
+      image: "/static/assets/images/pantheons/UI_god_pantheon_Atlantean.png",
+      background: "/static/assets/images/backgrounds/background_atlantean.png",
+      subtitle: "Titan pantheon",
+      gods: [
+        { id: "oranos", name: "Oranos", subtitle: "Lord of the Skies." },
+        { id: "kronos", name: "Kronos", subtitle: "Ruler of the Titans." },
+        { id: "gaia", name: "Gaia", subtitle: "Goddess of the Earth."},
+      ]
+    },
+    {
+      id: "chinese",
+      name: "Chinese",
+      image: "/static/assets/images/pantheons/UI_god_pantheon_Chinese.png",
+      background: "/static/assets/images/backgrounds/background_chinese.png",
+      subtitle: "Celestial pantheon",
+      gods: [
+        { id: "fuxi", name: "Fu Xi", subtitle: "God of Civilization, Culture, and Heaven." },
+        { id: "nuwa", name: "Nüwa", subtitle: "Goddess of Creation and the Earth." },
+        { id: "shennong", name: "Shennong", subtitle: "God of Agriculture and Herbal Medicine." }
+      ]
+    },
+    {
+      id: "japanese",
+      name: "Japanese",
+      image: "/static/assets/images/pantheons/UI_god_pantheon_japanese.png",
+      background: "/static/assets/images/backgrounds/background_japanese.png",
+      subtitle: "Heavenly Spear pantheon",
+      gods: [
+        {
+          id: "amaterasu",
+          name: "Amaterasu",
+          subtitle: "Shrine economy, tempo, and polished scaling.",
+          details: {
+            focus: "Economy and Samurai.",
+            bonuses: [
+              "Earns an increasing Gold trickle with each Bushido tier.",
+              "Samurai and Onna-mushas earn 300% more XP outside of combat.",
+              "Shrines increase the content of nearby resources, up to 140%.",
+              "Samurai and Onna-mushas regenerate hit points, twice as fast in combat."
+            ]
+          }
+        },
+        { id: "tsukuyomi", name: "Tsukuyomi", subtitle: "Fast pressure and aggressive openings." },
+        { id: "susanoo", name: "Susanoo", subtitle: "Raids, disruption, and storm-driven attacks." }
+      ]
+    },
+    {
+      id: "aztec",
+      name: "Aztec",
+      image: "/static/assets/images/pantheons/UI_god_pantheon_Aztec.png",
+      background: "/static/assets/images/backgrounds/background_aztec.png",
+      subtitle: "Immortal Pillars pantheon",
+      gods: [
+        { id: "quetzalcoatl", name: "Quetzalcoatl", subtitle: "Flexible economy and myth support." },
+        { id: "tezcatlipoca", name: "Tezcatlipoca", subtitle: "Favor tempo and volatile power spikes." },
+        { id: "huitzilopochtli", name: "Huitzilopochtli", subtitle: "War pressure and decisive timings." }
+      ]
+    }
+  ];
+
+  const buildOrderData = {
+    zeus: [
+      {
+        id: "zeus-standard-opener",
+        title: "Standard Land Opener",
+        meta: "Land · Standard",
+        summary: "A flexible Zeus opening for clean Classical timing, early pressure, and stable follow-up.",
+        steps: []
+      },
+      {
+        id: "zeus-430-classical",
+        title: "4:30 Classical",
+        meta: "Land · Fast Classical",
+        summary: "A quick Classical timing designed to start pressure before the opponent is fully comfortable.",
+        steps: []
+      }
+    ],
+
+    hades: [
+      {
+        id: "hades-standard-archer",
+        title: "Standard Archer Opener",
+        meta: "Land · Archers",
+        summary: "A safe Hades opening built around strong ranged pressure and efficient defensive trades.",
+        steps: []
+      },
+      {
+        id: "hades-fast-town-center",
+        title: "Fast Town Center",
+        meta: "Land · Economy",
+        summary: "A defensive economy opener that uses Hades' strengths to stabilize and scale.",
+        steps: []
+      }
+    ],
+
+    poseidon: [
+      {
+        id: "poseidon-standard-cav",
+        title: "Standard Cavalry Opener",
+        meta: "Land · Cavalry",
+        summary: "A mobile Poseidon opening focused on early raids, scouting, and map control.",
+        steps: []
+      },
+      {
+        id: "poseidon-standard-water",
+        title: "Standard Water Opener",
+        meta: "Water · Standard",
+        summary: "A water-first opener with safe fishing economy and flexible Classical follow-up.",
+        steps: []
+      }
+    ],
+
+    demeter: [
+      {
+        id: "demeter-standard-opener",
+        title: "Standard Land Opener",
+        meta: "Land · Standard",
+        summary: "A stable Demeter opening for balanced economy, safe Classical timing, and flexible transitions.",
+        steps: []
+      }
+    ],
+
+    odin: [
+      {
+        id: "odin-standard-land",
+        title: "Standard Land Opener",
+        meta: "Land · Standard",
+        summary: "A flexible Odin opening with clean economy, early scouting, and steady raiding pressure.",
+        steps: []
+      },
+      {
+        id: "odin-standard-water",
+        title: "Standard Water Opener",
+        meta: "Water · Standard",
+        summary: "A water-first Odin opener with stable food income and strong map control potential.",
+        steps: []
+      },
+      {
+        id: "odin-330-fast-age-up",
+        title: "3:30 Fast Age Up",
+        meta: "Land · Fast Classical",
+        summary: "A fast Classical timing for quick pressure, early tempo, and aggressive map presence.",
+        steps: []
+      }
+    ],
+
+    thor: [
+      {
+        id: "thor-standard-opener",
+        title: "Standard Land Opener",
+        meta: "Land · Standard",
+        summary: "A clean Thor opener focused on stable economy, early upgrades, and flexible Classical pressure.",
+        steps: []
+      },
+      {
+        id: "thor-dwarf-boom",
+        title: "Dwarf Boom",
+        meta: "Land · Economy",
+        summary: "An economy-heavy Thor setup designed to leverage dwarves and armory value.",
+        steps: []
+      }
+    ],
+
+    loki: [
+      {
+        id: "loki-standard-rush",
+        title: "Standard Rush",
+        meta: "Land · Aggressive",
+        summary: "A fast Loki pressure opener built around early disruption and myth-unit tempo.",
+        steps: []
+      },
+      {
+        id: "loki-hersir-pressure",
+        title: "Hersir Pressure",
+        meta: "Land · Pressure",
+        summary: "A direct pressure build using Hersirs to contest the map and create chaos early.",
+        steps: []
+      }
+    ],
+
+    freyr: [
+      {
+        id: "freyr-standard-opener",
+        title: "Standard Land Opener",
+        meta: "Land · Standard",
+        summary: "A sturdy Freyr opener focused on safe development and strong defensive transitions.",
+        steps: []
+      }
+    ],
+
+    ra: [
+      {
+        id: "ra-standard-boom",
+        title: "Standard Boom",
+        meta: "Land · Economy",
+        summary: "A classic Ra economy opener built around safe growth, empowerment, and strong scaling.",
+        steps: []
+      },
+      {
+        id: "ra-standard-water",
+        title: "Standard Water Opener",
+        meta: "Water · Economy",
+        summary: "A water-focused Ra opener designed to build a strong food economy behind safe defense.",
+        steps: []
+      }
+    ],
+
+    isis: [
+      {
+        id: "isis-standard-opener",
+        title: "Standard Land Opener",
+        meta: "Land · Standard",
+        summary: "A safe Isis opening with protected economy, stable Classical timing, and flexible defense.",
+        steps: []
+      },
+      {
+        id: "isis-fast-town-center",
+        title: "Fast Town Center",
+        meta: "Land · Economy",
+        summary: "A defensive boom opener that uses Isis' protection tools to secure early scaling.",
+        steps: []
+      }
+    ],
+
+    set: [
+      {
+        id: "set-standard-pressure",
+        title: "Standard Pressure",
+        meta: "Land · Pressure",
+        summary: "A Set opening focused on early disruption, map control, and forcing awkward responses.",
+        steps: []
+      },
+      {
+        id: "set-animal-pressure",
+        title: "Animal Pressure",
+        meta: "Land · Aggressive",
+        summary: "A pressure-oriented opener using Set's early tools to contest resources and tempo.",
+        steps: []
+      }
+    ],
+
+    oranos: [
+      {
+        id: "oranos-standard-opener",
+        title: "Standard Land Opener",
+        meta: "Land · Standard",
+        summary: "A mobile Oranos opener built around fast map movement and flexible early pressure.",
+        steps: []
+      },
+      {
+        id: "oranos-fast-raid",
+        title: "Fast Raid",
+        meta: "Land · Aggressive",
+        summary: "A tempo-heavy opener designed to pressure quickly and rotate efficiently around the map.",
+        steps: []
+      }
+    ],
+
+    kronos: [
+      {
+        id: "kronos-standard-rush",
+        title: "Standard Rush",
+        meta: "Land · Aggressive",
+        summary: "A forward-pressure Kronos opener using early tempo to disrupt the opponent's setup.",
+        steps: []
+      }
+    ],
+
+    gaia: [
+      {
+        id: "gaia-standard-boom",
+        title: "Standard Boom",
+        meta: "Land · Economy",
+        summary: "A stable Gaia opener focused on safe economy, map control, and scaling.",
+        steps: []
+      }
+    ],
+
+    prometheus: [
+      {
+        id: "prometheus-standard-opener",
+        title: "Standard Land Opener",
+        meta: "Land · Standard",
+        summary: "A balanced Prometheus opener with efficient economy and flexible Classical options.",
+        steps: []
+      }
+    ],
+
+    fuxi: [
+      {
+        id: "fuxi-standard-opener",
+        title: "Standard Land Opener",
+        meta: "Land · Standard",
+        summary: "A balanced Fu Xi opener focused on clean fundamentals and flexible transitions.",
+        steps: []
+      }
+    ],
+
+    nuwa: [
+      {
+        id: "nuwa-standard-boom",
+        title: "Standard Boom",
+        meta: "Land · Economy",
+        summary: "A Nuwa economy opener built around smooth scaling and flexible follow-up options.",
+        steps: []
+      }
+    ],
+
+    shennong: [
+      {
+        id: "shennong-standard-opener",
+        title: "Standard Land Opener",
+        meta: "Land · Standard",
+        summary: "A steady Shennong opener focused on stability, sustain, and clean progression.",
+        steps: []
+      }
+    ],
+
+    amaterasu: [
+      {
+        id: "amaterasu-standard-opener",
+        title: "Standard Land Opener",
+        meta: "Land · Standard",
+        summary: "A flexible Amaterasu opener built around shrine value, stable tempo, and smooth transitions.",
+        steps: []
+      },
+      {
+        id: "amaterasu-3-miko-boom",
+        title: "3 Miko Boom",
+        meta: "Land · Economy",
+        summary: "A shrine-focused economic opener designed to build strong income behind safe development.",
+        steps: []
+      },
+      {
+        id: "amaterasu-standard-water",
+        title: "Standard Water Opener",
+        meta: "Water · Standard",
+        summary: "A water-first Amaterasu opener with strong food income and flexible Classical options.",
+        steps: []
+      }
+    ],
+
+    tsukuyomi: [
+      {
+        id: "tsukuyomi-330-fast-age-up",
+        title: "3:30 Fast Age Up",
+        meta: "Land · Fast Classical",
+        summary: "A fast Tsukuyomi timing built for early pressure and immediate tempo.",
+        steps: []
+      },
+      {
+        id: "tsukuyomi-2-stable-pressure",
+        title: "2 Stable Pressure",
+        meta: "Land · Aggressive",
+        summary: "A direct pressure opener using fast mounted production to force early reactions.",
+        steps: []
+      }
+    ],
+
+    susanoo: [
+      {
+        id: "susanoo-standard-raid",
+        title: "Standard Raid Opener",
+        meta: "Land · Raid",
+        summary: "A mobile Susanoo opening focused on disruption, tempo, and punishing exposed economy.",
+        steps: []
+      }
+    ],
+
+    quetzalcoatl: [
+      {
+        id: "quetzalcoatl-standard-opener",
+        title: "Standard Land Opener",
+        meta: "Land · Standard",
+        summary: "A flexible Quetzalcoatl opener with stable economy and adaptable Classical options.",
+        steps: []
+      }
+    ],
+
+    tezcatlipoca: [
+      {
+        id: "tezcatlipoca-standard-pressure",
+        title: "Standard Pressure",
+        meta: "Land · Pressure",
+        summary: "A tempo-focused opener built around early favor momentum and pressure potential.",
+        steps: []
+      }
+    ],
+
+    huitzilopochtli: [
+      {
+        id: "huitzilopochtli-standard-rush",
+        title: "Standard Rush",
+        meta: "Land · Aggressive",
+        summary: "A war-focused opener designed to create early fights and force defensive responses.",
+        steps: []
+      }
+    ]
+  };
+
+  window.AOM_DATA = {
+    pantheons: pantheonData,
+    buildOrders: buildOrderData
+  };
+})();

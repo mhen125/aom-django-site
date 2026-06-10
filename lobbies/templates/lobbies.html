@@ -1,0 +1,304 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}AoM: Retold Lobby Browser | Prostagma Live{% endblock %}
+{% block body_class %}lobby-browser-page{% endblock %}
+{% block body_attrs %}data-page="lobby-browser"{% endblock %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'css/lobbies.css' %}">
+{% endblock %}
+
+{% block extra_head %}
+  <script>
+    window.AOM_STATIC_URL = "{% static '' %}";
+    window.AOM_API_BASE_URL = "";
+    window.AOM_ACTIVE_MATCHES_API_URL = "{% url 'lobbies:api_active_matches' %}";
+    window.AOM_ACTIVE_CUSTOM_MATCHES_API_URL = "{% url 'lobbies:api_active_custom_matches' %}";
+  </script>
+{% endblock %}
+
+{% block site_header %}
+  {% include "partials/header.html" with active_page="lobbies" show_game_logo=True show_last_updated=True show_refresh_button=True header_subtitle="Live unofficial custom lobby browser with open lobbies, in-progress custom matches, and ranked games." %}
+{% endblock %}
+
+{% block content %}
+  <main class="app-shell">
+    <header class="lobby-browser-header-panel">
+      <div class="lobby-browser-header-stars" aria-hidden="true"></div>
+
+      <nav class="lobby-panel-tabs" aria-label="Lobby browser sections">
+        <button class="tab-button lobby-panel-tab active" type="button" data-tab="custom">
+          Open Lobbies
+        </button>
+
+        <button class="tab-button lobby-panel-tab" type="button" data-tab="inProgressCustom">
+          Custom
+        </button>
+
+        <button class="tab-button lobby-panel-tab" type="button" data-tab="observable">
+          Ranked
+        </button>
+      </nav>
+    </header>
+
+    <section id="customTab" class="tab-panel active">
+      <section class="browser-layout">
+        <section class="lobby-panel">
+          <div class="filter-bar">
+            <div class="search-control">
+              <label for="searchInput">Search</label>
+              <input
+                id="searchInput"
+                type="text"
+                placeholder="Lobby, host, map, region, player..."
+                autocomplete="off"
+              />
+            </div>
+
+            <div>
+              <label for="regionFilter">Region</label>
+              <select id="regionFilter">
+                <option value="">All regions</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="modeFilter">Mode</label>
+              <select id="modeFilter">
+                <option value="">All modes</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="mapFilter">Map</label>
+              <select id="mapFilter">
+                <option value="">All maps</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="quick-filters" aria-label="Quick filters">
+            <label class="toggle-pill">
+              <input id="hideAiGames" type="checkbox" checked />
+              <span>Hide AI / AotG</span>
+            </label>
+
+            <label class="toggle-pill">
+              <input id="hideFullLobbies" type="checkbox" />
+              <span>Hide full</span>
+            </label>
+
+            <label class="toggle-pill">
+              <input id="hidePassworded" type="checkbox" checked />
+              <span>Hide passworded</span>
+            </label>
+
+            <label class="toggle-pill">
+              <input id="hideCheats" type="checkbox" checked />
+              <span>Hide cheats</span>
+            </label>
+          </div>
+
+          <div class="summary-row">
+            <div>
+              <div id="summary" class="summary">Loading lobbies...</div>
+              <div id="filterNote" class="filter-note">
+                AI / Arena of the Gods lobbies are hidden by default.
+              </div>
+            </div>
+          </div>
+
+          <div class="table-card">
+            <table class="lobby-table">
+              <thead>
+                <tr>
+                  <th data-sort="name">Lobby</th>
+                  <th data-sort="max_players">Players</th>
+                  <th data-sort="game_mode">Mode</th>
+                  <th data-sort="map">Map</th>
+                  <th data-sort="region">Region</th>
+                </tr>
+              </thead>
+              <tbody id="lobbyTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <aside id="detailsSidebar" class="details-sidebar" aria-live="polite">
+          <div class="empty-state">
+            <div class="empty-icon">☥</div>
+            <h2>Select a lobby</h2>
+            <p>Click a row to view the map, players, and the important lobby settings.</p>
+          </div>
+        </aside>
+      </section>
+    </section>
+
+    <section id="inProgressCustomTab" class="tab-panel active-matches-tab">
+      <section class="browser-layout">
+        <section class="lobby-panel">
+          <div class="filter-bar">
+            <div class="search-control">
+              <label for="customMatchSearchInput">Search</label>
+              <input
+                id="customMatchSearchInput"
+                type="text"
+                placeholder="Player, map, god, server, match..."
+                autocomplete="off"
+              />
+            </div>
+
+            <div>
+              <label for="customMatchServerFilter">Server</label>
+              <select id="customMatchServerFilter">
+                <option value="">All servers</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="customMatchMapFilter">Map</label>
+              <select id="customMatchMapFilter">
+                <option value="">All maps</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="summary-row">
+            <div>
+              <div id="customMatchesStatus" class="summary">Loading custom matches...</div>
+              <div class="filter-note">
+                In-progress custom games from the active custom match feed.
+              </div>
+            </div>
+          </div>
+
+          <div class="table-card">
+            <table class="lobby-table active-match-table">
+              <thead>
+                <tr>
+                  <th data-custom-sort="match">Match</th>
+                  <th data-custom-sort="players">Players</th>
+                  <th data-custom-sort="elo">ELO</th>
+                  <th data-custom-sort="time">Time</th>
+                  <th data-custom-sort="observers" class="observer-header-cell">
+                    <img
+                      class="observer-header-icon"
+                      src="{% static 'assets/images/misc/icon_MPLobby_Spectate.png' %}"
+                      alt="Observers"
+                      title="Observers"
+                      loading="lazy"
+                    />
+                  </th>
+                  <th data-custom-sort="map">Map</th>
+                  <th data-custom-sort="region">Region</th>
+                </tr>
+              </thead>
+              <tbody id="customMatchesTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <aside id="customMatchDetailsSidebar" class="details-sidebar active-match-details-sidebar" aria-live="polite">
+          <div class="empty-state">
+            <div class="empty-icon">⚔</div>
+            <h2>Select a custom match</h2>
+            <p>Click a match to view players, teams, gods, ratings, and match details.</p>
+          </div>
+        </aside>
+      </section>
+    </section>
+
+    <section id="observableTab" class="tab-panel active-matches-tab">
+      <section class="browser-layout">
+        <section class="lobby-panel">
+          <div class="filter-bar">
+            <div class="search-control">
+              <label for="activeMatchSearchInput">Search</label>
+              <input
+                id="activeMatchSearchInput"
+                type="text"
+                placeholder="Player, map, god, server, match..."
+                autocomplete="off"
+              />
+            </div>
+
+            <div>
+              <label for="activeMatchQueueFilter">Queue</label>
+              <select id="activeMatchQueueFilter">
+                <option value="">All queues</option>
+                <option value="standard" selected>Standard</option>
+                <option value="team">Ranked Teams</option>
+                <option value="deathmatch">Deathmatch</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="activeMatchServerFilter">Server</label>
+              <select id="activeMatchServerFilter">
+                <option value="">All servers</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="activeMatchMapFilter">Map</label>
+              <select id="activeMatchMapFilter">
+                <option value="">All maps</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="summary-row">
+            <div>
+              <div id="activeMatchesStatus" class="summary">Loading ranked matches...</div>
+              <div id="activeMatchesFilterNote" class="filter-note">
+                Ranked and in-progress matches from the active match feed.
+              </div>
+            </div>
+          </div>
+
+          <div class="table-card">
+            <table class="lobby-table active-match-table">
+              <thead>
+                <tr>
+                  <th data-active-sort="match">Match</th>
+                  <th data-active-sort="players">Players</th>
+                  <th data-active-sort="elo">ELO</th>
+                  <th data-active-sort="time">Time</th>
+                  <th data-active-sort="observers" class="observer-header-cell">
+                    <img
+                      class="observer-header-icon"
+                      src="{% static 'assets/images/misc/icon_MPLobby_Spectate.png' %}"
+                      alt="Observers"
+                      title="Observers"
+                      loading="lazy"
+                    />
+                  </th>
+                  <th data-active-sort="map">Map</th>
+                  <th data-active-sort="region">Region</th>
+                </tr>
+              </thead>
+              <tbody id="activeMatchesTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <aside id="activeMatchDetailsSidebar" class="details-sidebar active-match-details-sidebar" aria-live="polite">
+          <div class="empty-state">
+            <div class="empty-icon">⚔</div>
+            <h2>Select a ranked match</h2>
+            <p>Click a match to view players, teams, gods, ratings, and match details.</p>
+          </div>
+        </aside>
+      </section>
+    </section>
+  </main>
+
+  <div id="hoverTooltip" class="hover-tooltip"></div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'js/lobbies.js' %}" defer></script>
+  <script src="{% static 'js/active_matches.js' %}" defer></script>
+{% endblock %}

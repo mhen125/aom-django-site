@@ -1,0 +1,42 @@
+{# Replace only the signed-out {% else %} block inside <div class="site-user-auth"> with this #}
+<div class="site-user-menu-wrap site-auth-menu-wrap">
+  <button class="site-user-menu-button" type="button" aria-haspopup="true" aria-expanded="false">
+    <span class="site-auth-menu-icon-stack" aria-hidden="true">
+      <img src="{% static 'assets/images/auth/steam_icon.png' %}" alt="" loading="eager" />
+      <img src="{% static 'assets/images/auth/xbox_icon.png' %}" alt="" loading="eager" />
+    </span>
+    <span class="site-user-name">Sign in</span>
+    <span class="site-user-caret" aria-hidden="true">▾</span>
+  </button>
+
+  <div class="site-user-dropdown" role="menu">
+    <div class="site-user-dropdown-heading">
+      <span>Choose account</span>
+      <strong>Sign in to Prostagma</strong>
+    </div>
+
+    <a class="site-platform-login-link" href="{% url 'steam_auth:login' %}?next={{ request.path|urlencode }}" role="menuitem">
+      <img class="site-platform-login-icon" src="{% static 'assets/images/auth/steam_icon.png' %}" alt="" loading="eager" />
+      <span class="site-platform-login-copy">
+        <strong>Sign in with Steam</strong>
+        <span>Recommended for Steam players</span>
+      </span>
+    </a>
+
+    <a class="site-platform-login-link" href="/auth/xbox/login/?next={{ request.path|urlencode }}" role="menuitem">
+      <img class="site-platform-login-icon" src="{% static 'assets/images/auth/xbox_icon.png' %}" alt="" loading="eager" />
+      <span class="site-platform-login-copy">
+        <strong>Sign in with Xbox</strong>
+        <span>Microsoft / Xbox account</span>
+      </span>
+    </a>
+
+    <a class="site-platform-login-link is-disabled" href="#" role="menuitem" aria-disabled="true">
+      <span class="site-platform-login-icon site-user-avatar-fallback" aria-hidden="true">PS</span>
+      <span class="site-platform-login-copy">
+        <strong>PlayStation</strong>
+        <span>Coming later</span>
+      </span>
+    </a>
+  </div>
+</div>
