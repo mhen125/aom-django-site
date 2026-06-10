@@ -539,13 +539,16 @@ def god_portrait_url(god_slug):
     return asset_url(f"assets/images/gods/{god_slug}_portrait.png")
 
 
-def god_hud_ring_url(god):
+def god_hud_ring_url(god=None, god_slug=""):
+    resolved_slug = normalize_slug(god.slug if god else god_slug)
+
+    if resolved_slug in GOD_HUD_RING_FILES:
+        return asset_url(f"{HUD_RING_BASE_PATH}{GOD_HUD_RING_FILES[resolved_slug]}")
+
     if god and god.hud_ring:
         return asset_url(god.hud_ring)
 
-    god_slug = normalize_slug(god.slug if god else "")
-    filename = GOD_HUD_RING_FILES.get(god_slug, "Hud_Ring_Gauge.png")
-    return asset_url(f"{HUD_RING_BASE_PATH}{filename}")
+    return asset_url(f"{HUD_RING_BASE_PATH}Hud_Ring_Gauge.png")
 
 
 def build_detail_url(build):
@@ -711,7 +714,7 @@ def build_detail(request, build_slug):
         canonical_path = f"/builds/{build_slug}/"
         build_portrait = god_portrait_url(requested_god_slug) if requested_god_slug else ""
         goal_icon = asset_url(DEFAULT_GOAL_ICON_PATH)
-        hud_ring = god_hud_ring_url(None)
+        hud_ring = god_hud_ring_url(god_slug=requested_god_slug)
         god_overview_url = "/build_orders/"
         back_to_builds_url = "/build_orders/"
         editor_url = f"/editor/?id={build_slug}"
