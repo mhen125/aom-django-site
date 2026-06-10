@@ -166,21 +166,35 @@ function pictureMarkup({ imagePath, optimizedPath, className, altText }) {
   `;
 }
 
-function godCardPortraitPath(godId) {
+function godCardPortraitPath(god) {
+  const dataPath = normalizeStaticAssetPath(god?.portrait || god?.image || "");
+
+  if (dataPath) {
+    return dataPath;
+  }
+
+  const godId = getGodId(god);
   return staticPath(`assets/images/gods/${godId}_portrait.png`);
 }
 
-function godHeroPortraitPath(godId) {
+function godHeroPortraitPath(god) {
+  const dataPath = normalizeStaticAssetPath(god?.breakoutPortrait || god?.breakout_portrait || god?.portrait || "");
+
+  if (dataPath) {
+    return dataPath;
+  }
+
+  const godId = getGodId(god);
   return staticPath(`assets/images/gods/${godId}_breakoutportrait.png`);
 }
 
-function godCardBackgroundValue(godId) {
-  const sourcePath = godCardPortraitPath(godId);
+function godCardBackgroundValue(god) {
+  const sourcePath = godCardPortraitPath(god);
   return imageSetValue(sourcePath, optimizedAssetPath(sourcePath, ".card"));
 }
 
-function godHeroBackgroundValue(godId) {
-  const sourcePath = godHeroPortraitPath(godId);
+function godHeroBackgroundValue(god) {
+  const sourcePath = godHeroPortraitPath(god);
   return imageSetValue(sourcePath, optimizedAssetPath(sourcePath, ".hero"));
 }
 
@@ -276,12 +290,12 @@ function createGodCard(god, index) {
   card.type = "button";
   card.style.animationDelay = `${index * 75}ms`;
   card.dataset.godId = godId;
-  card.dataset.heroImage = godHeroPortraitPath(godId);
+  card.dataset.heroImage = godHeroPortraitPath(god);
   card.setAttribute("aria-label", `View build orders for ${godName}`);
 
   card.innerHTML = `
     <div class="god-icon-shell">
-      <div class="god-art" style="background-image: ${escapeHtml(godCardBackgroundValue(godId))};"></div>
+      <div class="god-art" style="background-image: ${escapeHtml(godCardBackgroundValue(god))};"></div>
       <div class="god-frame" aria-hidden="true"></div>
     </div>
 

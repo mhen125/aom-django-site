@@ -66,6 +66,13 @@ class Command(BaseCommand):
             "quality": 82,
         },
         {
+            "label": "selection frame",
+            "glob": "assets/images/misc/Party_God_Icon_Frame_Temp.png",
+            "suffix": ".webp",
+            "max_size": (512, 512),
+            "quality": 82,
+        },
+        {
             "label": "large ornate buttons",
             "glob": "assets/images/ui/BtnOrnate_Large_*.png",
             "suffix": ".webp",
@@ -82,6 +89,20 @@ class Command(BaseCommand):
         {
             "label": "shortcode icons",
             "glob": "assets/images/*_icon.png",
+            "suffix": ".webp",
+            "max_size": (128, 128),
+            "quality": 82,
+        },
+        {
+            "label": "shortcode economic building icons",
+            "glob": "assets/images/eco_builds/*_icon.png",
+            "suffix": ".webp",
+            "max_size": (128, 128),
+            "quality": 82,
+        },
+        {
+            "label": "shortcode hero icons",
+            "glob": "assets/images/heroes/*_icon.png",
             "suffix": ".webp",
             "max_size": (128, 128),
             "quality": 82,

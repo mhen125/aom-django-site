@@ -604,7 +604,10 @@ button {
   inset: 0;
   z-index: 3;
   border-radius: 50% / 44%;
-  background-image: url("../assets/images/ui/pantheon_frame.png");
+  background-image: image-set(
+    url("../assets/optimized/images/misc/Party_God_Icon_Frame_Temp.webp") type("image/webp"),
+    url("../assets/images/misc/Party_God_Icon_Frame_Temp.png") type("image/png")
+  );
   background-size: 100% 100%;
   background-position: center;
   background-repeat: no-repeat;
@@ -764,7 +767,10 @@ button {
   inset: 0;
   z-index: 4;
   border-radius: 50% / 44%;
-  background-image: url("../assets/images/ui/pantheon_frame.png");
+  background-image: image-set(
+    url("../assets/optimized/images/misc/Party_God_Icon_Frame_Temp.webp") type("image/webp"),
+    url("../assets/images/misc/Party_God_Icon_Frame_Temp.png") type("image/png")
+  );
   background-size: 100% 100%;
   background-position: center;
   background-repeat: no-repeat;

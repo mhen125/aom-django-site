@@ -515,12 +515,19 @@ function findGod(godId) {
   return null;
 }
 
-function godHeroPortraitPath(godId) {
+function godHeroPortraitPath(god) {
+  const dataPath = normalizeStaticAssetPath(god?.breakoutPortrait || god?.breakout_portrait || god?.portrait || "");
+
+  if (dataPath) {
+    return dataPath;
+  }
+
+  const godId = god?.id || god?.slug || "";
   return staticPath(`assets/images/gods/${godId}_breakoutportrait.png`);
 }
 
-function godHeroBackgroundValue(godId) {
-  const sourcePath = godHeroPortraitPath(godId);
+function godHeroBackgroundValue(god) {
+  const sourcePath = godHeroPortraitPath(god);
   return imageSetValue(sourcePath, optimizedAssetPath(sourcePath, ".hero"));
 }
 
@@ -709,7 +716,7 @@ function renderHero(god, pantheon) {
   pantheonLabel.textContent = `${pantheon.name} Pantheon`;
   godName.textContent = god.name;
   godSummary.textContent = god.subtitle;
-  godHeroArt.style.backgroundImage = godHeroBackgroundValue(god.id);
+  godHeroArt.style.backgroundImage = godHeroBackgroundValue(god);
   buildSectionHeading.textContent = `${god.name} Build Orders`;
 
   updateReturnLinks(pantheon);

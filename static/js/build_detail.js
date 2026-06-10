@@ -20,13 +20,22 @@ const ICONS = {
 
   ox: optimizedImagePath("ox_cart_icon.webp"),
   cart: optimizedImagePath("ox_cart_icon.webp"),
-  ox_cart: optimizedImagePath("ox_cart_icon.webp"),
-  oxcart: optimizedImagePath("ox_cart_icon.webp"),
+  ox_cart: optimizedImagePath("eco_builds/ox_cart_icon.webp"),
+  oxcart: optimizedImagePath("eco_builds/ox_cart_icon.webp"),
 
   miko: optimizedImagePath("miko_icon.webp"),
   temple: optimizedImagePath("temple_icon.webp"),
   shrine: optimizedImagePath("shrine_icon.webp"),
-  storehouse: optimizedImagePath("storehouse_icon.webp"),
+  storehouse: optimizedImagePath("eco_builds/storehouse_icon.webp"),
+  silo: optimizedImagePath("eco_builds/silo_icon.webp"),
+  granary: optimizedImagePath("eco_builds/granary_icon.webp"),
+  lumber_camp: optimizedImagePath("eco_builds/lumber_camp_icon.webp"),
+  watermill: optimizedImagePath("eco_builds/watermill_icon.webp"),
+  economic_guild: optimizedImagePath("eco_builds/economic_guild_icon.webp"),
+  calpulli: optimizedImagePath("eco_builds/calpulli_icon.webp"),
+  calpulli_craft_workshop: optimizedImagePath("eco_builds/calpulli_craft_workshop_icon.webp"),
+  calpulli_livestock_pen: optimizedImagePath("eco_builds/calpulli_livestock_pen_icon.webp"),
+  calpulli_lumber_outpost: optimizedImagePath("eco_builds/calpulli_lumber_outpost_icon.webp"),
 
   kuafu: optimizedImagePath("kuafu_icon.webp"),
   kuafu_hero: optimizedImagePath("kuafu_hero_icon.webp"),
@@ -53,6 +62,11 @@ const ICONS = {
   oracle: optimizedImagePath("oracle_icon.webp"),
   oracle_hero: optimizedImagePath("oracle_hero_icon.webp"),
   pioneer: optimizedImagePath("pioneer_icon.webp"),
+
+  ajax: optimizedImagePath("heroes/ajax_icon.webp"),
+  jason: optimizedImagePath("heroes/jason_icon.webp"),
+  orpheus: optimizedImagePath("heroes/orpheus_icon.webp"),
+  theseus: optimizedImagePath("heroes/theseus_icon.webp"),
 };
 
 const SHORTCODE_ALIASES = {
@@ -95,7 +109,20 @@ const SHORTCODE_ALIASES = {
   storehouse: "storehouse",
   silo: "silo",
   granary: "granary",
-  mining_camp: "mining_camp",
+  lumber_camp: "lumber_camp",
+  lumbercamp: "lumber_camp",
+  watermill: "watermill",
+  water_mill: "watermill",
+  economic_guild: "economic_guild",
+  guild: "economic_guild",
+  calpulli: "calpulli",
+  calpulli_craft_workshop: "calpulli_craft_workshop",
+  craft_workshop: "calpulli_craft_workshop",
+  workshop: "calpulli_craft_workshop",
+  calpulli_livestock_pen: "calpulli_livestock_pen",
+  livestock_pen: "calpulli_livestock_pen",
+  calpulli_lumber_outpost: "calpulli_lumber_outpost",
+  lumber_outpost: "calpulli_lumber_outpost",
 
 
   kuafu: "kuafu",
@@ -120,6 +147,11 @@ const SHORTCODE_ALIASES = {
   oracle: "oracle",
   oracle_hero: "oracle_hero",
   pioneer: "pioneer",
+
+  ajax: "ajax",
+  jason: "jason",
+  orpheus: "orpheus",
+  theseus: "theseus",
 
 };
 

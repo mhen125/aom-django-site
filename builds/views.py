@@ -553,8 +553,45 @@ def static_relative_path(path):
     return value.lstrip("/")
 
 
-def optimized_static_asset_url(path, variant=""):
+def resolve_static_asset_path(path):
     relative_path = static_relative_path(path)
+
+    if not relative_path:
+        return ""
+
+    static_root = settings.BASE_DIR / "static"
+    current_path = static_root
+    resolved_parts = []
+
+    for part in relative_path.split("/"):
+        if not part:
+            continue
+
+        if not current_path.is_dir():
+            return relative_path
+
+        matches = {
+            child.name.lower(): child.name
+            for child in current_path.iterdir()
+        }
+        resolved_part = matches.get(part.lower())
+
+        if not resolved_part:
+            return relative_path
+
+        resolved_parts.append(resolved_part)
+        current_path = current_path / resolved_part
+
+    return "/".join(resolved_parts)
+
+
+def static_asset_url(path):
+    relative_path = resolve_static_asset_path(path)
+    return static(relative_path) if relative_path else ""
+
+
+def optimized_static_asset_url(path, variant=""):
+    relative_path = resolve_static_asset_path(path)
 
     if not relative_path.startswith("assets/images/") or not relative_path.endswith(".png"):
         return ""
@@ -569,7 +606,7 @@ def optimized_static_asset_url(path, variant=""):
 
 
 def god_portrait_url(god_slug):
-    return asset_url(f"assets/images/gods/{god_slug}_portrait.png")
+    return static_asset_url(f"assets/images/gods/{god_slug}_portrait.png")
 
 
 def god_hud_ring_url(god=None, god_slug=""):
@@ -806,12 +843,44 @@ def normalize_fallback_build(build, god_slug, pantheon_slug):
     payload.setdefault("meta", "")
     payload.setdefault("goalLabel", "Goal")
     payload.setdefault("goalText", payload.get("meta") or "Build Order")
-    payload.setdefault("goalIcon", "/static/assets/images/score_age_2.png")
-    payload.setdefault("portrait", f"/static/assets/images/gods/{god_slug}_portrait.png")
+    payload.setdefault("goalIcon", static_asset_url("assets/images/score_age_2.png"))
+    payload.setdefault("portrait", static_asset_url(f"assets/images/gods/{god_slug}_portrait.png"))
+    payload["goalIcon"] = static_asset_url(payload.get("goalIcon")) or payload.get("goalIcon", "")
+    payload["portrait"] = static_asset_url(payload.get("portrait")) or payload.get("portrait", "")
     payload.setdefault("sourceGodId", god_slug)
     payload.setdefault("sourcePantheonId", pantheon_slug)
     payload.setdefault("steps", [])
     return payload
+
+
+def normalize_fallback_god(god, god_slug):
+    clean_god = dict(god or {})
+    clean_god.setdefault("slug", god_slug)
+    clean_god.setdefault("subtitle", clean_god.get("subtitle") or "")
+    clean_god.setdefault("portrait", f"/static/assets/images/gods/{god_slug}_portrait.png")
+    clean_god.setdefault("breakoutPortrait", f"/static/assets/images/gods/{god_slug}_breakoutportrait.png")
+    clean_god.setdefault("hudRing", "")
+    clean_god["portrait"] = static_asset_url(clean_god.get("portrait")) or clean_god.get("portrait", "")
+    clean_god["breakoutPortrait"] = static_asset_url(clean_god.get("breakoutPortrait")) or clean_god.get("breakoutPortrait", "")
+    clean_god["hudRing"] = static_asset_url(clean_god.get("hudRing")) or clean_god.get("hudRing", "")
+    clean_god["details"] = merged_details_for_god(
+        god_slug,
+        clean_god.get("details"),
+        clean_god.get("title") or clean_god.get("name") or "",
+    )
+    return clean_god
+
+
+def normalize_fallback_pantheon(pantheon, pantheon_slug, gods):
+    return {
+        "id": pantheon_slug,
+        "slug": pantheon_slug,
+        "name": pantheon.get("name") or pantheon_slug.title(),
+        "description": pantheon.get("description") or pantheon.get("subtitle") or "",
+        "icon": static_asset_url(pantheon.get("icon") or pantheon.get("image") or ""),
+        "background": static_asset_url(pantheon.get("background") or ""),
+        "gods": gods,
+    }
 
 
 def merge_fallback_build_data(pantheons_payload, build_orders_payload):
@@ -833,30 +902,14 @@ def merge_fallback_build_data(pantheons_payload, build_orders_payload):
 
             for god in pantheon.get("gods") or []:
                 god_slug = god.get("id") or god.get("slug") or ""
-                clean_god = dict(god)
-                clean_god.setdefault("slug", god_slug)
-                clean_god.setdefault("subtitle", clean_god.get("subtitle") or "")
-                clean_god.setdefault("portrait", f"/static/assets/images/gods/{god_slug}_portrait.png")
-                clean_god.setdefault("breakoutPortrait", f"/static/assets/images/gods/{god_slug}_breakoutportrait.png")
-                clean_god.setdefault("hudRing", "")
-                clean_god["details"] = merged_details_for_god(god_slug, clean_god.get("details"), clean_god.get("title") or clean_god.get("name") or "")
-                gods.append(clean_god)
+                gods.append(normalize_fallback_god(god, god_slug))
 
                 fallback_build_payload[god_slug] = [
                     normalize_fallback_build(build, god_slug, pantheon_slug)
                     for build in fallback_build_orders.get(god_slug, [])
                 ]
 
-            clean_pantheon = {
-                "id": pantheon_slug,
-                "slug": pantheon_slug,
-                "name": pantheon.get("name") or pantheon_slug.title(),
-                "description": pantheon.get("description") or pantheon.get("subtitle") or "",
-                "icon": pantheon.get("icon") or pantheon.get("image") or "",
-                "background": pantheon.get("background") or "",
-                "gods": gods,
-            }
-            fallback_payload.append(clean_pantheon)
+            fallback_payload.append(normalize_fallback_pantheon(pantheon, pantheon_slug, gods))
 
         return fallback_payload, fallback_build_payload
 
@@ -870,30 +923,14 @@ def merge_fallback_build_data(pantheons_payload, build_orders_payload):
             gods = []
             for god in fallback_pantheon.get("gods") or []:
                 god_slug = god.get("id") or god.get("slug") or ""
-                clean_god = dict(god)
-                clean_god.setdefault("slug", god_slug)
-                clean_god.setdefault("portrait", f"/static/assets/images/gods/{god_slug}_portrait.png")
-                clean_god.setdefault("breakoutPortrait", f"/static/assets/images/gods/{god_slug}_breakoutportrait.png")
-                clean_god.setdefault("hudRing", "")
-                clean_god["details"] = merged_details_for_god(god_slug, clean_god.get("details"), clean_god.get("title") or clean_god.get("name") or "")
-                gods.append(clean_god)
+                gods.append(normalize_fallback_god(god, god_slug))
 
                 build_orders_payload.setdefault(
                     god_slug,
                     [normalize_fallback_build(build, god_slug, pantheon_slug) for build in fallback_build_orders.get(god_slug, [])],
                 )
 
-            pantheons_payload.append(
-                {
-                    "id": pantheon_slug,
-                    "slug": pantheon_slug,
-                    "name": fallback_pantheon.get("name") or pantheon_slug.title(),
-                    "description": fallback_pantheon.get("description") or fallback_pantheon.get("subtitle") or "",
-                    "icon": fallback_pantheon.get("icon") or fallback_pantheon.get("image") or "",
-                    "background": fallback_pantheon.get("background") or "",
-                    "gods": gods,
-                }
-            )
+            pantheons_payload.append(normalize_fallback_pantheon(fallback_pantheon, pantheon_slug, gods))
             continue
 
         existing_gods = existing_pantheon.setdefault("gods", [])
@@ -903,13 +940,7 @@ def merge_fallback_build_data(pantheons_payload, build_orders_payload):
             god_slug = fallback_god.get("id") or fallback_god.get("slug") or ""
 
             if god_slug not in existing_god_slugs:
-                clean_god = dict(fallback_god)
-                clean_god.setdefault("slug", god_slug)
-                clean_god.setdefault("portrait", f"/static/assets/images/gods/{god_slug}_portrait.png")
-                clean_god.setdefault("breakoutPortrait", f"/static/assets/images/gods/{god_slug}_breakoutportrait.png")
-                clean_god.setdefault("hudRing", "")
-                clean_god["details"] = merged_details_for_god(god_slug, clean_god.get("details"), clean_god.get("title") or clean_god.get("name") or "")
-                existing_gods.append(clean_god)
+                existing_gods.append(normalize_fallback_god(fallback_god, god_slug))
 
             if not build_orders_payload.get(god_slug):
                 fallback_builds = fallback_build_orders.get(god_slug, [])
@@ -981,9 +1012,9 @@ def data_js(request):
                     "slug": god.slug,
                     "name": god.name,
                     "subtitle": god.subtitle,
-                    "portrait": f"/static/{god.portrait}" if god.portrait else "",
-                    "breakoutPortrait": f"/static/{god.breakout_portrait}" if god.breakout_portrait else "",
-                    "hudRing": f"/static/{god.hud_ring}" if god.hud_ring else "",
+                    "portrait": static_asset_url(god.portrait),
+                    "breakoutPortrait": static_asset_url(god.breakout_portrait),
+                    "hudRing": static_asset_url(god.hud_ring),
                     "details": merged_details_for_god(
                         god.slug,
                         {
@@ -1007,8 +1038,8 @@ def data_js(request):
                     "meta": build.meta,
                     "goalLabel": build.goal_label,
                     "goalText": build.goal_text,
-                    "goalIcon": f"/static/{build.goal_icon}" if build.goal_icon else "",
-                    "portrait": f"/static/{build.portrait}" if build.portrait else "",
+                    "goalIcon": static_asset_url(build.goal_icon),
+                    "portrait": static_asset_url(build.portrait),
                     "sourceGodId": god.slug,
                     "sourcePantheonId": pantheon.slug,
                     "steps": [
@@ -1043,8 +1074,8 @@ def data_js(request):
                 "slug": pantheon.slug,
                 "name": pantheon.name,
                 "description": pantheon.description,
-                "icon": f"/static/{pantheon.icon}" if pantheon.icon else "",
-                "background": f"/static/{pantheon.background}" if pantheon.background else "",
+                "icon": static_asset_url(pantheon.icon),
+                "background": static_asset_url(pantheon.background),
                 "gods": gods_payload,
             }
         )
@@ -1099,8 +1130,8 @@ def serialize_build_for_editor(build):
         "meta": build.meta,
         "goalLabel": build.goal_label,
         "goalText": build.goal_text,
-        "goalIcon": f"/static/{build.goal_icon}" if build.goal_icon else "",
-        "portrait": f"/static/{build.portrait}" if build.portrait else "",
+        "goalIcon": static_asset_url(build.goal_icon),
+        "portrait": static_asset_url(build.portrait),
         "sourceGodId": build.major_god.slug,
         "sourcePantheonId": build.major_god.pantheon.slug,
         "steps": [
