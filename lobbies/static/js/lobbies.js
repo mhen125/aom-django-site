@@ -8,6 +8,16 @@ const MAP_ICON_BASE_PATHS = [
   "map-icons",
 ];
 
+const OPTIMIZED_MAP_ICON_BASE_PATHS = [
+  `${STATIC_URL}assets/optimized/map-icons`,
+  "/static/assets/optimized/map-icons",
+];
+
+const MAP_IMAGE_BASE_PATHS = [
+  ...OPTIMIZED_MAP_ICON_BASE_PATHS,
+  ...MAP_ICON_BASE_PATHS,
+];
+
 const GOD_ICON_BASE_PATHS = [
   `${STATIC_URL}god-icons`,
   "/static/god-icons",
@@ -1685,7 +1695,7 @@ window.handleMapImageError = function handleMapImageError(imageElement) {
   const usingFallbackMapIcon =
     imageElement.dataset.usingFallbackMapIcon === "true";
 
-  if (nextIndex < MAP_ICON_BASE_PATHS.length) {
+  if (nextIndex < MAP_IMAGE_BASE_PATHS.length) {
     imageElement.dataset.mapPathIndex = String(nextIndex);
     imageElement.src = usingFallbackMapIcon
       ? getMapImagePath("All Maps", nextIndex)
@@ -1706,8 +1716,9 @@ window.handleMapImageError = function handleMapImageError(imageElement) {
 
 function getMapImagePath(mapName, basePathIndex = 0) {
   const fileName = getMapIconFilename(mapName);
-  const basePath = MAP_ICON_BASE_PATHS[basePathIndex] || MAP_ICON_BASE_PATHS[0];
-  return `${basePath}/${fileName}.png`;
+  const basePath = MAP_IMAGE_BASE_PATHS[basePathIndex] || MAP_IMAGE_BASE_PATHS[0];
+  const extension = basePathIndex < OPTIMIZED_MAP_ICON_BASE_PATHS.length ? "webp" : "png";
+  return `${basePath}/${fileName}.${extension}`;
 }
 
 function getMapIconFilename(mapName) {

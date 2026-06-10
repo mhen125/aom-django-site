@@ -44,6 +44,20 @@ class Command(BaseCommand):
             "max_size": (320, 320),
             "quality": 82,
         },
+        {
+            "label": "map thumbnails",
+            "glob": "map-icons/*.png",
+            "suffix": ".webp",
+            "max_size": (384, 384),
+            "quality": 78,
+        },
+        {
+            "label": "map previews",
+            "glob": "map-icons/previews/*.png",
+            "suffix": ".webp",
+            "max_size": (720, 405),
+            "quality": 76,
+        },
     ]
 
     def add_arguments(self, parser):
@@ -78,7 +92,7 @@ class Command(BaseCommand):
 
                 relative_source = source_path.relative_to(static_root)
                 relative_parent = relative_source.parent
-                output_dir = output_root / relative_parent.relative_to("assets")
+                output_dir = self.get_output_dir(output_root, relative_parent)
                 output_path = output_dir / f"{source_path.stem}{target['suffix']}"
 
                 if (
@@ -127,6 +141,13 @@ class Command(BaseCommand):
                 f"served payload savings: {self.format_bytes(saved)} ({ratio:.1f}%)."
             )
         )
+
+    @staticmethod
+    def get_output_dir(output_root, relative_parent):
+        if relative_parent == Path("assets") or relative_parent.is_relative_to("assets"):
+            return output_root / relative_parent.relative_to("assets")
+
+        return output_root / relative_parent
 
     @staticmethod
     def format_bytes(value):
