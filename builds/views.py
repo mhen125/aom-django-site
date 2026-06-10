@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.utils.text import slugify
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import user_passes_test
+from django.conf import settings
 from django.templatetags.static import static
 
 import json
@@ -535,6 +536,38 @@ def asset_url(path, fallback=""):
     return static(value.lstrip("/"))
 
 
+def static_relative_path(path):
+    value = str(path or "").strip()
+
+    if not value or value.startswith(("http://", "https://", "data:")):
+        return ""
+
+    if value.startswith("/static/"):
+        value = value.replace("/static/", "", 1)
+    elif value.startswith("static/"):
+        value = value.replace("static/", "", 1)
+
+    while value.startswith("../"):
+        value = value[3:]
+
+    return value.lstrip("/")
+
+
+def optimized_static_asset_url(path, variant=""):
+    relative_path = static_relative_path(path)
+
+    if not relative_path.startswith("assets/images/") or not relative_path.endswith(".png"):
+        return ""
+
+    optimized_path = relative_path.replace("assets/images/", "assets/optimized/images/", 1)
+    optimized_path = optimized_path.removesuffix(".png") + f"{variant}.webp"
+
+    if not (settings.BASE_DIR / "static" / optimized_path).exists():
+        return ""
+
+    return static(optimized_path)
+
+
 def god_portrait_url(god_slug):
     return asset_url(f"assets/images/gods/{god_slug}_portrait.png")
 
@@ -704,6 +737,8 @@ def build_detail(request, build_slug):
         )
         goal_icon = asset_url(build.goal_icon, DEFAULT_GOAL_ICON_PATH)
         hud_ring = god_hud_ring_url(build.major_god)
+        build_portrait_webp = optimized_static_asset_url(build_portrait, ".card")
+        hud_ring_webp = optimized_static_asset_url(hud_ring)
         god_overview_url = f"/gods/{build.major_god.slug}/"
         back_to_builds_url = f"/build_orders/?pantheon={build.major_god.pantheon.slug}"
         editor_url = f"/editor/?id={build.slug}&god={build.major_god.slug}"
@@ -715,6 +750,8 @@ def build_detail(request, build_slug):
         build_portrait = god_portrait_url(requested_god_slug) if requested_god_slug else ""
         goal_icon = asset_url(DEFAULT_GOAL_ICON_PATH)
         hud_ring = god_hud_ring_url(god_slug=requested_god_slug)
+        build_portrait_webp = optimized_static_asset_url(build_portrait, ".card")
+        hud_ring_webp = optimized_static_asset_url(hud_ring)
         god_overview_url = "/build_orders/"
         back_to_builds_url = "/build_orders/"
         editor_url = f"/editor/?id={build_slug}"
@@ -730,8 +767,10 @@ def build_detail(request, build_slug):
             "canonical_url": absolute_url(request, canonical_path),
             "meta_description": description,
             "build_portrait_url": build_portrait,
+            "build_portrait_webp_url": build_portrait_webp,
             "goal_icon_url": goal_icon,
             "god_hud_ring_url": hud_ring,
+            "god_hud_ring_webp_url": hud_ring_webp,
             "god_overview_url": god_overview_url,
             "back_to_builds_url": back_to_builds_url,
             "editor_url": editor_url,

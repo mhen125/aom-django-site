@@ -87,6 +87,13 @@ class Command(BaseCommand):
             "quality": 84,
         },
         {
+            "label": "god HUD rings",
+            "glob": "assets/images/pantheons/major_gods/hud/*.png",
+            "suffix": ".webp",
+            "max_size": (302, 105),
+            "quality": 82,
+        },
+        {
             "label": "map thumbnails",
             "glob": "map-icons/*.png",
             "suffix": ".webp",

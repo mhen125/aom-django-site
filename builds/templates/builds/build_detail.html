@@ -55,16 +55,28 @@
             <div
               id="detailGodRing"
               class="detail-god-ring"
-              style="background-image: url('{{ god_hud_ring_url }}');"
+              style="background-image: {% if god_hud_ring_webp_url %}image-set(url('{{ god_hud_ring_webp_url }}') type('image/webp'), url('{{ god_hud_ring_url }}') type('image/png')){% else %}url('{{ god_hud_ring_url }}'){% endif %};"
             ></div>
 
             {% if build_portrait_url %}
-              <img
-                id="buildPortrait"
-                class="detail-god-icon"
-                src="{{ build_portrait_url }}"
-                alt=""
-              >
+              {% if build_portrait_webp_url %}
+                <picture>
+                  <source srcset="{{ build_portrait_webp_url }}" type="image/webp">
+                  <img
+                    id="buildPortrait"
+                    class="detail-god-icon"
+                    src="{{ build_portrait_url }}"
+                    alt=""
+                  >
+                </picture>
+              {% else %}
+                <img
+                  id="buildPortrait"
+                  class="detail-god-icon"
+                  src="{{ build_portrait_url }}"
+                  alt=""
+                >
+              {% endif %}
             {% endif %}
           </div>
         </div>
