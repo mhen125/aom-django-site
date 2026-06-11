@@ -11,6 +11,7 @@ urlpatterns = [
 
     path("api/lobbies/", views.api_lobbies, name="api_lobbies"),
     path("api/activity/live", views.api_live_activity, name="api_live_activity"),
+    path("api/home/news/", views.api_home_news, name="api_home_news"),
     path("api/active-matches/", views.api_active_matches, name="api_active_matches"),
     path(
         "api/active-custom-matches/",

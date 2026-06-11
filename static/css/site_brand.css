@@ -5,13 +5,14 @@
 .site-shell-header {
   position: relative;
   z-index: 5000;
-  padding: clamp(0.7rem, 1.15vw, 0.95rem) var(--site-page-gutter);
+  padding: clamp(0.62rem, 1vw, 0.82rem) var(--site-page-gutter);
   border-bottom: 1px solid var(--site-border);
   color: var(--site-text);
   background:
-    radial-gradient(circle at 12% 0%, rgba(232, 196, 111, 0.12), transparent 30%),
-    linear-gradient(180deg, rgba(5, 9, 18, 0.97), rgba(5, 9, 18, 0.86));
-  box-shadow: 0 14px 38px rgba(0, 0, 0, 0.28);
+    radial-gradient(circle at 12% 0%, rgba(232, 196, 111, 0.1), transparent 30%),
+    linear-gradient(180deg, rgba(3, 8, 16, 0.97), rgba(3, 8, 16, 0.84));
+  box-shadow: 0 14px 38px rgba(0, 0, 0, 0.26);
+  backdrop-filter: blur(6px);
 }
 
 .site-shell-header-agora,
@@ -42,8 +43,8 @@ body.agora-page .site-shell-header {
 
 .site-brand-icon {
   display: block;
-  width: clamp(48px, 4.4vw, 70px);
-  height: clamp(48px, 4.4vw, 70px);
+  width: clamp(44px, 3.7vw, 58px);
+  height: clamp(44px, 3.7vw, 58px);
   object-fit: contain;
   filter:
     drop-shadow(0 0 7px rgba(230, 190, 88, 0.2))
@@ -60,7 +61,7 @@ body.agora-page .site-shell-header {
   display: block;
   color: #071125;
   font-family: var(--site-font-title);
-  font-size: clamp(1.85rem, 3.05vw, 3.2rem);
+  font-size: clamp(1.65rem, 2.35vw, 2.65rem);
   font-weight: 900;
   letter-spacing: 0;
   line-height: 0.86;
@@ -105,21 +106,20 @@ body.agora-page .site-brand-tagline {
   justify-self: center;
   display: flex;
   align-items: center;
-  gap: 0.22rem;
+  gap: clamp(0.2rem, 0.7vw, 0.58rem);
   min-width: 0;
-  padding: 0.25rem;
-  border: 1px solid rgba(201, 163, 82, 0.32);
-  border-radius: var(--site-radius-pill);
-  background:
-    linear-gradient(180deg, rgba(255, 235, 170, 0.04), rgba(0, 0, 0, 0.12)),
-    rgba(0, 0, 0, 0.22);
-  box-shadow: inset 0 0 0 1px rgba(255, 235, 176, 0.04);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .site-primary-nav a,
 .site-primary-nav button,
 .site-menu-dropdown a,
-.site-nav-dropdown-disabled {
+.site-nav-dropdown-disabled,
+.site-nav-disabled {
   font-family: var(--site-font-body);
   font-weight: 800;
   letter-spacing: 0.09em;
@@ -128,14 +128,16 @@ body.agora-page .site-brand-tagline {
 }
 
 .site-primary-nav a,
-.site-primary-nav button {
+.site-primary-nav button,
+.site-nav-disabled {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 2.05rem;
-  padding: 0.34rem 0.68rem;
+  min-height: 2.25rem;
+  padding: 0.34rem 0.38rem;
   border: 0;
-  border-radius: var(--site-radius-pill);
+  border-radius: 0;
   color: rgba(244, 229, 184, 0.84);
   background: transparent;
   cursor: pointer;
@@ -143,6 +145,26 @@ body.agora-page .site-brand-tagline {
   line-height: 1;
   white-space: nowrap;
   transition: color 160ms ease, background 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.site-nav-disabled {
+  color: rgba(244, 229, 184, 0.48);
+  cursor: default;
+}
+
+.site-primary-nav a::after,
+.site-primary-nav button::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -0.78rem;
+  width: 5.6rem;
+  height: 20px;
+  background: url("../assets/optimized/images/homepage/Main_Menu_Selection_Highlight_Underlay.webp") center / 100% 100% no-repeat;
+  opacity: 0;
+  transform: translateX(-50%) scaleX(0.7);
+  transition: opacity 160ms ease, transform 160ms ease;
+  pointer-events: none;
 }
 
 .site-primary-nav a:hover,
@@ -153,17 +175,26 @@ body.agora-page .site-brand-tagline {
 .site-primary-nav button[aria-current="page"],
 .site-nav-dropdown:hover .site-nav-dropdown-button {
   color: #fff7d8;
-  background:
-    radial-gradient(circle at 50% 0%, rgba(255, 230, 150, 0.18), transparent 65%),
-    rgba(186, 145, 61, 0.22);
-  box-shadow: inset 0 0 0 1px rgba(239, 205, 122, 0.3), 0 0 18px rgba(214, 168, 74, 0.13);
+  background: transparent;
+  box-shadow: none;
   transform: translateY(-1px);
+}
+
+.site-primary-nav a:hover::after,
+.site-primary-nav a:focus-visible::after,
+.site-primary-nav a[aria-current="page"]::after,
+.site-primary-nav button:hover::after,
+.site-primary-nav button:focus-visible::after,
+.site-primary-nav button[aria-current="page"]::after,
+.site-nav-dropdown:hover .site-nav-dropdown-button::after {
+  opacity: 0.9;
+  transform: translateX(-50%) scaleX(1);
 }
 
 .site-shell-header-agora .site-primary-nav,
 body.agora-page .site-primary-nav {
-  border-color: rgba(170, 205, 229, 0.3);
-  background: rgba(22, 38, 54, 0.36);
+  border-color: transparent;
+  background: transparent;
 }
 
 .site-shell-header-agora .site-primary-nav a,
@@ -432,17 +463,18 @@ body.agora-page .site-section-heading p {
   }
 
   .site-brand-icon {
-    width: 58px;
-    height: 58px;
+    width: 52px;
+    height: 52px;
   }
 
   .site-brand-wordmark {
-    font-size: clamp(1.8rem, 2.8vw, 2.85rem);
+    font-size: clamp(1.7rem, 2.35vw, 2.45rem);
   }
 
   .site-primary-nav a,
-  .site-primary-nav button {
-    padding-inline: 0.54rem;
+  .site-primary-nav button,
+  .site-nav-disabled {
+    padding-inline: 0.22rem;
     font-size: 0.58rem;
   }
 }
@@ -476,8 +508,8 @@ body.agora-page .site-section-heading p {
   }
 
   .site-user-menu-button {
-    min-width: 42px;
-    min-height: 42px;
+    min-width: 44px;
+    min-height: 44px;
     justify-content: center;
     padding: 0.28rem;
   }

@@ -1,11 +1,21 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Prostagma? | Age of Mythology: Retold Tools{% endblock %}
+{% block title %}Prostagma? | Age of Mythology: Retold Hub{% endblock %}
 {% block body_class %}prostagma-landing-page{% endblock %}
 
 {% block styles %}
   <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+{% endblock %}
+
+{% block extra_head %}
+  <script>
+    window.PROSTAGMA_HOME = {
+      activityUrl: "{% url 'lobbies:api_live_activity' %}",
+      newsUrl: "{% url 'lobbies:api_home_news' %}",
+      fallbackNewsImage: "{% static 'assets/optimized/images/homepage/Gods_Portrait_Window_Multi.webp' %}"
+    };
+  </script>
 {% endblock %}
 
 {% block site_header %}
@@ -15,104 +25,195 @@
 {% block content %}
   <main class="landing-shell">
     <section class="landing-hero" aria-labelledby="landing-title">
-      <div class="landing-hero-backdrop" aria-hidden="true">
+      <div class="landing-map-backdrop" aria-hidden="true">
         <picture>
           <source
-            srcset="{% static 'assets/optimized/images/Background.webp' %}"
+            srcset="{% static 'assets/optimized/images/live/earth_beacon_base_map.webp' %}"
             type="image/webp"
           >
           <img
-            src="{% static 'assets/images/Background.png' %}"
+            src="{% static 'assets/images/live/earth_beacon_base_map.png' %}"
             alt=""
             loading="eager"
           >
         </picture>
+        <canvas id="homeActivityCanvas" class="landing-map-canvas" aria-hidden="true"></canvas>
+        <div class="landing-map-vignette"></div>
       </div>
 
-      <div class="landing-hero-art" aria-hidden="true">
-        <picture>
-          <source
-            srcset="{% static 'assets/optimized/images/ui/prostagma_arkantos.brand.webp' %}"
-            type="image/webp"
-          >
-          <img
-            src="{% static 'assets/images/ui/prostagma_arkantos.png' %}"
-            alt=""
-            loading="eager"
-            width="320"
-            height="320"
-          >
-        </picture>
+      <div class="landing-hero-grid">
+        <div class="landing-hero-copy">
+          <p class="landing-kicker site-kicker">Age of Mythology: Retold Hub</p>
+          <h1 id="landing-title">Prostagma?</h1>
+          <p class="landing-copy">
+            Live lobbies, build orders, stats, and community tools for sharper games.
+          </p>
+
+          <nav class="landing-actions" aria-label="Featured Prostagma destinations">
+            <a class="landing-primary-action" href="/lobbies/">
+              <img src="{% static 'assets/optimized/images/homepage/Watch_On.webp' %}" alt="" width="34" height="34" loading="eager">
+              <span>View Live Lobbies</span>
+            </a>
+            <a href="/build_orders/">
+              <img src="{% static 'assets/optimized/images/homepage/TechTree_On.webp' %}" alt="" width="34" height="34" loading="eager">
+              <span>Browse Build Orders</span>
+            </a>
+          </nav>
+        </div>
+
+        <article id="homeFeaturedNews" class="landing-feature-card landing-panel" aria-live="polite">
+          <div class="landing-feature-media">
+            <img
+              id="homeFeaturedNewsImage"
+              src="{% static 'assets/optimized/images/homepage/Gods_Portrait_Window_Multi.webp' %}"
+              alt=""
+              loading="eager"
+            >
+          </div>
+          <div class="landing-feature-copy">
+            <span id="homeFeaturedNewsBadge" class="landing-badge">Latest News</span>
+            <time id="homeFeaturedNewsDate" datetime="">Loading official feed</time>
+            <h2 id="homeFeaturedNewsTitle">Checking for fresh updates...</h2>
+            <p id="homeFeaturedNewsSummary">
+              Official Age of Mythology: Retold updates will appear here when the Steam feed is available.
+            </p>
+            <a id="homeFeaturedNewsLink" class="landing-feature-link" href="https://steamcommunity.com/games/1934680/announcements/" target="_blank" rel="noopener noreferrer">
+              View News
+              <span aria-hidden="true">›</span>
+            </a>
+          </div>
+        </article>
       </div>
 
-      <div class="landing-hero-content">
-        <p class="landing-kicker site-kicker">Age of Mythology: Retold tools</p>
-        <h1 id="landing-title">Prostagma?</h1>
-        <p class="landing-copy">
-          Live lobby tracking, build order archives, and community tools for sharper games.
-        </p>
+      <section class="landing-live-strip landing-panel" aria-label="Live Age of Mythology activity">
+        <div class="landing-live-stat">
+          <img src="{% static 'assets/optimized/images/homepage/leaderboard.webp' %}" alt="" width="46" height="46" loading="eager">
+          <span>Players Online</span>
+          <strong id="homePlayersOnline">--</strong>
+        </div>
+        <div class="landing-live-stat">
+          <img src="{% static 'assets/optimized/images/homepage/Watch_On.webp' %}" alt="" width="46" height="46" loading="eager">
+          <span>Players in Matches</span>
+          <strong id="homePlayersInMatches">--</strong>
+        </div>
+        <div class="landing-live-stat">
+          <img src="{% static 'assets/optimized/images/homepage/News_On.webp' %}" alt="" width="46" height="46" loading="eager">
+          <span>Open Lobbies</span>
+          <strong id="homeOpenLobbies">--</strong>
+        </div>
+        <div class="landing-live-stat">
+          <img src="{% static 'assets/optimized/images/homepage/Secondary_Xbox_On.webp' %}" alt="" width="46" height="46" loading="eager">
+          <span>Players in Queue</span>
+          <strong id="homePlayersInQueue">--</strong>
+        </div>
+      </section>
+    </section>
 
-        <nav class="landing-actions" aria-label="Featured Prostagma destinations">
-          <a class="landing-primary-action" href="/lobbies/">
-            <img src="{% static 'assets/optimized/images/homepage/Watch_On.webp' %}" alt="" width="34" height="34" loading="eager">
-            <span>Open Lobbies</span>
-            <strong>Live browser</strong>
-          </a>
-          <a href="/activity/">
-            <img src="{% static 'assets/optimized/images/homepage/leaderboard.webp' %}" alt="" width="34" height="34" loading="eager">
-            <span>Activity</span>
-            <strong>Global dashboard</strong>
-          </a>
-          <a href="/build_orders/">
-            <img src="{% static 'assets/optimized/images/homepage/TechTree_On.webp' %}" alt="" width="34" height="34" loading="eager">
-            <span>Build Orders</span>
-            <strong>Pantheons and gods</strong>
-          </a>
-          <a href="/agora/">
-            <img src="{% static 'assets/optimized/images/homepage/chat.webp' %}" alt="" width="34" height="34" loading="eager">
-            <span>Agora</span>
-            <strong>Community hub</strong>
-          </a>
-        </nav>
+    <section class="landing-section landing-news-section" aria-labelledby="landing-news-title">
+      <div class="landing-section-heading">
+        <h2 id="landing-news-title">News &amp; Announcements</h2>
+        <a href="https://steamcommunity.com/games/1934680/announcements/" target="_blank" rel="noopener noreferrer">
+          View All News
+          <span aria-hidden="true">›</span>
+        </a>
+      </div>
+
+      <div id="homeNewsGrid" class="landing-news-grid" aria-live="polite">
+        <article class="landing-news-card landing-panel is-loading">
+          <span class="landing-news-date">Steam Feed</span>
+          <h3>Loading latest announcements...</h3>
+          <p>Patch notes and official news will populate from Steam.</p>
+        </article>
+        <article class="landing-news-card landing-panel is-loading">
+          <span class="landing-news-date">Community</span>
+          <h3>Waiting for updates...</h3>
+          <p>Older news moves here after it is no longer fresh.</p>
+        </article>
+        <article class="landing-news-card landing-panel is-loading">
+          <span class="landing-news-date">Prostagma</span>
+          <h3>More signals coming soon...</h3>
+          <p>Creator and site updates can share this row later.</p>
+        </article>
       </div>
     </section>
 
-    <section class="landing-tool-band" aria-label="Prostagma sections">
-      <a class="landing-tool-card site-panel" href="/lobbies/">
-        <span class="landing-tool-meta">
-          <img src="{% static 'assets/optimized/images/homepage/Watch_On.webp' %}" alt="" width="38" height="38" loading="lazy">
-          <span class="landing-tool-index">01</span>
-        </span>
-        <h2>Open Lobbies</h2>
-        <p>Scan public custom rooms by map, region, player slots, and lobby settings.</p>
-      </a>
+    <section class="landing-section landing-community-section" aria-labelledby="landing-community-title">
+      <div class="landing-section-heading">
+        <h2 id="landing-community-title">Community Pulse</h2>
+      </div>
 
-      <a class="landing-tool-card site-panel" href="/activity/">
-        <span class="landing-tool-meta">
-          <img src="{% static 'assets/optimized/images/homepage/leaderboard.webp' %}" alt="" width="38" height="38" loading="lazy">
-          <span class="landing-tool-index">02</span>
-        </span>
-        <h2>Global Activity</h2>
-        <p>Watch live player activity, queue counts, match totals, and active regions.</p>
-      </a>
+      <div class="landing-community-grid">
+        <article class="landing-community-card landing-panel">
+          <span class="landing-card-kicker">Creator Spotlight</span>
+          <h3>Featured guides and streams</h3>
+          <p>Reserved for top creators, tournament coverage, and community build-order highlights.</p>
+        </article>
+        <article class="landing-community-card landing-panel">
+          <span class="landing-card-kicker">Latest Video</span>
+          <h3>Strategy features</h3>
+          <p>Short-form guide and matchup content can slot in here once the source list is finalized.</p>
+        </article>
+        <article class="landing-community-card landing-panel">
+          <span class="landing-card-kicker">Competitive</span>
+          <h3>Ranked and event signals</h3>
+          <p>Leaderboards, queue stats, and featured events will have a natural home in this space.</p>
+        </article>
+      </div>
+    </section>
 
-      <a class="landing-tool-card site-panel" href="/build_orders/">
-        <span class="landing-tool-meta">
-          <img src="{% static 'assets/optimized/images/homepage/TechTree_On.webp' %}" alt="" width="38" height="38" loading="lazy">
-          <span class="landing-tool-index">03</span>
-        </span>
-        <h2>Build Orders</h2>
-        <p>Browse openings by pantheon and major god with fast paths into each build.</p>
-      </a>
+    <section class="landing-section landing-explore-section" aria-labelledby="landing-explore-title">
+      <div class="landing-section-heading landing-section-heading-centered">
+        <h2 id="landing-explore-title">Explore Prostagma</h2>
+      </div>
 
-      <a class="landing-tool-card site-panel" href="/agora/">
-        <span class="landing-tool-meta">
-          <img src="{% static 'assets/optimized/images/homepage/chat.webp' %}" alt="" width="38" height="38" loading="lazy">
-          <span class="landing-tool-index">04</span>
+      <div class="landing-explore-grid">
+        <a class="landing-entry-card landing-panel" href="/lobbies/">
+          <img src="{% static 'assets/optimized/images/homepage/Watch_On.webp' %}" alt="" width="48" height="48" loading="lazy">
+          <span>
+            <strong>Lobbies</strong>
+            <small>Find and join live games.</small>
+          </span>
+        </a>
+        <a class="landing-entry-card landing-panel" href="/build_orders/">
+          <img src="{% static 'assets/optimized/images/homepage/TechTree_On.webp' %}" alt="" width="48" height="48" loading="lazy">
+          <span>
+            <strong>Build Orders</strong>
+            <small>Browse openings by pantheon and god.</small>
+          </span>
+        </a>
+        <span class="landing-entry-card landing-panel is-disabled" aria-disabled="true">
+          <img src="{% static 'assets/optimized/images/homepage/leaderboard.webp' %}" alt="" width="48" height="48" loading="lazy">
+          <span>
+            <strong>Leaderboards</strong>
+            <small>Rankings and player stats coming soon.</small>
+          </span>
         </span>
-        <h2>Agora</h2>
-        <p>A quieter space for player tools, discussion, and the next set of site features.</p>
-      </a>
+        <span class="landing-entry-card landing-panel is-disabled" aria-disabled="true">
+          <img src="{% static 'assets/optimized/images/homepage/compendium.webp' %}" alt="" width="48" height="48" loading="lazy">
+          <span>
+            <strong>Compendium</strong>
+            <small>Gods, units, techs, and matchup data.</small>
+          </span>
+        </span>
+        <span class="landing-entry-card landing-panel is-disabled" aria-disabled="true">
+          <img src="{% static 'assets/optimized/images/homepage/Secondary_Xbox_On.webp' %}" alt="" width="48" height="48" loading="lazy">
+          <span>
+            <strong>Combat Simulator</strong>
+            <small>Test unit matchups and theorycraft.</small>
+          </span>
+        </span>
+        <a class="landing-entry-card landing-panel" href="/agora/">
+          <img src="{% static 'assets/optimized/images/homepage/chat.webp' %}" alt="" width="48" height="48" loading="lazy">
+          <span>
+            <strong>Agora</strong>
+            <small>Discuss, share, and connect.</small>
+          </span>
+        </a>
+      </div>
     </section>
   </main>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'js/landing.js' %}" defer></script>
 {% endblock %}

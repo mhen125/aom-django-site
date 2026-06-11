@@ -1,3 +1,13 @@
+import html
+import json
+import re
+import time
+import urllib.error
+import urllib.request
+import xml.etree.ElementTree as ET
+from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
+
 from django.http import JsonResponse
 from django.shortcuts import render
 
@@ -20,6 +30,176 @@ def _json_cache_response(payload, *, status=200, refresh=False, max_age=CACHE_SE
         response["Cache-Control"] = f"public, max-age={max_age}, stale-while-revalidate={max_age}"
 
     return response
+
+
+STEAM_APP_ID = 1934680
+STEAM_RSS_URL = "https://steamcommunity.com/games/1934680/rss"
+STEAM_NEWS_URL = (
+    "https://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/"
+    "?appid=1934680&count=5&maxlength=500&format=json"
+)
+HOME_NEWS_CACHE_SECONDS = 60 * 30
+HOME_NEWS_FRESH_DAYS = 14
+
+_home_news_cache = {
+    "created_at": 0.0,
+    "data": None,
+}
+
+
+def _fetch_text(url, timeout=5):
+    request = urllib.request.Request(
+        url,
+        headers={
+            "User-Agent": "Prostagma/1.0 (+https://prostagma.live)",
+            "Accept": "application/rss+xml, application/json, text/xml;q=0.9, */*;q=0.8",
+        },
+    )
+
+    with urllib.request.urlopen(request, timeout=timeout) as response:
+        return response.read().decode("utf-8", errors="replace")
+
+
+def _parse_steam_date(value):
+    if not value:
+        return None
+
+    try:
+        parsed = parsedate_to_datetime(value)
+    except (TypeError, ValueError):
+        return None
+
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+
+    return parsed.astimezone(timezone.utc)
+
+
+def _plain_text_from_html(value, max_length=220):
+    unescaped = html.unescape(value or "")
+    without_scripts = re.sub(r"<(script|style)[^>]*>.*?</\1>", " ", unescaped, flags=re.I | re.S)
+    with_breaks = re.sub(r"<\s*(br|/p|/div|/li|/blockquote|hr)[^>]*>", " ", without_scripts, flags=re.I)
+    text = re.sub(r"<[^>]+>", " ", with_breaks)
+    text = re.sub(r"\s+", " ", html.unescape(text)).strip()
+
+    if len(text) <= max_length:
+        return text
+
+    trimmed = text[: max_length - 1].rsplit(" ", 1)[0].strip()
+    return f"{trimmed}..."
+
+
+def _first_image_from_html(value):
+    unescaped = html.unescape(value or "")
+    match = re.search(r"<img[^>]+src=[\"']([^\"']+)[\"']", unescaped, flags=re.I)
+    return html.unescape(match.group(1)) if match else ""
+
+
+def _normalize_news_item(index, title, link, published_at, summary_html, author="Steam"):
+    now = datetime.now(timezone.utc)
+    age_days = None
+
+    if published_at is not None:
+        age_days = max(0, (now - published_at).days)
+
+    return {
+        "id": f"steam-news-{index}",
+        "title": title or "Age of Mythology: Retold News",
+        "url": link or "https://steamcommunity.com/games/1934680",
+        "author": author or "Steam",
+        "publishedAt": published_at.isoformat() if published_at else None,
+        "ageDays": age_days,
+        "isFresh": age_days is not None and age_days <= HOME_NEWS_FRESH_DAYS,
+        "imageUrl": _first_image_from_html(summary_html),
+        "summary": _plain_text_from_html(summary_html),
+    }
+
+
+def _parse_steam_rss(xml_text):
+    root = ET.fromstring(xml_text)
+    items = []
+
+    for index, item in enumerate(root.findall("./channel/item")):
+        title = item.findtext("title") or ""
+        link = item.findtext("link") or ""
+        published_at = _parse_steam_date(item.findtext("pubDate"))
+        description = item.findtext("description") or ""
+        author = item.findtext("author") or "Steam"
+        items.append(_normalize_news_item(index, title, link, published_at, description, author))
+
+    return items
+
+
+def _parse_steam_news_json(json_text):
+    payload = json.loads(json_text)
+    news_items = payload.get("appnews", {}).get("newsitems", [])
+    items = []
+
+    for index, item in enumerate(news_items):
+        published_at = None
+        raw_date = item.get("date")
+
+        if raw_date:
+            try:
+                published_at = datetime.fromtimestamp(int(raw_date), tz=timezone.utc)
+            except (TypeError, ValueError, OSError):
+                published_at = None
+
+        items.append(
+            _normalize_news_item(
+                index,
+                item.get("title") or "",
+                item.get("url") or "",
+                published_at,
+                item.get("contents") or "",
+                item.get("author") or "Steam",
+            )
+        )
+
+    return items
+
+
+def _get_home_news(force_refresh=False):
+    now = time.time()
+
+    if (
+        not force_refresh
+        and _home_news_cache["data"] is not None
+        and now - _home_news_cache["created_at"] < HOME_NEWS_CACHE_SECONDS
+    ):
+        return _home_news_cache["data"]
+
+    source = "steam_rss"
+    error = None
+
+    try:
+        items = _parse_steam_rss(_fetch_text(STEAM_RSS_URL))
+    except (ET.ParseError, urllib.error.URLError, TimeoutError, OSError, ValueError) as rss_error:
+        source = "steam_news_api"
+        error = str(rss_error)
+
+        try:
+            items = _parse_steam_news_json(_fetch_text(STEAM_NEWS_URL))
+        except (json.JSONDecodeError, urllib.error.URLError, TimeoutError, OSError, ValueError) as news_error:
+            items = []
+            error = str(news_error)
+
+    fresh_items = [item for item in items if item["isFresh"]]
+    featured = fresh_items[0] if fresh_items else (items[0] if items else None)
+
+    payload = {
+        "ok": bool(items),
+        "source": source,
+        "freshDays": HOME_NEWS_FRESH_DAYS,
+        "generatedAt": datetime.now(timezone.utc).isoformat(),
+        "featured": featured,
+        "items": items[:6],
+        "error": error,
+    }
+
+    _home_news_cache["created_at"] = now
+    _home_news_cache["data"] = payload
+    return payload
 
 
 def live_activity_home(request):
@@ -48,6 +228,12 @@ def landing_home(request):
             ),
         },
     )
+
+
+def api_home_news(request):
+    refresh = _refresh_requested(request)
+    payload = _get_home_news(force_refresh=refresh)
+    return _json_cache_response(payload, refresh=refresh, max_age=HOME_NEWS_CACHE_SECONDS)
 
 
 def lobby_browser(request):

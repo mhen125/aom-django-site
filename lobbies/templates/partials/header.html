@@ -26,9 +26,9 @@
 
     <nav class="site-primary-nav" aria-label="Primary navigation">
       <a href="/"{% if active_page == "home" %} aria-current="page"{% endif %}>Home</a>
-      <a href="/build_orders/"{% if active_page == "builds" %} aria-current="page"{% endif %}>Build Orders</a>
       <a href="/lobbies/"{% if active_page == "lobbies" %} aria-current="page"{% endif %}>Lobbies</a>
-      <a href="/activity/"{% if active_page == "activity" %} aria-current="page"{% endif %}>Activity</a>
+      <a href="/build_orders/"{% if active_page == "builds" %} aria-current="page"{% endif %}>Build Orders</a>
+      <span class="site-nav-disabled" aria-disabled="true">Leaderboards</span>
       <a href="/agora/"{% if active_page == "agora" %} aria-current="page"{% endif %}>Agora</a>
 
       <div class="site-nav-dropdown">
@@ -226,9 +226,9 @@
           data-site-menu-dropdown
         >
           <a href="/"{% if active_page == "home" %} aria-current="page"{% endif %}>Home</a>
-          <a href="/build_orders/"{% if active_page == "builds" %} aria-current="page"{% endif %}>Build Orders</a>
           <a href="/lobbies/"{% if active_page == "lobbies" %} aria-current="page"{% endif %}>Lobbies</a>
-          <a href="/activity/"{% if active_page == "activity" %} aria-current="page"{% endif %}>Activity</a>
+          <a href="/build_orders/"{% if active_page == "builds" %} aria-current="page"{% endif %}>Build Orders</a>
+          <span class="site-mobile-menu-disabled">Leaderboards <small>Coming soon</small></span>
           <a href="/agora/"{% if active_page == "agora" %} aria-current="page"{% endif %}>Agora</a>
 
           <div class="site-mobile-menu-section">
