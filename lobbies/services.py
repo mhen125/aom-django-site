@@ -14,10 +14,7 @@ from .worlds_edge import DEFAULT_START_VALUES, fetch_raw_lobbies
 
 CACHE_SECONDS = 20
 
-_cache: dict[str, Any] = {
-    "created_at": 0.0,
-    "data": None,
-}
+_cache: dict[tuple[int, ...], dict[str, Any]] = {}
 
 _live_activity_cache: dict[str, Any] = {
     "created_at": 0.0,
@@ -31,15 +28,18 @@ async def get_normalized_lobbies(
 ) -> list[dict[str, Any]]:
     now = time.time()
 
-    if (
-        not force_refresh
-        and _cache["data"] is not None
-        and now - _cache["created_at"] < CACHE_SECONDS
-    ):
-        return _cache["data"]
-
     if start_values is None:
         start_values = DEFAULT_START_VALUES
+
+    cache_key = tuple(start_values)
+    cache_entry = _cache.get(cache_key)
+
+    if (
+        not force_refresh
+        and cache_entry is not None
+        and now - cache_entry["created_at"] < CACHE_SECONDS
+    ):
+        return cache_entry["data"]
 
     raw_data = await fetch_raw_lobbies(start_values)
     avatars_by_profile_id = build_avatar_lookup(raw_data)
@@ -54,8 +54,10 @@ async def get_normalized_lobbies(
         reverse=True,
     )
 
-    _cache["created_at"] = now
-    _cache["data"] = normalized_lobbies
+    _cache[cache_key] = {
+        "created_at": now,
+        "data": normalized_lobbies,
+    }
 
     return normalized_lobbies
 

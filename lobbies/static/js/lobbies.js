@@ -1,6 +1,8 @@
 const API_BASE_URL = window.AOM_API_BASE_URL || "";
 const STATIC_URL = window.AOM_STATIC_URL || "/static/";
 const ACTIVE_MATCHES_SCRIPT_URL = window.AOM_ACTIVE_MATCHES_SCRIPT_URL || "";
+const INITIAL_LOBBY_PAGE_COUNT = 2;
+const FULL_LOBBY_PAGE_COUNT = 4;
 
 const MAP_ICON_BASE_PATHS = [`${STATIC_URL}map-icons`];
 
@@ -99,6 +101,7 @@ let sortDirection = "desc";
 let activeTab = "custom";
 let hoveredLobby = null;
 let activeMatchesScriptPromise = null;
+let pendingLobbyHydration = null;
 
 let leaderboardCache = new Map();
 let leaderboardPending = new Map();
@@ -1211,12 +1214,17 @@ async function openPlayerDetails(participant, lobby) {
 
 window.openPlayerDetails = openPlayerDetails;
 
-async function loadLobbies(forceRefresh = false) {
-  if (summary) {
+async function loadLobbies(forceRefresh = false, options = {}) {
+  const pageCount = options.pageCount ?? (
+    forceRefresh ? FULL_LOBBY_PAGE_COUNT : INITIAL_LOBBY_PAGE_COUNT
+  );
+  const isBackground = Boolean(options.isBackground);
+
+  if (summary && !isBackground) {
     summary.textContent = "Loading lobbies...";
   }
 
-  if (filterNote) {
+  if (filterNote && !isBackground) {
     filterNote.textContent = "";
   }
 
@@ -1226,7 +1234,7 @@ async function loadLobbies(forceRefresh = false) {
     params.set("refresh", "1");
   }
 
-  params.set("pages", "4");
+  params.set("pages", String(pageCount));
 
   const response = await fetch(`${API_BASE_URL}/api/lobbies/?${params.toString()}`);
 
@@ -1249,6 +1257,40 @@ async function loadLobbies(forceRefresh = false) {
 
   populateFilters();
   applyFiltersAndRender();
+
+  if (
+    !forceRefresh &&
+    !isBackground &&
+    pageCount < FULL_LOBBY_PAGE_COUNT &&
+    lobbies.length >= pageCount * 25
+  ) {
+    scheduleFullLobbyHydration();
+  }
+}
+
+function scheduleFullLobbyHydration() {
+  if (pendingLobbyHydration) {
+    return;
+  }
+
+  const hydrate = () => {
+    pendingLobbyHydration = loadLobbies(false, {
+      pageCount: FULL_LOBBY_PAGE_COUNT,
+      isBackground: true,
+    })
+      .catch((error) => {
+        console.warn(error);
+      })
+      .finally(() => {
+        pendingLobbyHydration = null;
+      });
+  };
+
+  if ("requestIdleCallback" in window) {
+    window.requestIdleCallback(hydrate, { timeout: 2500 });
+  } else {
+    window.setTimeout(hydrate, 900);
+  }
 }
 
 function populateFilters() {
