@@ -36,7 +36,7 @@ urlpatterns = [
         name="faq",
     ),
 
-    # Live activity owns the public home page and live lobby/API routes.
+    # Landing page, live lobby/API routes, and activity dashboard.
     path("", include("lobbies.urls")),
 
     # Canonical build-order section URL.

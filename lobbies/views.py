@@ -27,10 +27,24 @@ def live_activity_home(request):
         request,
         "live_activity.html",
         {
-            "canonical_url": request.build_absolute_uri("/"),
+            "canonical_url": request.build_absolute_uri("/activity/"),
             "meta_description": (
                 "Live Age of Mythology: Retold activity dashboard for Steam players online, "
                 "ranked queues, custom matches, open lobbies, and active server regions."
+            ),
+        },
+    )
+
+
+def landing_home(request):
+    return render(
+        request,
+        "landing.html",
+        {
+            "canonical_url": request.build_absolute_uri("/"),
+            "meta_description": (
+                "Prostagma is an Age of Mythology: Retold hub for live lobbies, global activity, "
+                "build orders, and community tools."
             ),
         },
     )

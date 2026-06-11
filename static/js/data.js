@@ -1,10 +1,16 @@
 (() => {
+  const STATIC_URL = window.AOM_STATIC_URL || "/static/";
+
+  function staticPath(path) {
+    return `${STATIC_URL}${String(path).replace(/^\/+/, "")}`;
+  }
+
   const pantheonData = [
     {
       id: "greek",
       name: "Greek",
-      image: "/static/assets/images/pantheons/UI_god_pantheon_Greek.png",
-      background: "/static/assets/images/backgrounds/background_greek.png",
+      image: staticPath("assets/images/pantheons/UI_god_pantheon_Greek.png"),
+      background: staticPath("assets/images/backgrounds/background_greek.png"),
       subtitle: "Olympian pantheon",
       gods: [
         { id: "zeus", name: "Zeus", subtitle: "Lightning, pressure, and strong heroic timings." },
@@ -16,8 +22,8 @@
     {
       id: "norse",
       name: "Norse",
-      image: "/static/assets/images/pantheons/UI_god_pantheon_Norse.png",
-      background: "/static/assets/images/backgrounds/background_norse.png",
+      image: staticPath("assets/images/pantheons/UI_god_pantheon_Norse.png"),
+      background: staticPath("assets/images/backgrounds/background_norse.png"),
       subtitle: "Northern pantheon",
       gods: [
         { id: "odin", name: "Odin", subtitle: "Raiding, map control, and durable armies." },
@@ -29,8 +35,8 @@
     {
       id: "egyptian",
       name: "Egyptian",
-      image: "/static/assets/images/pantheons/UI_god_pantheon_egyptian.png",
-      background: "/static/assets/images/backgrounds/background_egyptian.png",
+      image: staticPath("assets/images/pantheons/UI_god_pantheon_egyptian.png"),
+      background: staticPath("assets/images/backgrounds/background_egyptian.png"),
       subtitle: "Desert pantheon",
       gods: [
         { id: "ra", name: "Ra", subtitle: "Empowered economy, priests, and scaling." },
@@ -41,8 +47,8 @@
     {
       id: "atlantean",
       name: "Atlantean",
-      image: "/static/assets/images/pantheons/UI_god_pantheon_Atlantean.png",
-      background: "/static/assets/images/backgrounds/background_atlantean.png",
+      image: staticPath("assets/images/pantheons/UI_god_pantheon_Atlantean.png"),
+      background: staticPath("assets/images/backgrounds/background_atlantean.png"),
       subtitle: "Titan pantheon",
       gods: [
         { id: "oranos", name: "Oranos", subtitle: "Lord of the Skies." },
@@ -53,8 +59,8 @@
     {
       id: "chinese",
       name: "Chinese",
-      image: "/static/assets/images/pantheons/UI_god_pantheon_Chinese.png",
-      background: "/static/assets/images/backgrounds/background_chinese.png",
+      image: staticPath("assets/images/pantheons/UI_god_pantheon_Chinese.png"),
+      background: staticPath("assets/images/backgrounds/background_chinese.png"),
       subtitle: "Celestial pantheon",
       gods: [
         { id: "fuxi", name: "Fu Xi", subtitle: "God of Civilization, Culture, and Heaven." },
@@ -65,8 +71,8 @@
     {
       id: "japanese",
       name: "Japanese",
-      image: "/static/assets/images/pantheons/UI_god_pantheon_japanese.png",
-      background: "/static/assets/images/backgrounds/background_japanese.png",
+      image: staticPath("assets/images/pantheons/UI_god_pantheon_japanese.png"),
+      background: staticPath("assets/images/backgrounds/background_japanese.png"),
       subtitle: "Heavenly Spear pantheon",
       gods: [
         {
@@ -90,8 +96,8 @@
     {
       id: "aztec",
       name: "Aztec",
-      image: "/static/assets/images/pantheons/UI_god_pantheon_Aztec.png",
-      background: "/static/assets/images/backgrounds/background_aztec.png",
+      image: staticPath("assets/images/pantheons/UI_god_pantheon_Aztec.png"),
+      background: staticPath("assets/images/backgrounds/background_aztec.png"),
       subtitle: "Immortal Pillars pantheon",
       gods: [
         { id: "quetzalcoatl", name: "Quetzalcoatl", subtitle: "Flexible economy and myth support." },

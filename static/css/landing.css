@@ -1,0 +1,291 @@
+.prostagma-landing-page {
+  min-height: 100vh;
+  margin: 0;
+  color: #f6ead0;
+  background: #050812;
+}
+
+.landing-shell {
+  min-height: calc(100vh - 88px);
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(2, 5, 11, 0.04), #050812 78%),
+    #050812;
+}
+
+.landing-hero {
+  position: relative;
+  display: grid;
+  align-items: center;
+  box-sizing: border-box;
+  min-height: min(760px, calc(100svh - 92px));
+  padding: clamp(4rem, 8vw, 7.6rem) clamp(1.1rem, 5vw, 6.6rem) clamp(4.2rem, 7vw, 6.6rem);
+  isolation: isolate;
+}
+
+.landing-hero::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 34%;
+  z-index: -1;
+  background: linear-gradient(180deg, transparent, #050812 82%);
+  pointer-events: none;
+}
+
+.landing-hero-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+  overflow: hidden;
+  background: #050812;
+}
+
+.landing-hero-backdrop picture,
+.landing-hero-backdrop img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.landing-hero-backdrop img {
+  object-fit: cover;
+  object-position: center;
+  filter: saturate(1.04) contrast(1.04) brightness(0.76);
+}
+
+.landing-hero-backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(3, 7, 16, 0.88) 0%, rgba(3, 7, 16, 0.68) 38%, rgba(3, 7, 16, 0.34) 68%, rgba(3, 7, 16, 0.72) 100%),
+    linear-gradient(180deg, rgba(3, 7, 16, 0.22), rgba(3, 7, 16, 0.58));
+}
+
+.landing-hero-art {
+  position: absolute;
+  right: clamp(1rem, 7vw, 8rem);
+  bottom: clamp(2.4rem, 7vw, 6.4rem);
+  z-index: -1;
+  width: clamp(180px, 24vw, 360px);
+  opacity: 0.9;
+  filter:
+    drop-shadow(0 26px 38px rgba(0, 0, 0, 0.54))
+    drop-shadow(0 0 18px rgba(223, 183, 92, 0.18));
+}
+
+.landing-hero-art img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.landing-hero-content {
+  width: min(760px, 100%);
+}
+
+.landing-kicker {
+  margin: 0 0 0.95rem;
+  color: rgba(237, 205, 130, 0.9);
+  font-family: Baskervville, Georgia, serif;
+  font-size: clamp(0.72rem, 1vw, 0.92rem);
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.landing-hero h1 {
+  margin: 0;
+  color: #091226;
+  font-family: Cinzel, Baskervville, Georgia, serif;
+  font-size: clamp(4.6rem, 13vw, 11.5rem);
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 0.82;
+  -webkit-text-stroke: clamp(1px, 0.11vw, 1.6px) rgba(245, 212, 121, 0.98);
+  text-shadow:
+    0 1px 0 #fff0bd,
+    0 3px 0 rgba(118, 74, 22, 0.9),
+    0 0 16px rgba(235, 196, 92, 0.22),
+    0 16px 30px rgba(0, 0, 0, 0.72);
+}
+
+.landing-copy {
+  width: min(610px, 100%);
+  margin: clamp(1.2rem, 2.4vw, 1.8rem) 0 0;
+  color: rgba(250, 240, 214, 0.9);
+  font-family: Baskervville, Georgia, serif;
+  font-size: clamp(1.15rem, 2vw, 1.72rem);
+  font-weight: 700;
+  line-height: 1.35;
+  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.6);
+}
+
+.landing-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.78rem;
+  margin-top: clamp(1.8rem, 3vw, 2.6rem);
+}
+
+.landing-actions a {
+  display: grid;
+  min-width: min(100%, 174px);
+  padding: 0.92rem 1.05rem;
+  border: 1px solid rgba(222, 183, 92, 0.35);
+  border-radius: 6px;
+  color: #f9edcb;
+  text-decoration: none;
+  background:
+    linear-gradient(180deg, rgba(255, 236, 170, 0.08), rgba(0, 0, 0, 0.16)),
+    rgba(8, 13, 24, 0.66);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 238, 174, 0.05),
+    0 15px 32px rgba(0, 0, 0, 0.26);
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.landing-actions a:hover,
+.landing-actions a:focus-visible {
+  transform: translateY(-2px);
+  border-color: rgba(247, 214, 130, 0.72);
+  background:
+    linear-gradient(180deg, rgba(255, 234, 164, 0.14), rgba(0, 0, 0, 0.12)),
+    rgba(22, 25, 34, 0.78);
+}
+
+.landing-actions span,
+.landing-actions strong {
+  display: block;
+}
+
+.landing-actions span {
+  font-family: Cinzel, Baskervville, Georgia, serif;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.landing-actions strong {
+  margin-top: 0.2rem;
+  color: rgba(246, 226, 176, 0.78);
+  font-family: Baskervville, Georgia, serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.landing-primary-action {
+  border-color: rgba(247, 213, 122, 0.68) !important;
+  background:
+    linear-gradient(180deg, rgba(224, 181, 86, 0.26), rgba(119, 69, 20, 0.18)),
+    rgba(18, 18, 24, 0.82) !important;
+}
+
+.landing-tool-band {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(0.9rem, 1.6vw, 1.25rem);
+  width: min(1420px, calc(100% - clamp(2rem, 7vw, 8rem)));
+  margin: clamp(-1.8rem, -2vw, -1rem) auto clamp(2.6rem, 6vw, 5rem);
+  position: relative;
+  z-index: 2;
+}
+
+.landing-tool-card {
+  display: grid;
+  min-height: 190px;
+  align-content: start;
+  gap: 0.62rem;
+  padding: clamp(1.1rem, 2vw, 1.55rem);
+  border: 1px solid rgba(213, 177, 101, 0.24);
+  border-radius: 8px;
+  color: inherit;
+  text-decoration: none;
+  background:
+    linear-gradient(180deg, rgba(255, 236, 176, 0.065), rgba(0, 0, 0, 0.08)),
+    rgba(9, 14, 24, 0.82);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 236, 176, 0.035),
+    0 18px 42px rgba(0, 0, 0, 0.28);
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.landing-tool-card:hover,
+.landing-tool-card:focus-visible {
+  transform: translateY(-3px);
+  border-color: rgba(235, 199, 119, 0.52);
+  background:
+    linear-gradient(180deg, rgba(255, 236, 176, 0.09), rgba(0, 0, 0, 0.07)),
+    rgba(13, 19, 31, 0.9);
+}
+
+.landing-tool-index {
+  color: rgba(224, 190, 112, 0.72);
+  font-family: Cinzel, Baskervville, Georgia, serif;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+}
+
+.landing-tool-card h2 {
+  margin: 0;
+  color: #fff2c6;
+  font-family: Cinzel, Baskervville, Georgia, serif;
+  font-size: clamp(1.25rem, 2vw, 1.8rem);
+  font-weight: 850;
+  letter-spacing: 0;
+  line-height: 1.05;
+}
+
+.landing-tool-card p {
+  margin: 0;
+  color: rgba(241, 228, 198, 0.78);
+  font-family: Baskervville, Georgia, serif;
+  font-size: clamp(0.98rem, 1.1vw, 1.12rem);
+  font-weight: 650;
+  line-height: 1.44;
+}
+
+@media (max-width: 980px) {
+  .landing-hero {
+    min-height: auto;
+    padding-top: clamp(3.2rem, 10vw, 5.2rem);
+  }
+
+  .landing-hero-art {
+    right: 1rem;
+    width: clamp(130px, 30vw, 220px);
+    opacity: 0.34;
+  }
+
+  .landing-tool-band {
+    grid-template-columns: 1fr;
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 620px) {
+  .landing-hero {
+    padding: 3rem 1rem 3.4rem;
+  }
+
+  .landing-hero h1 {
+    font-size: clamp(3rem, 14vw, 3.7rem);
+  }
+
+  .landing-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .landing-actions a {
+    min-width: 0;
+  }
+
+  .landing-tool-band {
+    width: calc(100% - 2rem);
+  }
+}

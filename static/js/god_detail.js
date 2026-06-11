@@ -52,10 +52,17 @@ function normalizeStaticAssetPath(path) {
 
   if (
     value.startsWith("http://") ||
-    value.startsWith("https://") ||
-    value.startsWith("/static/")
+    value.startsWith("https://")
   ) {
     return value;
+  }
+
+  if (value.startsWith(STATIC_URL)) {
+    return value;
+  }
+
+  if (value.startsWith("/static/")) {
+    return staticPath(value.slice("/static/".length));
   }
 
   return staticPath(value.replace(/^(\.\.\/)+/, "").replace(/^\/+/, ""));
@@ -64,12 +71,11 @@ function normalizeStaticAssetPath(path) {
 function optimizedAssetPath(path, variant = "") {
   const normalized = normalizeStaticAssetPath(path);
 
-  if (!normalized || !normalized.endsWith(".png")) {
+  if (!normalized || !normalized.endsWith(".png") || !normalized.startsWith(STATIC_URL)) {
     return "";
   }
 
-  const staticPrefix = normalized.startsWith(STATIC_URL) ? STATIC_URL : "/static/";
-  const relativePath = normalized.slice(staticPrefix.length);
+  const relativePath = normalized.slice(STATIC_URL.length);
 
   if (!relativePath.startsWith("assets/images/")) {
     return "";
@@ -78,7 +84,7 @@ function optimizedAssetPath(path, variant = "") {
   const extensionless = relativePath.replace(/\.png$/i, "");
   const optimizedPath = extensionless.replace("assets/images/", "assets/optimized/images/");
 
-  return `${staticPrefix}${optimizedPath}${variant}.webp`;
+  return staticPath(`${optimizedPath}${variant}.webp`);
 }
 
 function imageSetValue(fallbackPath, optimizedPath) {

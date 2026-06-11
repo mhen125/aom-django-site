@@ -7,6 +7,7 @@
 
 {% block styles %}
   <link rel="stylesheet" href="{% static 'css/lobbies.css' %}">
+  <link rel="stylesheet" href="{% static 'css/live_activity.css' %}">
 {% endblock %}
 
 {% block extra_head %}
@@ -17,7 +18,7 @@
 {% endblock %}
 
 {% block site_header %}
-  {% include "partials/header.html" with active_page="home" show_game_logo=True header_subtitle="Unofficial live activity dashboard for custom matches, ranked queues, open lobbies, and active AoM Retold games." %}
+  {% include "partials/header.html" with active_page="lobbies" show_game_logo=True header_subtitle="Unofficial live activity dashboard for custom matches, ranked queues, open lobbies, and active AoM Retold games." %}
 {% endblock %}
 
 {% block content %}
@@ -225,5 +226,6 @@
 {% endblock %}
 
 {% block scripts %}
-  <script src="{% static 'js/lobbies.js' %}?v=20260611-staged-lobbies" defer></script>
+  <script src="{% static 'js/lobbies.js' %}" defer></script>
+  <script src="{% static 'js/live_activity.js' %}" defer></script>
 {% endblock %}

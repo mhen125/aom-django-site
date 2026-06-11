@@ -5,7 +5,8 @@ from . import views
 app_name = "lobbies"
 
 urlpatterns = [
-    path("", views.live_activity_home, name="live_activity_home"),
+    path("", views.landing_home, name="landing_home"),
+    path("activity/", views.live_activity_home, name="live_activity_home"),
     path("lobbies/", views.lobby_browser, name="browser"),
 
     path("api/lobbies/", views.api_lobbies, name="api_lobbies"),

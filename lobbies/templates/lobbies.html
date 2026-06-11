@@ -6,7 +6,7 @@
 {% block body_attrs %}data-page="lobby-browser"{% endblock %}
 
 {% block styles %}
-  <link rel="stylesheet" href="{% static 'css/lobbies.css' %}?v=20260610-live-tab">
+  <link rel="stylesheet" href="{% static 'css/lobbies.css' %}">
 {% endblock %}
 
 {% block extra_head %}
@@ -15,7 +15,9 @@
     window.AOM_API_BASE_URL = "";
     window.AOM_ACTIVE_MATCHES_API_URL = "{% url 'lobbies:api_active_matches' %}";
     window.AOM_ACTIVE_CUSTOM_MATCHES_API_URL = "{% url 'lobbies:api_active_custom_matches' %}";
-    window.AOM_ACTIVE_MATCHES_SCRIPT_URL = "{% static 'js/active_matches.js' %}?v=20260610-active-lazy";
+    window.AOM_ACTIVE_MATCHES_SCRIPT_URL = "{% static 'js/active_matches.js' %}";
+    window.AOM_LIVE_ACTIVITY_SCRIPT_URL = "{% static 'js/live_activity.js' %}";
+    window.AOM_LIVE_ACTIVITY_STYLESHEET_URL = "{% static 'css/live_activity.css' %}";
   </script>
 {% endblock %}
 
@@ -413,5 +415,5 @@
 {% endblock %}
 
 {% block scripts %}
-  <script src="{% static 'js/lobbies.js' %}?v=20260611-staged-lobbies" defer></script>
+  <script src="{% static 'js/lobbies.js' %}" defer></script>
 {% endblock %}

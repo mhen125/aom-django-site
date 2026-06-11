@@ -22,10 +22,17 @@ function normalizeStaticAssetPath(path) {
 
   if (
     value.startsWith("http://") ||
-    value.startsWith("https://") ||
-    value.startsWith("/static/")
+    value.startsWith("https://")
   ) {
     return value;
+  }
+
+  if (value.startsWith(STATIC_URL)) {
+    return value;
+  }
+
+  if (value.startsWith("/static/")) {
+    return staticPath(value.slice("/static/".length));
   }
 
   return staticPath(

@@ -1,0 +1,3601 @@
+/* Live activity page */
+.live-activity-panel {
+    display: grid;
+    gap: 18px;
+}
+
+.live-hero-card,
+.live-map-shell,
+.live-list-card {
+    position: relative;
+    border: 1px solid rgba(212, 177, 104, 0.32);
+    border-radius: 20px;
+    background:
+        linear-gradient(135deg, rgba(9, 18, 33, 0.92), rgba(20, 30, 46, 0.84)),
+        radial-gradient(circle at top left, rgba(212, 177, 104, 0.22), transparent 38%);
+    box-shadow: 0 18px 42px rgba(0, 0, 0, 0.32);
+}
+
+.live-hero-card {
+    display: grid;
+    grid-template-columns: minmax(280px, 1.2fr) minmax(320px, 1.8fr);
+    gap: 22px;
+    align-items: center;
+    padding: 24px;
+    overflow: hidden;
+}
+
+.live-hero-card::before {
+    content: "";
+    position: absolute;
+    inset: -80px -120px auto auto;
+    width: 320px;
+    height: 320px;
+    border-radius: 999px;
+    background: radial-gradient(circle, rgba(74, 144, 226, 0.22), transparent 68%);
+    pointer-events: none;
+}
+
+.live-status-copy,
+.live-stat-grid,
+.live-map-header,
+.live-lower-grid {
+    position: relative;
+    z-index: 1;
+}
+
+.live-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    color: rgba(244, 219, 163, 0.88);
+    font-size: 0.86rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.live-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: #df3b2f;
+    box-shadow: 0 0 18px rgba(223, 59, 47, 0.8);
+}
+
+.live-status-copy h2 {
+    margin: 0 0 8px;
+    color: #f8e7b8;
+    font-size: clamp(2rem, 4vw, 4.2rem);
+    line-height: 0.98;
+    text-shadow: 0 2px 0 rgba(13, 25, 48, 0.9), 0 0 26px rgba(212, 177, 104, 0.25);
+}
+
+.live-status-copy p {
+    max-width: 680px;
+    margin: 0;
+    color: rgba(239, 244, 252, 0.82);
+    font-size: 1.02rem;
+    line-height: 1.55;
+}
+
+.live-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(120px, 1fr));
+    gap: 12px;
+}
+
+.live-stat-card {
+    min-height: 102px;
+    padding: 14px;
+    border: 1px solid rgba(244, 219, 163, 0.22);
+    border-radius: 16px;
+    background: rgba(4, 10, 22, 0.42);
+    backdrop-filter: blur(6px);
+}
+
+.live-stat-label {
+    display: block;
+    margin-bottom: 7px;
+    color: rgba(239, 244, 252, 0.66);
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.live-stat-card strong {
+    display: block;
+    color: #f8e7b8;
+    font-size: clamp(1.5rem, 3vw, 2.45rem);
+    line-height: 1;
+}
+
+.live-stat-card small {
+    display: block;
+    margin-top: 8px;
+    color: rgba(239, 244, 252, 0.54);
+    font-size: 0.75rem;
+}
+
+.live-map-shell {
+    padding: 18px;
+}
+
+.live-map-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: flex-start;
+    margin-bottom: 14px;
+}
+
+.live-map-header h3,
+.live-list-card h3 {
+    margin: 0 0 4px;
+    color: #f8e7b8;
+    font-size: 1.2rem;
+}
+
+.live-map-header p {
+    margin: 0;
+    color: rgba(239, 244, 252, 0.66);
+}
+
+.secondary-button {
+    border: 1px solid rgba(244, 219, 163, 0.36);
+    border-radius: 999px;
+    background: rgba(4, 10, 22, 0.48);
+    color: #f8e7b8;
+    cursor: pointer;
+    font-weight: 700;
+    padding: 10px 16px;
+}
+
+.secondary-button:hover:not(:disabled) {
+    background: rgba(212, 177, 104, 0.16);
+}
+
+.secondary-button:disabled {
+    cursor: wait;
+    opacity: 0.65;
+}
+
+.live-activity-map {
+    min-height: 520px;
+    border: 1px solid rgba(244, 219, 163, 0.2);
+    border-radius: 18px;
+    overflow: hidden;
+    background: #071325;
+}
+
+.live-activity-map .leaflet-tile-pane {
+    filter: saturate(0.8) brightness(0.58) contrast(1.22);
+}
+
+.live-activity-map .leaflet-control-attribution {
+    background: rgba(4, 10, 22, 0.76);
+    color: rgba(239, 244, 252, 0.66);
+}
+
+.live-activity-map .leaflet-control-attribution a {
+    color: #f8e7b8;
+}
+
+.live-region-marker {
+    stroke: #f8e7b8;
+    fill: #df3b2f;
+    filter: drop-shadow(0 0 10px rgba(223, 59, 47, 0.78));
+}
+
+.live-lower-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.live-list-card {
+    padding: 18px;
+}
+
+.live-list {
+    display: grid;
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.live-list-row {
+    display: grid;
+    gap: 7px;
+}
+
+.live-list-row-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    color: rgba(239, 244, 252, 0.86);
+}
+
+.live-list-row-top strong {
+    color: #f8e7b8;
+}
+
+.live-list-row-top span {
+    color: rgba(239, 244, 252, 0.62);
+    white-space: nowrap;
+}
+
+.live-meter {
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(239, 244, 252, 0.1);
+    overflow: hidden;
+}
+
+.live-meter span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, rgba(74, 144, 226, 0.95), rgba(248, 231, 184, 0.95));
+}
+
+@media (max-width: 1100px) {
+    .live-hero-card {
+        grid-template-columns: 1fr;
+    }
+
+    .live-stat-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 760px) {
+    .live-map-header,
+    .live-list-row-top {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .live-lower-grid,
+    .live-stat-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .live-activity-map {
+        min-height: 380px;
+    }
+}
+
+
+/* Open lobby sortable headers */
+#customTab .lobby-table th.sortable-header,
+#customTab .lobby-table th[data-sort] {
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}
+
+#customTab .lobby-table th.sortable-header::after,
+#customTab .lobby-table th[data-sort]::after {
+    content: "";
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    margin-left: 7px;
+    vertical-align: -2px;
+    background-image: url("/static/assets/images/ui/Icon_Sort_Off.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    opacity: 0.7;
+}
+
+#customTab .lobby-table th.sorted-asc::after,
+#customTab .lobby-table th[data-sort-direction="asc"]::after {
+    background-image: url("/static/assets/images/ui/Icon_Sort_Up.png");
+    opacity: 1;
+}
+
+#customTab .lobby-table th.sorted-desc::after,
+#customTab .lobby-table th[data-sort-direction="desc"]::after {
+    background-image: url("/static/assets/images/ui/Icon_Sort_Down.png");
+    opacity: 1;
+}
+
+#customTab .lobby-table th.sortable-header:hover,
+#customTab .lobby-table th[data-sort]:hover {
+    color: #f8e7b8;
+}
+
+ #observableTab .lobby-table th[data-active-sort] {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+#observableTab .lobby-table th[data-active-sort]::after {
+  content: "↕";
+  margin-left: 0.35rem;
+  opacity: 0.36;
+  font-size: 0.75em;
+}
+
+#observableTab .lobby-table th[data-active-sort].sorted-asc::after {
+  content: "▲";
+  opacity: 0.78;
+}
+
+#observableTab .lobby-table th[data-active-sort].sorted-desc::after {
+  content: "▼";
+  opacity: 0.78;
+}
+
+#observableTab .details-sidebar {
+  position: sticky;
+  top: 18px;
+  align-self: start;
+  max-height: calc(100vh - 36px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+#observableTab .details-sidebar-frame {
+  min-height: auto;
+}
+
+/* ------------------------------------------------------------------
+   Final header override: static Prostagma logo + pinned hamburger menu
+   ------------------------------------------------------------------
+   Keep the original .app-header flex layout intact:
+   - brand-block stays on the left
+   - lastUpdated / Refresh stay in the normal right-side action area
+   - the hamburger menu is pinned independently in the top-right corner
+*/
+
+.app-header {
+    position: relative !important;
+    overflow: visible !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-end !important;
+    gap: 24px !important;
+    padding: 24px 116px 18px 44px !important;
+}
+
+.app-header .brand-block {
+    min-width: 0 !important;
+    max-width: 820px !important;
+}
+
+.site-logo-home-link {
+    display: inline-flex !important;
+    align-items: center !important;
+    width: fit-content !important;
+    max-width: 100% !important;
+    color: inherit !important;
+    text-decoration: none !important;
+}
+
+.site-logo-home-link:focus-visible {
+    outline: 2px solid rgba(245, 222, 155, 0.76) !important;
+    outline-offset: 8px !important;
+    border-radius: 14px !important;
+}
+
+.prostagma-site-logo {
+    display: block !important;
+    width: clamp(240px, 24vw, 360px) !important;
+    max-width: 100% !important;
+    height: auto !important;
+    object-fit: contain !important;
+    filter:
+        drop-shadow(0 2px 0 rgba(0, 0, 0, 0.72))
+        drop-shadow(0 0 12px rgba(214, 168, 79, 0.14)) !important;
+}
+
+.site-logo-home-link:hover .prostagma-site-logo {
+    filter:
+        drop-shadow(0 2px 0 rgba(0, 0, 0, 0.76))
+        drop-shadow(0 0 16px rgba(245, 222, 155, 0.24)) !important;
+}
+
+/* Hide old CSS-built logo pieces if any older markup/classes remain. */
+.site-logo-lockup,
+.prostagma-mark,
+.prostagma-mark-halo,
+.prostagma-mark-glow,
+.prostagma-mark-ring,
+.prostagma-arkantos,
+.site-logo-lockup h1 {
+    display: none !important;
+}
+
+.app-header .game-logo-line {
+    display: flex !important;
+    justify-content: flex-start !important;
+    width: fit-content !important;
+    max-width: 100% !important;
+    margin: -6px 0 0 0 !important;
+}
+
+.app-header .top-logo-image,
+.game-logo-line .top-logo-image {
+    display: block !important;
+    width: min(360px, 31vw) !important;
+    min-width: 240px !important;
+    max-width: 100% !important;
+    height: auto !important;
+    object-fit: contain !important;
+}
+
+.app-header .subtitle {
+    max-width: 820px !important;
+    margin-top: 3px !important;
+}
+
+/* Refresh / last updated: normal flex item on the right, not pinned. */
+.app-header > .header-actions {
+    position: static !important;
+    z-index: 80 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 12px !important;
+    flex-wrap: wrap !important;
+    margin-right: 0 !important;
+    padding-right: 0 !important;
+}
+
+.app-header > .header-actions > a.secondary-button {
+    display: none !important;
+}
+
+.app-header > .header-actions .last-updated {
+    white-space: nowrap !important;
+}
+
+/* Hamburger menu: independent top-right pin, no longer part of header-actions. */
+.app-header > .site-menu {
+    position: absolute !important;
+    top: 24px !important;
+    right: 44px !important;
+    z-index: 140 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 auto !important;
+}
+
+.site-menu-button {
+    appearance: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 48px !important;
+    height: 42px !important;
+    padding: 0 !important;
+    border: 1px solid rgba(214, 168, 79, 0.58) !important;
+    border-radius: 10px !important;
+    background:
+        linear-gradient(
+            180deg,
+            rgba(25, 28, 35, 0.96),
+            rgba(7, 10, 17, 0.98)
+        ) !important;
+    cursor: pointer !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 8px 18px rgba(0, 0, 0, 0.38) !important;
+}
+
+.site-menu-button:hover,
+.site-menu-button:focus-visible,
+.site-menu.is-open .site-menu-button {
+    border-color: rgba(245, 222, 155, 0.88) !important;
+    background:
+        linear-gradient(
+            180deg,
+            rgba(48, 41, 28, 0.96),
+            rgba(11, 14, 22, 0.99)
+        ) !important;
+}
+
+.site-menu-button:focus-visible {
+    outline: 2px solid rgba(245, 222, 155, 0.7) !important;
+    outline-offset: 3px !important;
+}
+
+.site-menu-icon {
+    display: block !important;
+    width: 28px !important;
+    height: 28px !important;
+    object-fit: contain !important;
+    pointer-events: none !important;
+    filter:
+        drop-shadow(0 1px 0 rgba(0, 0, 0, 0.85))
+        drop-shadow(0 0 7px rgba(245, 222, 155, 0.18)) !important;
+}
+
+.site-menu-dropdown {
+    position: absolute !important;
+    top: calc(100% + 10px) !important;
+    right: 0 !important;
+    min-width: 210px !important;
+    padding: 8px !important;
+    border: 1px solid rgba(214, 168, 79, 0.62) !important;
+    border-radius: 12px !important;
+    background:
+        radial-gradient(circle at top, rgba(92, 68, 28, 0.24), transparent 58%),
+        linear-gradient(
+            180deg,
+            rgba(20, 24, 32, 0.98),
+            rgba(7, 10, 17, 0.99)
+        ) !important;
+    box-shadow:
+        0 20px 38px rgba(0, 0, 0, 0.52),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+    opacity: 0 !important;
+    transform: translateY(-6px) !important;
+    pointer-events: none !important;
+    transition:
+        opacity 160ms ease,
+        transform 160ms ease !important;
+    z-index: 180 !important;
+}
+
+.site-menu.is-open .site-menu-dropdown {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+    pointer-events: auto !important;
+}
+
+.site-menu-dropdown a {
+    display: block !important;
+    padding: 11px 13px !important;
+    border-radius: 8px !important;
+    color: #f2dfa7 !important;
+    font-family: "Baskervville", Georgia, serif !important;
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+    text-decoration: none !important;
+    text-shadow:
+        0 1px 0 rgba(0, 0, 0, 0.85),
+        0 0 8px rgba(214, 168, 79, 0.16) !important;
+}
+
+.site-menu-dropdown a:hover,
+.site-menu-dropdown a:focus-visible {
+    color: #fff4c4 !important;
+    background:
+        linear-gradient(
+            90deg,
+            rgba(214, 168, 79, 0.18),
+            rgba(214, 168, 79, 0.06)
+        ) !important;
+    outline: none !important;
+}
+
+@media (max-width: 1100px) {
+    .app-header {
+        padding: 22px 96px 18px 32px !important;
+    }
+
+    .app-header .brand-block {
+        max-width: 700px !important;
+    }
+
+    .prostagma-site-logo {
+        width: clamp(220px, 31vw, 330px) !important;
+    }
+
+    .app-header .top-logo-image,
+    .game-logo-line .top-logo-image {
+        width: min(330px, 42vw) !important;
+        min-width: 230px !important;
+    }
+
+    .app-header > .site-menu {
+        top: 22px !important;
+        right: 32px !important;
+    }
+}
+
+@media (max-width: 760px) {
+    .app-header {
+        align-items: flex-start !important;
+        padding: 20px 78px 16px 18px !important;
+    }
+
+    .app-header .brand-block {
+        max-width: 100% !important;
+    }
+
+    .prostagma-site-logo {
+        width: clamp(200px, 56vw, 290px) !important;
+    }
+
+    .app-header .top-logo-image,
+    .game-logo-line .top-logo-image {
+        width: min(280px, 62vw) !important;
+        min-width: 190px !important;
+    }
+
+    .app-header > .header-actions .last-updated,
+    .app-header > .header-actions #refreshButton,
+    .app-header > .header-actions .primary-button {
+        display: none !important;
+    }
+
+    .app-header > .site-menu {
+        top: 20px !important;
+        right: 18px !important;
+    }
+
+    .site-menu-button {
+        width: 46px !important;
+        height: 42px !important;
+    }
+
+    .site-menu-icon {
+        width: 28px !important;
+        height: 28px !important;
+    }
+}
+
+body[data-page="live-activity"] #refreshButton,
+body[data-page="live-activity"] #liveRefreshButton {
+    display: none !important;
+}
+
+body[data-page="live-activity"] .live-activity-map {
+    cursor: default;
+    pointer-events: none;
+}
+
+body[data-page="live-activity"] .live-activity-map .leaflet-interactive,
+body[data-page="live-activity"] .live-activity-map .leaflet-marker-icon,
+body[data-page="live-activity"] .live-activity-map .leaflet-marker-shadow {
+    pointer-events: none;
+}
+
+.live-list-row > span,
+.live-list-row > strong {
+    display: block;
+}
+
+.live-list-row > span {
+    color: rgba(239, 244, 252, 0.76);
+}
+
+.live-list-row > strong {
+    color: #f8e7b8;
+    font-size: 1.1rem;
+}
+
+
+/* =========================================================
+   Live Activity Atlas Overhaul
+   ========================================================= */
+body[data-page="live-activity"] .app-shell {
+    width: min(1420px, calc(100vw - 42px));
+    padding-top: 26px;
+}
+
+.live-atlas-shell {
+    display: grid;
+    gap: 22px;
+}
+
+.live-atlas-stage,
+.live-rune-card,
+.live-ledger-card {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border: 1px solid rgba(214, 168, 79, 0.26);
+    background:
+        radial-gradient(circle at 50% 25%, rgba(214, 168, 79, 0.12), transparent 28rem),
+        linear-gradient(180deg, rgba(7, 11, 18, 0.28), rgba(7, 11, 18, 0.62)),
+        var(--widget-frame-fill) center / cover repeat;
+    box-shadow:
+        inset 0 0 0 1px rgba(0, 0, 0, 0.72),
+        inset 0 0 54px rgba(0, 0, 0, 0.42),
+        0 24px 80px rgba(0, 0, 0, 0.32);
+}
+
+.live-atlas-stage {
+    border-radius: 24px;
+    padding: 42px 44px 40px;
+}
+
+.live-atlas-stage > :not(.widget-frame-ornaments) {
+    position: relative;
+    z-index: 2;
+}
+
+.live-atlas-heading {
+    max-width: 860px;
+    margin: 0 0 30px;
+}
+
+.live-page-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--gold-bright);
+    font-family: "Baskervville", Georgia, serif;
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85);
+}
+
+.live-page-kicker::before,
+.live-page-kicker::after {
+    content: "";
+    display: inline-block;
+    width: 42px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(248, 230, 173, 0.64));
+}
+
+.live-page-kicker::after {
+    background: linear-gradient(90deg, rgba(248, 230, 173, 0.64), transparent);
+}
+
+.live-atlas-heading .live-page-kicker::before {
+    display: none;
+}
+
+.live-atlas-heading h1 {
+    margin: 12px 0 12px;
+    max-width: 940px;
+    color: #f8f1df;
+    font-size: clamp(3.2rem, 7vw, 7.2rem);
+    line-height: 0.88;
+    letter-spacing: -0.085em;
+    text-shadow:
+        0 2px 0 rgba(0, 0, 0, 0.96),
+        0 0 34px rgba(214, 168, 79, 0.18);
+}
+
+.live-atlas-heading p {
+    max-width: 720px;
+    margin: 0;
+    color: rgba(247, 243, 232, 0.78);
+    font-size: clamp(1rem, 1.45vw, 1.22rem);
+    line-height: 1.55;
+}
+
+.live-atlas-layout {
+    display: grid;
+    grid-template-columns: minmax(300px, 0.72fr) minmax(600px, 1.28fr);
+    gap: 22px;
+    align-items: stretch;
+}
+
+.live-command-panel,
+.live-world-panel {
+    position: relative;
+    border: 1px solid rgba(214, 168, 79, 0.18);
+    border-radius: 18px;
+    background:
+        linear-gradient(180deg, rgba(7, 11, 18, 0.62), rgba(8, 12, 19, 0.82)),
+        rgba(0, 0, 0, 0.18);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+.live-command-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 430px;
+    padding: 28px;
+}
+
+.live-world-panel {
+    padding: 18px;
+}
+
+.live-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--gold-bright);
+    font-family: "Baskervville", Georgia, serif;
+    font-size: 0.84rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+.live-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 999px;
+    background: #d94739;
+    box-shadow: 0 0 18px rgba(217, 71, 57, 0.88);
+}
+
+.live-primary-number {
+    margin: 16px 0 4px;
+    color: #f8f1df;
+    font-size: clamp(4.8rem, 10vw, 9.4rem);
+    font-weight: 900;
+    line-height: 0.88;
+    letter-spacing: -0.08em;
+    text-shadow:
+        0 3px 0 rgba(0, 0, 0, 0.94),
+        0 0 34px rgba(214, 168, 79, 0.22);
+}
+
+.live-primary-caption {
+    min-height: 3.1em;
+    margin: 0 0 22px;
+    color: rgba(247, 243, 232, 0.76);
+    font-size: 1.02rem;
+    line-height: 1.55;
+}
+
+.live-command-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: auto;
+}
+
+.live-command-stat {
+    padding: 14px;
+    border: 1px solid rgba(214, 168, 79, 0.17);
+    border-radius: 14px;
+    background: rgba(0, 0, 0, 0.20);
+}
+
+.live-command-stat span,
+.live-rune-card span {
+    display: block;
+    margin-bottom: 7px;
+    color: rgba(248, 230, 173, 0.78);
+    font-family: "Baskervville", Georgia, serif;
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+}
+
+.live-command-stat strong,
+.live-rune-card strong {
+    display: block;
+    color: #f8f1df;
+    font-size: clamp(1.75rem, 3.4vw, 3rem);
+    line-height: 1;
+}
+
+.live-command-stat small,
+.live-rune-card small {
+    display: block;
+    margin-top: 7px;
+    color: rgba(247, 243, 232, 0.52);
+    font-size: 0.78rem;
+}
+
+.live-feed-note {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 18px;
+    color: rgba(247, 243, 232, 0.52);
+    font-size: 0.82rem;
+}
+
+.live-feed-note span {
+    padding: 6px 9px;
+    border: 1px solid rgba(214, 168, 79, 0.14);
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.18);
+}
+
+.live-world-panel-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 14px;
+    padding: 0 2px;
+}
+
+.live-world-panel-header .live-page-kicker::before {
+    display: none;
+}
+
+.live-world-panel-header .live-page-kicker::after {
+    width: 34px;
+}
+
+.live-world-panel-header h2 {
+    margin: 4px 0 0;
+    color: #f8f1df;
+    font-size: clamp(1.5rem, 2.4vw, 2.45rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
+}
+
+.live-map-badge {
+    padding: 9px 13px;
+    border: 1px solid rgba(214, 168, 79, 0.24);
+    border-radius: 999px;
+    color: var(--gold-bright);
+    background: rgba(0, 0, 0, 0.22);
+    font-family: "Baskervville", Georgia, serif;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.live-activity-map {
+    min-height: 372px;
+    border: 1px solid rgba(214, 168, 79, 0.24);
+    border-radius: 14px;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 50% 50%, rgba(214, 168, 79, 0.10), transparent 34rem),
+        #07111e;
+}
+
+.live-activity-map .leaflet-tile-pane {
+    filter: saturate(0.55) brightness(0.5) contrast(1.28) sepia(0.1);
+}
+
+.live-activity-map .leaflet-control-container {
+    display: none;
+}
+
+.live-server-marker {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(248, 230, 173, 0.95);
+    border-radius: 999px;
+    background: rgba(217, 71, 57, 0.92);
+    box-shadow:
+        0 0 0 7px rgba(217, 71, 57, 0.16),
+        0 0 22px rgba(248, 230, 173, 0.56),
+        0 3px 8px rgba(0, 0, 0, 0.82);
+}
+
+.live-rune-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.live-rune-card {
+    min-height: 150px;
+    border-radius: 18px;
+    padding: 21px 22px;
+}
+
+.live-rune-card::before,
+.live-ledger-card::before {
+    content: "";
+    position: absolute;
+    inset: 12px;
+    z-index: -1;
+    border: 1px solid rgba(214, 168, 79, 0.11);
+    border-radius: 12px;
+    pointer-events: none;
+}
+
+.live-rune-card-highlight {
+    background:
+        radial-gradient(circle at top right, rgba(214, 168, 79, 0.20), transparent 14rem),
+        linear-gradient(180deg, rgba(7, 11, 18, 0.22), rgba(7, 11, 18, 0.62)),
+        var(--widget-frame-fill) center / cover repeat;
+}
+
+.live-ledger-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.live-ledger-card {
+    border-radius: 18px;
+    padding: 24px;
+}
+
+.live-ledger-card .live-page-kicker::before {
+    display: none;
+}
+
+.live-ledger-card .live-page-kicker::after {
+    width: 36px;
+}
+
+.live-ledger-card h2 {
+    margin: 7px 0 18px;
+    color: #f8f1df;
+    font-size: clamp(1.35rem, 2vw, 2rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
+}
+
+.live-list {
+    display: grid;
+    gap: 10px;
+    margin: 0;
+}
+
+.live-list-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 0;
+    border-top: 1px solid rgba(214, 168, 79, 0.12);
+}
+
+.live-list-row:first-child {
+    border-top: none;
+}
+
+.live-list-row span {
+    color: rgba(247, 243, 232, 0.76);
+    font-weight: 750;
+}
+
+.live-list-row strong {
+    color: var(--gold-bright);
+    font-size: 1.08rem;
+}
+
+.live-list-row small {
+    display: block;
+    margin-top: 3px;
+    color: rgba(247, 243, 232, 0.46);
+    font-size: 0.76rem;
+    font-weight: 500;
+}
+
+@media (max-width: 1160px) {
+    .live-atlas-layout,
+    .live-ledger-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .live-command-panel {
+        min-height: 0;
+    }
+
+    .live-activity-map {
+        min-height: 340px;
+    }
+}
+
+@media (max-width: 860px) {
+    body[data-page="live-activity"] .app-shell {
+        width: min(100% - 24px, 720px);
+    }
+
+    .live-atlas-stage {
+        padding: 34px 24px 28px;
+    }
+
+    .live-rune-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .live-world-panel-header,
+    .live-command-stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 560px) {
+    .live-rune-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .live-world-panel-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .live-activity-map {
+        min-height: 280px;
+    }
+}
+
+/* =========================================================
+   Live Activity Atlas V5 refinements
+   ========================================================= */
+body[data-page="live-activity"] .app-shell {
+    width: min(1500px, calc(100vw - 42px));
+}
+
+.live-atlas-stage {
+    border: 0;
+    border-radius: 0;
+    padding: 42px 48px 44px;
+}
+
+.live-atlas-heading-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 28px;
+    max-width: none;
+}
+
+.live-atlas-heading-row > div {
+    min-width: 0;
+}
+
+.live-atlas-heading h1 {
+    max-width: 980px;
+}
+
+.live-ornate-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    min-width: 196px;
+    min-height: 58px;
+    margin-top: 34px;
+    padding: 0 34px 3px;
+    color: #151008;
+    background:
+        image-set(
+            url("../assets/optimized/images/ui/BtnOrnate_Large_On.webp") type("image/webp"),
+            url("../assets/images/ui/BtnOrnate_Large_On.png") type("image/png")
+        ) center / 100% 100% no-repeat;
+    border: 0;
+    font-family: "Baskervville", Georgia, serif;
+    font-size: 0.92rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    text-shadow: 0 1px 0 rgba(255, 244, 194, 0.42);
+    filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.32));
+}
+
+.live-ornate-button:hover,
+.live-ornate-button:focus-visible {
+    color: #090603;
+    background-image: image-set(
+        url("../assets/optimized/images/ui/BtnOrnate_Large_Focus.webp") type("image/webp"),
+        url("../assets/images/ui/BtnOrnate_Large_Focus.png") type("image/png")
+    );
+    outline: none;
+}
+
+.live-atlas-layout {
+    grid-template-columns: minmax(330px, 0.62fr) minmax(720px, 1.38fr);
+}
+
+.live-command-panel {
+    min-height: 392px;
+    padding: 30px;
+}
+
+.live-online-stack {
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    margin: 12px 0 4px;
+}
+
+.live-online-stack .live-primary-number {
+    margin: 0;
+}
+
+.live-online-word {
+    margin-bottom: 0.42em;
+    color: #f8f1df;
+    font-size: clamp(2rem, 4vw, 4.2rem);
+    font-weight: 900;
+    line-height: 0.9;
+    letter-spacing: -0.055em;
+    text-shadow:
+        0 2px 0 rgba(0, 0, 0, 0.92),
+        0 0 24px rgba(214, 168, 79, 0.15);
+}
+
+.live-primary-caption {
+    min-height: 0;
+    margin-bottom: 28px;
+    color: rgba(248, 230, 173, 0.78);
+    font-family: "Baskervville", Georgia, serif;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.live-command-summary {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-top: auto;
+}
+
+.live-command-summary span {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 14px 16px;
+    border: 1px solid rgba(214, 168, 79, 0.18);
+    border-radius: 13px;
+    color: rgba(247, 243, 232, 0.82);
+    background: rgba(0, 0, 0, 0.20);
+    font-weight: 750;
+}
+
+.live-command-summary strong {
+    color: var(--gold-bright);
+    font-size: clamp(1.8rem, 3vw, 2.7rem);
+    line-height: 0.9;
+}
+
+.live-command-stats,
+.live-feed-note {
+    display: none !important;
+}
+
+.live-world-panel {
+    padding: 18px 18px 16px;
+}
+
+.live-world-panel-header {
+    margin-bottom: 12px;
+}
+
+.live-map-badge,
+#liveTopRegion {
+    display: none !important;
+}
+
+.live-activity-map {
+    min-height: 392px;
+    border: 0;
+    border-radius: 10px;
+}
+
+.live-rune-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.live-rune-card,
+.live-ledger-card {
+    border-color: rgba(214, 168, 79, 0.24);
+}
+
+.live-rune-card small,
+.live-command-stat small,
+.live-list-row small {
+    display: none !important;
+}
+
+.live-ledger-card h2 {
+    margin-top: 0;
+    color: #f8f1df;
+    font-size: clamp(1.65rem, 2.3vw, 2.35rem);
+}
+
+.live-list-row {
+    padding: 14px 0;
+}
+
+.live-list-row span {
+    color: rgba(247, 243, 232, 0.86);
+    font-size: 1.02rem;
+}
+
+.live-list-row strong {
+    color: var(--gold-bright);
+    font-size: 1.2rem;
+}
+
+.live-list-row-total {
+    margin-top: 4px;
+    border-top-color: rgba(248, 230, 173, 0.26);
+}
+
+.live-list-row-total span,
+.live-list-row-total strong {
+    color: #f8f1df;
+}
+
+@media (max-width: 1160px) {
+    .live-atlas-heading-row {
+        flex-direction: column;
+    }
+
+    .live-ornate-button {
+        margin-top: 0;
+    }
+
+    .live-atlas-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 860px) {
+    .live-atlas-stage {
+        padding: 34px 26px 30px;
+    }
+
+    .live-online-stack {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .live-online-word {
+        margin-bottom: 0;
+    }
+}
+
+/* =========================================================
+   Live Activity Atlas V6 night-earth overhaul
+   ========================================================= */
+body[data-page="live-activity"] .app-shell {
+    width: min(1560px, calc(100vw - 44px));
+    overflow-x: hidden;
+}
+
+.live-atlas-stage {
+    padding: clamp(28px, 4vw, 46px);
+}
+
+.live-atlas-heading-row {
+    align-items: flex-start;
+    margin-bottom: 26px;
+}
+
+.live-ornate-button {
+    color: #fff2bc;
+    text-shadow:
+        0 2px 0 rgba(0, 0, 0, 0.92),
+        0 0 10px rgba(255, 232, 156, 0.42),
+        0 0 18px rgba(214, 168, 79, 0.36);
+}
+
+.live-ornate-button:hover,
+.live-ornate-button:focus-visible {
+    color: #fff8d4;
+    text-shadow:
+        0 2px 0 rgba(0, 0, 0, 0.96),
+        0 0 12px rgba(255, 239, 182, 0.70),
+        0 0 24px rgba(214, 168, 79, 0.52);
+}
+
+.live-world-panel {
+    padding: clamp(16px, 2vw, 24px);
+}
+
+.live-world-panel-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 330px);
+    align-items: end;
+    gap: clamp(18px, 3vw, 34px);
+    margin-bottom: 16px;
+}
+
+.live-command-panel {
+    min-height: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    align-items: flex-start;
+    justify-content: flex-end;
+}
+
+.live-eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+}
+
+.live-dot {
+    background: #f0d579;
+    box-shadow: 0 0 14px rgba(240, 213, 121, 0.82);
+}
+
+.live-online-stack {
+    display: block;
+    margin: 8px 0 5px;
+}
+
+.live-online-stack .live-primary-number,
+.live-primary-number {
+    margin: 0;
+    color: #f8f1df;
+    font-size: clamp(2.45rem, 4.7vw, 4.8rem);
+    font-weight: 950;
+    line-height: 0.94;
+    letter-spacing: -0.065em;
+    white-space: nowrap;
+    text-shadow:
+        0 2px 0 rgba(0, 0, 0, 0.96),
+        0 0 22px rgba(214, 168, 79, 0.20);
+}
+
+.live-online-word {
+    display: none;
+}
+
+.live-primary-caption {
+    display: grid;
+    grid-template-columns: auto auto;
+    align-items: baseline;
+    gap: 6px 14px;
+    min-height: 0;
+    margin: 0;
+    color: rgba(247, 243, 232, 0.78);
+    font-family: var(--body-font, system-ui, sans-serif);
+    font-size: clamp(0.95rem, 1.35vw, 1.12rem);
+    font-weight: 700;
+    letter-spacing: 0;
+    line-height: 1.25;
+    text-transform: none;
+}
+
+.live-tracked-line {
+    display: contents;
+}
+
+.live-primary-caption strong {
+    color: var(--gold-bright);
+    font-size: clamp(1.45rem, 2.3vw, 2.25rem);
+    line-height: 1;
+    text-shadow: 0 0 14px rgba(214, 168, 79, 0.18);
+}
+
+.live-activity-map.live-night-map {
+    position: relative;
+    width: 100%;
+    min-height: clamp(380px, 42vw, 620px);
+    border: 1px solid rgba(214, 168, 79, 0.16);
+    border-radius: 12px;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 52% 46%, rgba(50, 73, 105, 0.42), transparent 44rem),
+        linear-gradient(180deg, #050914 0%, #02050d 100%);
+    box-shadow:
+        inset 0 0 0 1px rgba(0, 0, 0, 0.78),
+        inset 0 0 92px rgba(0, 0, 0, 0.68),
+        0 18px 48px rgba(0, 0, 0, 0.26);
+}
+
+.live-activity-canvas {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.live-map-vignette {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 50% 46%, transparent 0%, transparent 54%, rgba(0, 0, 0, 0.22) 74%, rgba(0, 0, 0, 0.62) 100%),
+        linear-gradient(90deg, rgba(0, 0, 0, 0.34), transparent 14%, transparent 86%, rgba(0, 0, 0, 0.34));
+    mix-blend-mode: multiply;
+}
+
+.live-rune-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.live-rune-card {
+    min-height: 124px;
+}
+
+.live-rune-card span {
+    margin-bottom: 14px;
+    color: rgba(248, 230, 173, 0.88);
+}
+
+.live-rune-card strong {
+    font-size: clamp(2.5rem, 4.2vw, 4.1rem);
+}
+
+.live-queue-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.72fr);
+}
+
+.live-queue-card {
+    min-height: 0;
+    padding: 20px 24px 22px;
+}
+
+.live-queue-card h2 {
+    margin-bottom: 8px;
+    font-size: clamp(1.25rem, 1.8vw, 1.75rem);
+}
+
+.live-queue-list {
+    gap: 0;
+}
+
+.live-queue-list .live-list-row {
+    padding: 10px 0;
+}
+
+.live-queue-list .live-list-row span {
+    color: rgba(247, 243, 232, 0.76);
+    font-size: 0.96rem;
+}
+
+.live-queue-list .live-list-row strong {
+    font-size: 1.04rem;
+}
+
+.live-queue-list .live-list-row-total {
+    margin-top: 2px;
+}
+
+body[data-page="live-activity"] #liveRegionsList[hidden],
+body[data-page="live-activity"] #livePublicLobbies[hidden],
+body[data-page="live-activity"] #livePlayersInLobbies[hidden],
+body[data-page="live-activity"] #liveSteamOnline[hidden],
+body[data-page="live-activity"] #liveTopRegion[hidden] {
+    display: none !important;
+}
+
+@media (max-width: 1020px) {
+    .live-world-panel-header {
+        grid-template-columns: 1fr;
+        align-items: start;
+    }
+
+    .live-command-panel {
+        max-width: 420px;
+    }
+
+    .live-rune-grid,
+    .live-queue-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    body[data-page="live-activity"] .app-shell {
+        width: min(100% - 22px, 720px);
+    }
+
+    .live-primary-caption {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+
+    .live-activity-map.live-night-map {
+        min-height: 330px;
+    }
+}
+
+/* Live atlas v7 refinements */
+body[data-page="live-activity"] .app-shell {
+  max-width: min(1560px, calc(100vw - 48px));
+  overflow-x: hidden;
+}
+
+body[data-page="live-activity"] .live-atlas-stage {
+  overflow: hidden;
+}
+
+body[data-page="live-activity"] .live-world-panel {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+body[data-page="live-activity"] .live-world-panel-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 28px;
+  align-items: end;
+  margin-bottom: 18px;
+}
+
+body[data-page="live-activity"] .live-command-panel {
+  min-width: 360px;
+  max-width: 460px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  text-align: right;
+}
+
+body[data-page="live-activity"] .live-command-panel .live-eyebrow {
+  justify-content: flex-end;
+  margin-bottom: 8px;
+  color: #f5dda0;
+}
+
+body[data-page="live-activity"] .live-primary-number {
+  font-size: clamp(2.25rem, 4.2vw, 4.9rem);
+  line-height: 0.95;
+  letter-spacing: -0.06em;
+  white-space: nowrap;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.55);
+}
+
+body[data-page="live-activity"] .live-online-word {
+  display: none;
+}
+
+body[data-page="live-activity"] .live-primary-caption {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.35rem 0.65rem;
+  margin-top: 10px;
+  color: rgba(244, 238, 220, 0.82);
+  font-size: clamp(1rem, 1.25vw, 1.35rem);
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+body[data-page="live-activity"] .live-primary-caption span {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+body[data-page="live-activity"] .live-primary-caption strong {
+  color: #fff5c7;
+  font-size: 1.18em;
+  letter-spacing: -0.025em;
+}
+
+body[data-page="live-activity"] .live-activity-map.live-night-map {
+  width: 100%;
+  min-height: 460px;
+  height: clamp(460px, 42vw, 640px);
+  border: 1px solid rgba(224, 190, 112, 0.22);
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(38, 65, 100, 0.18), transparent 58%),
+    linear-gradient(180deg, #06101e, #020711 72%);
+  box-shadow:
+    inset 0 0 52px rgba(0, 0, 0, 0.62),
+    0 18px 55px rgba(0, 0, 0, 0.35);
+}
+
+body[data-page="live-activity"] .live-rune-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+body[data-page="live-activity"] .live-rune-card {
+  min-height: 120px;
+}
+
+body[data-page="live-activity"] .live-rune-card strong {
+  font-size: clamp(2.8rem, 4.8vw, 4.4rem);
+}
+
+body[data-page="live-activity"] .live-queue-grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 760px);
+  justify-content: center;
+  margin-top: 28px;
+}
+
+body[data-page="live-activity"] .live-queue-card {
+  width: 100%;
+}
+
+body[data-page="live-activity"] .live-queue-card h2 {
+  text-align: center;
+}
+
+body[data-page="live-activity"] .live-queue-list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+body[data-page="live-activity"] .live-queue-list .live-list-row {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 14px 12px;
+  border: 1px solid rgba(224, 190, 112, 0.16);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+body[data-page="live-activity"] .live-queue-list .live-list-row span {
+  color: rgba(244, 224, 167, 0.82);
+  font-size: 0.72rem;
+  letter-spacing: 0.13em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+body[data-page="live-activity"] .live-queue-list .live-list-row strong {
+  color: #fff3c6;
+  font-size: clamp(1.6rem, 2.2vw, 2.25rem);
+}
+
+@media (max-width: 980px) {
+  body[data-page="live-activity"] .live-world-panel-header {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  body[data-page="live-activity"] .live-command-panel,
+  body[data-page="live-activity"] .live-command-panel .live-eyebrow,
+  body[data-page="live-activity"] .live-primary-caption {
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  body[data-page="live-activity"] .live-command-panel {
+    min-width: 0;
+    max-width: none;
+  }
+
+  body[data-page="live-activity"] .live-rune-grid,
+  body[data-page="live-activity"] .live-queue-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Live activity v8 refinement */
+body[data-page="live-activity"] .app-shell.live-atlas-shell {
+  width: min(1480px, calc(100vw - 48px));
+  max-width: min(1480px, calc(100vw - 48px));
+  margin-inline: auto;
+  overflow: visible;
+}
+
+body[data-page="live-activity"] .live-atlas-stage {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+body[data-page="live-activity"] .live-atlas-heading-row {
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+body[data-page="live-activity"] .live-atlas-heading h1 {
+  margin: 0;
+  font-size: clamp(4.2rem, 8vw, 8.6rem);
+}
+
+body[data-page="live-activity"] .live-atlas-heading p,
+body[data-page="live-activity"] .live-atlas-heading .live-page-kicker {
+  display: none;
+}
+
+body[data-page="live-activity"] .live-ornate-button {
+  flex: 0 0 auto;
+  color: #fff3bc;
+  text-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.9),
+    0 0 12px rgba(255, 227, 139, 0.42);
+}
+
+body[data-page="live-activity"] .live-world-panel {
+  display: block;
+  padding: clamp(18px, 2vw, 28px);
+  overflow: hidden;
+}
+
+body[data-page="live-activity"] .live-activity-scoreboard {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.82fr) minmax(320px, 1fr);
+  align-items: end;
+  gap: clamp(24px, 4vw, 64px);
+  margin-bottom: 24px;
+}
+
+body[data-page="live-activity"] .live-online-panel,
+body[data-page="live-activity"] .live-match-panel {
+  min-width: 0;
+}
+
+body[data-page="live-activity"] .live-online-panel .live-eyebrow {
+  margin-bottom: 8px;
+}
+
+body[data-page="live-activity"] .live-primary-number {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin: 0;
+  white-space: nowrap;
+  line-height: 0.95;
+  letter-spacing: -0.055em;
+}
+
+body[data-page="live-activity"] .live-primary-number strong {
+  color: #fff8df;
+  font-size: clamp(3.8rem, 6.8vw, 7.2rem);
+  line-height: 0.9;
+}
+
+body[data-page="live-activity"] .live-primary-number span {
+  color: #f1deb0;
+  font-family: "Baskervville", Georgia, serif;
+  font-size: clamp(1.08rem, 1.65vw, 1.65rem);
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+body[data-page="live-activity"] .live-primary-caption {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: baseline;
+  gap: 0.5rem 1rem;
+  margin: 0 0 0 auto;
+  color: rgba(246, 235, 204, 0.88);
+  font-family: inherit;
+  font-size: clamp(1.42rem, 2.6vw, 2.55rem);
+  font-weight: 900;
+  letter-spacing: -0.035em;
+  line-height: 1;
+  text-align: right;
+  text-transform: none;
+}
+
+body[data-page="live-activity"] .live-primary-caption span {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.42rem;
+}
+
+body[data-page="live-activity"] .live-primary-caption strong {
+  color: #fff4bd;
+  font-size: 1.28em;
+  letter-spacing: -0.055em;
+}
+
+body[data-page="live-activity"] .live-activity-map.live-night-map {
+  position: relative;
+  width: 100%;
+  min-height: 360px;
+  height: clamp(360px, 36vw, 540px);
+  overflow: hidden;
+  border: 1px solid rgba(224, 190, 112, 0.22);
+  border-radius: 14px;
+  background: #020712;
+  box-shadow:
+    inset 0 0 70px rgba(0, 0, 0, 0.72),
+    0 18px 55px rgba(0, 0, 0, 0.35);
+}
+
+body[data-page="live-activity"] .live-earth-night-image,
+body[data-page="live-activity"] .live-activity-canvas,
+body[data-page="live-activity"] .live-map-vignette {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+body[data-page="live-activity"] .live-earth-night-image {
+  display: block;
+  object-fit: cover;
+  opacity: 0.96;
+  filter: saturate(1.05) contrast(1.08) brightness(0.9);
+}
+
+body[data-page="live-activity"] .live-activity-canvas {
+  z-index: 2;
+  pointer-events: none;
+}
+
+body[data-page="live-activity"] .live-map-vignette {
+  z-index: 3;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 46%, transparent 45%, rgba(0, 0, 0, 0.24) 76%, rgba(0, 0, 0, 0.62) 100%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.38), transparent 16%, transparent 84%, rgba(0, 0, 0, 0.38));
+}
+
+body[data-page="live-activity"] .live-rune-grid {
+  width: 100%;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+body[data-page="live-activity"] .live-rune-card {
+  min-height: 112px;
+}
+
+body[data-page="live-activity"] .live-rune-card > div {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+
+body[data-page="live-activity"] .live-rune-card strong {
+  font-size: clamp(2.8rem, 4.6vw, 4.25rem);
+  line-height: 0.92;
+}
+
+body[data-page="live-activity"] .live-rune-card small {
+  color: rgba(248, 226, 167, 0.74);
+  font-family: "Baskervville", Georgia, serif;
+  font-size: clamp(0.84rem, 1vw, 1.05rem);
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+body[data-page="live-activity"] .live-queue-grid {
+  grid-template-columns: minmax(320px, 980px);
+  justify-content: center;
+}
+
+@media (max-width: 980px) {
+  body[data-page="live-activity"] .app-shell.live-atlas-shell {
+    width: min(100% - 24px, 760px);
+    max-width: min(100% - 24px, 760px);
+  }
+
+  body[data-page="live-activity"] .live-atlas-heading-row,
+  body[data-page="live-activity"] .live-activity-scoreboard {
+    grid-template-columns: 1fr;
+  }
+
+  body[data-page="live-activity"] .live-primary-caption {
+    justify-content: flex-start;
+    margin-left: 0;
+    text-align: left;
+  }
+
+  body[data-page="live-activity"] .live-primary-number {
+    white-space: normal;
+  }
+}
+
+/* Live activity v9 refinements */
+body[data-page="live-activity"] .live-atlas-heading h1 {
+  font-size: clamp(3.2rem, 5.2vw, 5.9rem);
+  font-weight: 700;
+  letter-spacing: -0.055em;
+}
+
+body[data-page="live-activity"] .live-world-panel {
+  padding: clamp(18px, 2.2vw, 30px);
+}
+
+body[data-page="live-activity"] .live-activity-scoreboard {
+  grid-template-columns: minmax(260px, 0.82fr) minmax(310px, 1fr);
+  align-items: center;
+  gap: clamp(22px, 4vw, 72px);
+  margin-bottom: 22px;
+}
+
+body[data-page="live-activity"] .live-eyebrow {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  opacity: 0.9;
+}
+
+body[data-page="live-activity"] .live-primary-number {
+  gap: 0.66rem;
+  letter-spacing: -0.04em;
+}
+
+body[data-page="live-activity"] .live-primary-number strong {
+  font-size: clamp(2.9rem, 5.1vw, 5.6rem);
+  font-weight: 720;
+  letter-spacing: -0.06em;
+}
+
+body[data-page="live-activity"] .live-primary-number span {
+  color: rgba(250, 234, 190, 0.9);
+  font-size: clamp(0.92rem, 1.25vw, 1.22rem);
+  font-weight: 700;
+  letter-spacing: 0.105em;
+}
+
+body[data-page="live-activity"] .live-primary-caption {
+  justify-content: flex-end;
+  gap: 0.45rem 0.9rem;
+  color: rgba(246, 235, 204, 0.86);
+  font-size: clamp(1.2rem, 2.1vw, 2.05rem);
+  font-weight: 640;
+  letter-spacing: -0.02em;
+}
+
+body[data-page="live-activity"] .live-primary-caption span {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.36rem;
+}
+
+body[data-page="live-activity"] .live-primary-caption strong {
+  color: #fff1b2;
+  font-size: 1.38em;
+  font-weight: 720;
+  letter-spacing: -0.045em;
+}
+
+body[data-page="live-activity"] .live-primary-caption em,
+body[data-page="live-activity"] .live-caption-joiner {
+  color: rgba(241, 222, 176, 0.84);
+  font-family: "Baskervville", Georgia, serif;
+  font-size: 0.58em;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+body[data-page="live-activity"] .live-activity-map.live-night-map {
+  height: clamp(390px, 38vw, 560px);
+  background: #07111d;
+}
+
+body[data-page="live-activity"] .live-earth-night-image {
+  object-fit: fill;
+  opacity: 1;
+  filter: saturate(1.24) contrast(1.09) brightness(1.28);
+}
+
+body[data-page="live-activity"] .live-map-vignette {
+  background:
+    radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.03) 0, transparent 52%, rgba(0, 0, 0, 0.2) 82%, rgba(0, 0, 0, 0.5) 100%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.18), transparent 12%, transparent 88%, rgba(0, 0, 0, 0.18));
+}
+
+body[data-page="live-activity"] .live-rune-grid {
+  gap: 16px;
+}
+
+body[data-page="live-activity"] .live-rune-card {
+  min-height: 96px;
+  padding: 18px 22px;
+}
+
+body[data-page="live-activity"] .live-rune-card span {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+}
+
+body[data-page="live-activity"] .live-rune-card strong {
+  font-size: clamp(2.05rem, 3.35vw, 3.25rem);
+  font-weight: 700;
+}
+
+body[data-page="live-activity"] .live-rune-card small {
+  font-size: clamp(0.72rem, 0.9vw, 0.9rem);
+  font-weight: 650;
+  letter-spacing: 0.1em;
+}
+
+body[data-page="live-activity"] .live-region-strip {
+  margin-top: 18px;
+  padding: 16px 18px 18px;
+  border: 1px solid rgba(215, 181, 99, 0.16);
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, rgba(255, 230, 167, 0.055), transparent 70%),
+    rgba(2, 6, 13, 0.46);
+}
+
+body[data-page="live-activity"] .live-region-strip h2 {
+  margin: 0 0 12px;
+  color: #f5e7bb;
+  font-family: "Baskervville", Georgia, serif;
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.19em;
+  text-transform: uppercase;
+}
+
+body[data-page="live-activity"] .live-region-list {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+body[data-page="live-activity"] .live-region-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px 12px;
+  align-items: center;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(215, 181, 99, 0.13);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.24);
+}
+
+body[data-page="live-activity"] .live-region-row span {
+  overflow: hidden;
+  color: rgba(246, 235, 204, 0.9);
+  font-size: 0.88rem;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body[data-page="live-activity"] .live-region-row strong {
+  color: #fff1b1;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+body[data-page="live-activity"] .live-region-meter {
+  grid-column: 1 / -1;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+body[data-page="live-activity"] .live-region-meter i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(168, 114, 35, 0.78), rgba(255, 224, 130, 0.94));
+  box-shadow: 0 0 14px rgba(255, 214, 111, 0.25);
+}
+
+body[data-page="live-activity"] .live-queue-grid {
+  grid-template-columns: minmax(320px, 920px);
+}
+
+body[data-page="live-activity"] .live-queue-card h2 {
+  font-size: clamp(1.4rem, 2vw, 2rem);
+  font-weight: 680;
+}
+
+body[data-page="live-activity"] .live-queue-list .live-list-row span,
+body[data-page="live-activity"] .live-queue-list .live-list-row strong {
+  font-size: 0.96rem;
+}
+
+@media (max-width: 980px) {
+  body[data-page="live-activity"] .live-region-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  body[data-page="live-activity"] .live-primary-caption {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  body[data-page="live-activity"] .live-region-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   Live Global Activity v10 polish
+   Typography, map frame, region ledger, brighter night map
+   ========================================================= */
+body[data-page="live-activity"] {
+  --live-serif: Baskerville, "Libre Baskerville", "Baskervville", Georgia, serif;
+}
+
+body[data-page="live-activity"] .live-atlas-heading h1 {
+  font-family: var(--live-serif);
+  font-size: clamp(3.1rem, 6.2vw, 6.4rem);
+  font-weight: 640;
+  letter-spacing: -0.045em;
+  line-height: 0.96;
+  text-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.82),
+    0 0 22px rgba(214, 168, 79, 0.12);
+}
+
+body[data-page="live-activity"] .live-activity-scoreboard {
+  align-items: baseline;
+  gap: clamp(22px, 4vw, 58px);
+}
+
+body[data-page="live-activity"] .live-eyebrow,
+body[data-page="live-activity"] .live-rune-card span,
+body[data-page="live-activity"] .live-region-strip h2,
+body[data-page="live-activity"] .live-queue-card h2 {
+  font-family: var(--live-serif);
+  font-weight: 640;
+}
+
+body[data-page="live-activity"] .live-eyebrow {
+  color: rgba(248, 226, 166, 0.9);
+  font-size: clamp(0.68rem, 0.78vw, 0.82rem);
+  letter-spacing: 0.2em;
+}
+
+body[data-page="live-activity"] .live-primary-number,
+body[data-page="live-activity"] .live-primary-number strong {
+  color: #f7efd7;
+  font-family: var(--live-serif);
+  font-size: clamp(2.45rem, 4.9vw, 5.15rem);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 0.96;
+  text-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.82),
+    0 0 18px rgba(214, 168, 79, 0.16);
+}
+
+body[data-page="live-activity"] .live-primary-number span {
+  margin-left: 0.35em;
+  color: rgba(242, 221, 168, 0.9);
+  font-family: var(--live-serif);
+  font-size: clamp(0.9rem, 1.25vw, 1.25rem);
+  font-weight: 600;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  vertical-align: baseline;
+}
+
+body[data-page="live-activity"] .live-primary-caption {
+  color: rgba(246, 235, 204, 0.88);
+  font-family: var(--live-serif);
+  font-size: clamp(1.25rem, 2.25vw, 2.25rem);
+  font-weight: 560;
+  letter-spacing: -0.025em;
+}
+
+body[data-page="live-activity"] .live-primary-caption strong {
+  color: #fff0b5;
+  font-family: var(--live-serif);
+  font-size: 1.24em;
+  font-weight: 620;
+}
+
+body[data-page="live-activity"] .live-primary-caption em,
+body[data-page="live-activity"] .live-caption-joiner {
+  color: rgba(239, 218, 163, 0.86);
+  font-size: 0.54em;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+}
+
+body[data-page="live-activity"] .live-map-frame {
+  position: relative;
+  margin-top: 10px;
+  padding: 13px;
+  border: 1px solid rgba(210, 170, 82, 0.18);
+  border-radius: 4px;
+  background:
+    linear-gradient(180deg, rgba(255, 231, 165, 0.045), rgba(0, 0, 0, 0.02)),
+    rgba(0, 0, 0, 0.28);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 229, 154, 0.035),
+    0 18px 40px rgba(0, 0, 0, 0.34);
+}
+
+body[data-page="live-activity"] .live-map-frame > .widget-frame-ornaments {
+  pointer-events: none;
+  z-index: 4;
+}
+
+body[data-page="live-activity"] .live-activity-map.live-night-map {
+  height: clamp(405px, 39vw, 585px);
+  border: 1px solid rgba(219, 182, 91, 0.14);
+  border-radius: 3px;
+  box-shadow:
+    inset 0 0 46px rgba(0, 0, 0, 0.42),
+    inset 0 0 0 1px rgba(255, 232, 154, 0.035);
+}
+
+body[data-page="live-activity"] .live-earth-night-image {
+  filter: saturate(1.28) contrast(1.08) brightness(1.2);
+}
+
+body[data-page="live-activity"] .live-map-vignette {
+  background:
+    radial-gradient(circle at 50% 46%, rgba(255, 246, 198, 0.035) 0, transparent 50%, rgba(0, 0, 0, 0.10) 83%, rgba(0, 0, 0, 0.28) 100%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.08), transparent 11%, transparent 89%, rgba(0, 0, 0, 0.08));
+}
+
+body[data-page="live-activity"] .live-rune-card {
+  min-height: 104px;
+  padding: 18px 22px 20px;
+}
+
+body[data-page="live-activity"] .live-rune-card span {
+  margin-bottom: 10px;
+  color: rgba(248, 229, 175, 0.92);
+  font-size: clamp(0.72rem, 0.82vw, 0.86rem);
+  letter-spacing: 0.2em;
+}
+
+body[data-page="live-activity"] .live-rune-card div {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.45rem;
+}
+
+body[data-page="live-activity"] .live-rune-card strong {
+  color: #f8efd8;
+  font-family: var(--live-serif);
+  font-size: clamp(1.9rem, 3.15vw, 3.05rem);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+}
+
+body[data-page="live-activity"] .live-rune-card small {
+  color: rgba(242, 221, 168, 0.86);
+  font-family: var(--live-serif);
+  font-size: clamp(0.8rem, 1vw, 0.98rem);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: lowercase;
+}
+
+body[data-page="live-activity"] .live-region-strip {
+  margin-top: 20px;
+  padding: 18px 20px 20px;
+  border-color: rgba(215, 181, 99, 0.19);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(234, 192, 93, 0.09), transparent 38rem),
+    linear-gradient(180deg, rgba(255, 230, 167, 0.06), transparent 72%),
+    rgba(1, 5, 12, 0.52);
+}
+
+body[data-page="live-activity"] .live-region-strip h2 {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 16px;
+  color: #f5e4ad;
+  font-size: clamp(0.78rem, 0.9vw, 0.94rem);
+  letter-spacing: 0.18em;
+}
+
+body[data-page="live-activity"] .live-region-strip h2::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(224, 190, 112, 0.5), transparent);
+}
+
+body[data-page="live-activity"] .live-region-list {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+body[data-page="live-activity"] .live-region-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 8px 10px;
+  align-items: center;
+  min-width: 0;
+  padding: 12px 13px 13px;
+  overflow: hidden;
+  border: 1px solid rgba(215, 181, 99, 0.15);
+  border-radius: 10px;
+  background:
+    linear-gradient(180deg, rgba(255, 226, 151, 0.055), transparent 68%),
+    rgba(0, 0, 0, 0.22);
+}
+
+body[data-page="live-activity"] .live-region-row::before {
+  content: "";
+  position: absolute;
+  inset: -40% auto auto -15%;
+  width: 70%;
+  height: 150%;
+  background: radial-gradient(circle, rgba(231, 184, 83, 0.12), transparent 58%);
+  pointer-events: none;
+}
+
+body[data-page="live-activity"] .live-region-rank {
+  color: rgba(229, 198, 125, 0.62);
+  font-family: var(--live-serif);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+}
+
+body[data-page="live-activity"] .live-region-name {
+  overflow: hidden;
+  color: rgba(246, 236, 208, 0.94);
+  font-family: var(--live-serif);
+  font-size: clamp(0.92rem, 1vw, 1.05rem);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body[data-page="live-activity"] .live-region-percent {
+  color: #fff0ad;
+  font-family: var(--live-serif);
+  font-size: 0.94rem;
+  font-weight: 600;
+}
+
+body[data-page="live-activity"] .live-region-meter {
+  grid-column: 1 / -1;
+  height: 5px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.065);
+}
+
+body[data-page="live-activity"] .live-region-meter i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(152, 96, 26, 0.9), rgba(255, 228, 132, 0.98));
+  box-shadow:
+    0 0 10px rgba(255, 214, 111, 0.28),
+    0 0 22px rgba(255, 184, 73, 0.16);
+}
+
+body[data-page="live-activity"] .live-queue-card h2 {
+  font-family: var(--live-serif);
+  font-size: clamp(1.1rem, 1.45vw, 1.5rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+body[data-page="live-activity"] .live-queue-list .live-list-row span {
+  font-family: var(--live-serif);
+  font-weight: 600;
+}
+
+@media (max-width: 980px) {
+  body[data-page="live-activity"] .live-region-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  body[data-page="live-activity"] .live-activity-scoreboard {
+    gap: 16px;
+  }
+
+  body[data-page="live-activity"] .live-region-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* =========================================================
+   Live Global Activity v11 polish
+   Softer numerals, clearer rune units, brighter map edges
+   ========================================================= */
+body[data-page="live-activity"] {
+  --live-number-font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+}
+
+body[data-page="live-activity"] .live-atlas-heading h1 {
+  font-size: clamp(3rem, 5.7vw, 5.85rem);
+  font-weight: 620;
+}
+
+body[data-page="live-activity"] .live-activity-scoreboard {
+  align-items: center;
+  gap: clamp(28px, 6vw, 88px);
+}
+
+body[data-page="live-activity"] .live-online-panel,
+body[data-page="live-activity"] .live-match-panel {
+  min-width: 0;
+}
+
+body[data-page="live-activity"] .live-primary-number,
+body[data-page="live-activity"] .live-primary-number strong,
+body[data-page="live-activity"] .live-primary-caption strong,
+body[data-page="live-activity"] .live-rune-card strong,
+body[data-page="live-activity"] .live-region-percent,
+body[data-page="live-activity"] .live-queue-list .live-list-row strong {
+  font-family: var(--live-number-font);
+  font-variant-numeric: tabular-nums;
+}
+
+body[data-page="live-activity"] .live-primary-number,
+body[data-page="live-activity"] .live-primary-number strong {
+  font-size: clamp(2.35rem, 4.25vw, 4.55rem);
+  font-weight: 660;
+  letter-spacing: -0.055em;
+}
+
+body[data-page="live-activity"] .live-primary-number span {
+  margin-left: 0.55em;
+  font-family: var(--live-serif);
+  font-size: clamp(0.72rem, 0.95vw, 0.98rem);
+  font-weight: 620;
+  letter-spacing: 0.19em;
+}
+
+body[data-page="live-activity"] .live-primary-caption {
+  justify-content: flex-end;
+  font-family: var(--live-serif);
+  font-size: clamp(1.04rem, 1.65vw, 1.68rem);
+  font-weight: 560;
+  letter-spacing: 0.01em;
+}
+
+body[data-page="live-activity"] .live-primary-caption strong {
+  font-size: clamp(1.65rem, 2.9vw, 2.95rem);
+  font-weight: 660;
+  letter-spacing: -0.045em;
+}
+
+body[data-page="live-activity"] .live-primary-caption em,
+body[data-page="live-activity"] .live-caption-joiner {
+  font-family: var(--live-serif);
+  font-size: clamp(0.68rem, 0.85vw, 0.88rem);
+  font-weight: 620;
+  letter-spacing: 0.16em;
+}
+
+body[data-page="live-activity"] .live-activity-map.live-night-map {
+  background:
+    radial-gradient(circle at 50% 50%, rgba(20, 43, 78, 0.24), transparent 62%),
+    #07111d;
+}
+
+body[data-page="live-activity"] .live-earth-night-image {
+  filter: saturate(1.32) contrast(1.08) brightness(1.18);
+}
+
+body[data-page="live-activity"] .live-map-vignette {
+  background:
+    radial-gradient(circle at 50% 48%, rgba(255, 246, 198, 0.035) 0, transparent 54%, rgba(0, 0, 0, 0.06) 84%, rgba(255, 228, 158, 0.035) 100%),
+    linear-gradient(90deg, rgba(255, 222, 146, 0.055), transparent 14%, transparent 86%, rgba(255, 222, 146, 0.055)),
+    linear-gradient(180deg, rgba(255, 222, 146, 0.035), transparent 16%, transparent 84%, rgba(255, 222, 146, 0.03));
+  mix-blend-mode: screen;
+  opacity: 0.72;
+}
+
+body[data-page="live-activity"] .live-rune-grid {
+  gap: 18px;
+}
+
+body[data-page="live-activity"] .live-rune-card {
+  min-height: 94px;
+  padding: 17px 22px 18px;
+}
+
+body[data-page="live-activity"] .live-rune-card span {
+  margin-bottom: 9px;
+  font-size: clamp(0.7rem, 0.8vw, 0.82rem);
+  letter-spacing: 0.19em;
+}
+
+body[data-page="live-activity"] .live-rune-card div {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.48rem;
+  white-space: nowrap;
+}
+
+body[data-page="live-activity"] .live-rune-card strong {
+  font-size: clamp(1.9rem, 3vw, 2.85rem);
+  font-weight: 650;
+}
+
+body[data-page="live-activity"] .live-rune-card small {
+  display: inline-block;
+  color: rgba(245, 224, 170, 0.88);
+  font-family: var(--live-serif);
+  font-size: clamp(0.86rem, 1.02vw, 1.05rem);
+  font-weight: 620;
+  letter-spacing: 0.035em;
+  line-height: 1;
+  text-transform: lowercase;
+}
+
+body[data-page="live-activity"] .live-region-strip {
+  padding: 18px 18px 20px;
+}
+
+body[data-page="live-activity"] .live-region-strip h2 {
+  font-size: clamp(0.74rem, 0.85vw, 0.88rem);
+  font-weight: 620;
+}
+
+body[data-page="live-activity"] .live-region-row {
+  padding: 11px 12px 12px;
+}
+
+body[data-page="live-activity"] .live-region-name {
+  font-family: var(--live-serif);
+  font-size: clamp(0.86rem, 0.95vw, 1rem);
+  font-weight: 620;
+}
+
+body[data-page="live-activity"] .live-region-percent {
+  font-size: 0.88rem;
+  font-weight: 650;
+}
+
+@media (max-width: 760px) {
+  body[data-page="live-activity"] .live-activity-scoreboard {
+    align-items: flex-start;
+  }
+
+  body[data-page="live-activity"] .live-primary-caption {
+    justify-content: flex-start;
+  }
+}
+
+/* =========================================================
+   Sticky lobby inspector
+   Keeps the selected lobby/match details usable while the table scrolls.
+   ========================================================= */
+.browser-layout {
+    align-items: start;
+}
+
+.details-sidebar {
+    position: sticky !important;
+    top: clamp(0.75rem, 2vw, 1.25rem) !important;
+    align-self: start;
+    max-height: calc(100vh - clamp(1.5rem, 4vw, 2.5rem));
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(209, 174, 92, 0.55) rgba(3, 7, 13, 0.55);
+}
+
+.details-sidebar::-webkit-scrollbar {
+    width: 8px;
+}
+
+.details-sidebar::-webkit-scrollbar-track {
+    background: rgba(3, 7, 13, 0.55);
+}
+
+.details-sidebar::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: rgba(209, 174, 92, 0.55);
+}
+
+.details-sidebar-frame {
+    min-height: min-content;
+}
+
+@media (max-width: 1180px) {
+    .details-sidebar {
+        position: static !important;
+        max-height: none;
+        overflow: visible !important;
+    }
+}
+
+
+/* =========================================================
+   Lobby inspector sticky-frame correction
+   The inspector shell stays fixed while only the interior frame scrolls.
+   This prevents the ornate corners/frame from sliding away when long lobby
+   details are selected.
+   ========================================================= */
+@media (min-width: 1181px) {
+    .browser-layout {
+        align-items: start;
+    }
+
+    .details-sidebar {
+        position: sticky !important;
+        top: clamp(0.75rem, 2vw, 1.25rem) !important;
+        align-self: start;
+        max-height: calc(100vh - clamp(1.5rem, 4vw, 2.5rem));
+        overflow: visible !important;
+        padding: 0 !important;
+    }
+
+    .details-sidebar > .widget-frame-ornaments {
+        position: absolute;
+        inset: 0;
+        z-index: 20;
+        pointer-events: none;
+    }
+
+    .details-sidebar-frame {
+        max-height: calc(100vh - clamp(2.5rem, 5vw, 4rem));
+        overflow-y: auto !important;
+        overscroll-behavior: contain;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(209, 174, 92, 0.55) rgba(3, 7, 13, 0.55);
+    }
+
+    .details-sidebar-frame::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .details-sidebar-frame::-webkit-scrollbar-track {
+        background: rgba(3, 7, 13, 0.55);
+    }
+
+    .details-sidebar-frame::-webkit-scrollbar-thumb {
+        border-radius: 999px;
+        background: rgba(209, 174, 92, 0.55);
+    }
+}
+
+/* =========================================================
+   Lobby inspector frame containment fix
+   The ornate shell stays fixed/sticky and the content scrolls inside
+   an inset viewport, so player rows/settings never spill past the frame.
+   ========================================================= */
+@media (min-width: 1181px) {
+    .browser-layout {
+        align-items: start;
+    }
+
+    .details-sidebar {
+        --inspector-top: clamp(0.75rem, 2vw, 1.25rem);
+        position: sticky !important;
+        top: var(--inspector-top) !important;
+        align-self: start;
+        height: calc(100vh - (var(--inspector-top) * 2));
+        max-height: none !important;
+        min-height: 420px;
+        overflow: hidden !important;
+        padding: 0 !important;
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .details-sidebar > .widget-frame-ornaments {
+        position: absolute !important;
+        inset: 0 !important;
+        z-index: 30 !important;
+        pointer-events: none;
+    }
+
+    .details-sidebar-frame {
+        position: relative;
+        z-index: 1;
+        box-sizing: border-box;
+        height: calc(100% - 52px) !important;
+        max-height: none !important;
+        min-height: 0;
+        margin: 26px 18px !important;
+        padding: 22px 20px 34px !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        overscroll-behavior: contain;
+        scrollbar-gutter: stable;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(209, 174, 92, 0.58) rgba(3, 7, 13, 0.62);
+    }
+
+    .details-sidebar-frame::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .details-sidebar-frame::-webkit-scrollbar-track {
+        background: rgba(3, 7, 13, 0.62);
+    }
+
+    .details-sidebar-frame::-webkit-scrollbar-thumb {
+        border-radius: 999px;
+        background: rgba(209, 174, 92, 0.58);
+    }
+}
+
+@media (max-width: 1180px) {
+    .details-sidebar {
+        position: static !important;
+        height: auto !important;
+        min-height: 0 !important;
+        overflow: visible !important;
+    }
+
+    .details-sidebar-frame {
+        height: auto !important;
+        max-height: none !important;
+        overflow: visible !important;
+    }
+}
+
+/* =========================================================
+   Live activity v11 literal map pass
+   Halo-lobby inspired: flat 1:1 world, sparse cyan signals,
+   no inflated heat bubbles.
+   ========================================================= */
+body[data-page="live-activity"] .live-map-frame {
+  padding: 10px;
+  border-color: rgba(136, 217, 238, 0.24);
+  background:
+    linear-gradient(180deg, rgba(124, 220, 245, 0.06), rgba(0, 0, 0, 0.04)),
+    rgba(2, 10, 19, 0.48);
+  box-shadow:
+    inset 0 0 0 1px rgba(179, 232, 247, 0.045),
+    0 18px 42px rgba(0, 0, 0, 0.34);
+}
+
+body[data-page="live-activity"] .live-activity-map.live-night-map {
+  height: clamp(330px, 31vw, 480px);
+  border-color: rgba(148, 222, 240, 0.22);
+  border-radius: 2px;
+  background:
+    radial-gradient(circle at 50% 86%, rgba(89, 205, 230, 0.18), transparent 58%),
+    linear-gradient(180deg, #061325 0%, #112f44 57%, #1c6177 83%, #08131f 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(190, 239, 250, 0.035),
+    inset 0 0 48px rgba(0, 0, 0, 0.34);
+}
+
+body[data-page="live-activity"] .live-earth-night-image {
+  display: none;
+}
+
+body[data-page="live-activity"] .live-activity-canvas {
+  z-index: 1;
+}
+
+body[data-page="live-activity"] .live-map-vignette {
+  z-index: 2;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent 18%, transparent 72%, rgba(114, 221, 242, 0.10) 90%, rgba(0, 0, 0, 0.18) 100%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.30), transparent 13%, transparent 87%, rgba(0, 0, 0, 0.30)),
+    radial-gradient(circle at 50% 48%, transparent 0, transparent 64%, rgba(0, 0, 0, 0.30) 100%);
+  mix-blend-mode: normal;
+}
+
+body[data-page="live-activity"] .live-map-vignette::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.18;
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.08) 0,
+    rgba(255, 255, 255, 0.08) 1px,
+    transparent 1px,
+    transparent 5px
+  );
+}
+
+@media (max-width: 640px) {
+  body[data-page="live-activity"] .live-activity-map.live-night-map {
+    height: 310px;
+  }
+}
+
+
+/* =========================================================
+   Live activity map base pass 02
+   Restore the real Earth map as the base layer while keeping
+   the Halo-style restraint from the first literal pass.
+   ========================================================= */
+body[data-page="live-activity"] .live-map-frame {
+  padding: 10px;
+  border-color: rgba(132, 210, 232, 0.22);
+  background:
+    linear-gradient(180deg, rgba(110, 206, 236, 0.055), rgba(0, 0, 0, 0.035)),
+    rgba(2, 9, 18, 0.54);
+  box-shadow:
+    inset 0 0 0 1px rgba(196, 239, 250, 0.045),
+    0 18px 42px rgba(0, 0, 0, 0.34);
+}
+
+body[data-page="live-activity"] .live-activity-map.live-night-map {
+  min-height: unset;
+  height: auto;
+  aspect-ratio: 2520 / 993;
+  max-height: 560px;
+  border-color: rgba(140, 218, 238, 0.20);
+  border-radius: 2px;
+  background:
+    radial-gradient(circle at 50% 82%, rgba(71, 177, 218, 0.18), transparent 58%),
+    linear-gradient(180deg, #020914 0%, #07172a 55%, #0c2a42 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(190, 239, 250, 0.035),
+    inset 0 0 48px rgba(0, 0, 0, 0.36);
+}
+
+body[data-page="live-activity"] .live-earth-night-image {
+  display: block;
+  z-index: 0;
+  object-fit: contain;
+  opacity: 0.92;
+  filter: saturate(1.18) contrast(1.1) brightness(1.04);
+}
+
+body[data-page="live-activity"] .live-activity-canvas {
+  z-index: 1;
+}
+
+body[data-page="live-activity"] .live-map-vignette {
+  z-index: 2;
+  background:
+    linear-gradient(180deg, rgba(188, 242, 255, 0.035), transparent 16%, transparent 74%, rgba(96, 203, 234, 0.08) 91%, rgba(0, 0, 0, 0.16) 100%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.24), transparent 12%, transparent 88%, rgba(0, 0, 0, 0.24)),
+    radial-gradient(circle at 50% 48%, transparent 0, transparent 69%, rgba(0, 0, 0, 0.25) 100%);
+  mix-blend-mode: normal;
+}
+
+body[data-page="live-activity"] .live-map-vignette::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.14;
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.08) 0,
+    rgba(255, 255, 255, 0.08) 1px,
+    transparent 1px,
+    transparent 5px
+  );
+}
+
+@media (max-width: 640px) {
+  body[data-page="live-activity"] .live-activity-map.live-night-map {
+    min-height: 220px;
+  }
+}
+
+
+/* =========================================================
+   Live activity beacon-only map pass
+   The only plotted points on the map should be live beacons.
+   The base image is a clean Earth map with no city-light dots.
+   ========================================================= */
+body[data-page="live-activity"] .live-activity-map.live-night-map {
+  background:
+    radial-gradient(circle at 50% 52%, rgba(46, 143, 191, 0.10), transparent 64%),
+    linear-gradient(180deg, #020813 0%, #071729 52%, #020710 100%);
+}
+
+body[data-page="live-activity"] .live-earth-night-image {
+  opacity: 1;
+  filter: saturate(1.06) contrast(1.05) brightness(0.98);
+}
+
+body[data-page="live-activity"] .live-activity-canvas {
+  z-index: 1;
+  mix-blend-mode: screen;
+}
+
+body[data-page="live-activity"] .live-map-vignette {
+  background:
+    linear-gradient(180deg, rgba(188, 242, 255, 0.025), transparent 18%, transparent 76%, rgba(83, 187, 224, 0.05) 92%, rgba(0, 0, 0, 0.18) 100%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.28), transparent 13%, transparent 87%, rgba(0, 0, 0, 0.28)),
+    radial-gradient(circle at 50% 49%, transparent 0, transparent 70%, rgba(0, 0, 0, 0.24) 100%);
+}
+
+body[data-page="live-activity"] .live-map-vignette::before {
+  opacity: 0.055;
+}
+
+/* =========================================================
+   Live activity map developer toolbox
+   Toggle with the Map Dev tab or open directly with ?mapDev=1.
+   ========================================================= */
+body[data-page="live-activity"] .live-map-frame {
+  position: relative;
+}
+
+
+body[data-page="live-activity"] .live-map-dev-panel[hidden] {
+  display: none !important;
+}
+
+body[data-page="live-activity"] .live-map-dev-panel {
+  position: absolute;
+  right: 1.25rem;
+  top: 1.15rem;
+  z-index: 8;
+  width: min(23rem, calc(100% - 2.5rem));
+  color: rgba(245, 239, 214, 0.94);
+  font-family: var(--font-body, Georgia, serif);
+  pointer-events: none;
+}
+
+body[data-page="live-activity"] .live-map-dev-toggle {
+  pointer-events: auto;
+  display: block;
+  margin-left: auto;
+  border: 1px solid rgba(226, 198, 111, 0.52);
+  border-radius: 999px;
+  padding: 0.44rem 0.74rem;
+  background:
+    linear-gradient(180deg, rgba(35, 34, 25, 0.94), rgba(11, 14, 17, 0.94));
+  color: rgba(245, 231, 184, 0.96);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.58),
+    0 0 16px rgba(8, 13, 18, 0.58);
+  cursor: pointer;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+body[data-page="live-activity"] .live-map-dev-toggle:hover {
+  border-color: rgba(245, 219, 140, 0.78);
+  color: #fff8dd;
+}
+
+body[data-page="live-activity"] .live-map-dev-body {
+  pointer-events: auto;
+  display: none;
+  margin-top: 0.65rem;
+  border: 1px solid rgba(226, 198, 111, 0.26);
+  border-radius: 0.82rem;
+  padding: 0.82rem;
+  background:
+    linear-gradient(180deg, rgba(13, 18, 21, 0.94), rgba(7, 10, 14, 0.96));
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 246, 196, 0.05),
+    0 18px 48px rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(8px);
+}
+
+body[data-page="live-activity"] .live-map-dev-panel.is-open .live-map-dev-body {
+  display: block;
+}
+
+body[data-page="live-activity"] .live-map-dev-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.72rem;
+  padding-bottom: 0.54rem;
+  border-bottom: 1px solid rgba(226, 198, 111, 0.18);
+}
+
+body[data-page="live-activity"] .live-map-dev-head strong {
+  color: #fff4ca;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+body[data-page="live-activity"] .live-map-dev-head span {
+  color: rgba(144, 235, 255, 0.88);
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+body[data-page="live-activity"] .live-map-dev-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.45rem;
+  margin-bottom: 0.68rem;
+}
+
+body[data-page="live-activity"] .live-map-dev-grid > div {
+  border: 1px solid rgba(166, 220, 233, 0.12);
+  border-radius: 0.54rem;
+  padding: 0.48rem 0.56rem;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+body[data-page="live-activity"] .live-map-dev-grid span,
+body[data-page="live-activity"] .live-map-dev-controls label > span {
+  display: block;
+  color: rgba(232, 220, 175, 0.74);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+body[data-page="live-activity"] .live-map-dev-grid strong {
+  display: block;
+  margin-top: 0.15rem;
+  color: rgba(244, 252, 255, 0.96);
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+body[data-page="live-activity"] .live-map-dev-regions {
+  display: grid;
+  gap: 0.28rem;
+  max-height: 10.5rem;
+  overflow: auto;
+  margin-bottom: 0.72rem;
+  padding-right: 0.12rem;
+}
+
+body[data-page="live-activity"] .live-map-dev-region {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: baseline;
+  gap: 0.55rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.065);
+  padding: 0.25rem 0;
+  font-size: 0.7rem;
+}
+
+body[data-page="live-activity"] .live-map-dev-region span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body[data-page="live-activity"] .live-map-dev-region strong {
+  color: rgba(153, 238, 255, 0.96);
+  font-size: 0.78rem;
+}
+
+body[data-page="live-activity"] .live-map-dev-region small {
+  color: rgba(232, 220, 175, 0.68);
+  font-size: 0.66rem;
+}
+
+body[data-page="live-activity"] .live-map-dev-controls {
+  display: grid;
+  gap: 0.58rem;
+}
+
+body[data-page="live-activity"] .live-map-dev-controls h3 {
+  margin: 0.18rem 0 0.08rem;
+  padding-top: 0.4rem;
+  border-top: 1px solid rgba(226, 198, 111, 0.16);
+  color: rgba(255, 244, 202, 0.9);
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+body[data-page="live-activity"] .live-map-dev-controls h3:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+body[data-page="live-activity"] .live-map-dev-controls label {
+  display: grid;
+  grid-template-columns: 5.5rem 3.55rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.55rem;
+}
+
+body[data-page="live-activity"] .live-map-dev-control-value {
+  color: rgba(153, 238, 255, 0.96);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+body[data-page="live-activity"] .live-map-dev-color-value {
+  font-size: 0.58rem;
+  letter-spacing: 0.02em;
+}
+
+body[data-page="live-activity"] .live-map-dev-controls input[type="range"] {
+  width: 100%;
+  accent-color: #91edff;
+}
+
+body[data-page="live-activity"] .live-map-dev-controls input[type="color"] {
+  width: 100%;
+  min-height: 1.65rem;
+  border: 1px solid rgba(226, 198, 111, 0.28);
+  border-radius: 0.45rem;
+  background: rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+}
+
+body[data-page="live-activity"] .live-map-dev-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.45rem;
+  margin-top: 0.75rem;
+}
+
+body[data-page="live-activity"] .live-map-dev-actions button {
+  border: 1px solid rgba(226, 198, 111, 0.32);
+  border-radius: 999px;
+  padding: 0.38rem 0.62rem;
+  background: rgba(255, 255, 255, 0.045);
+  color: rgba(245, 231, 184, 0.94);
+  cursor: pointer;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+body[data-page="live-activity"] .live-map-dev-actions button:hover {
+  border-color: rgba(145, 237, 255, 0.62);
+  color: #f8fdff;
+}
+
+@media (max-width: 520px) {
+  body[data-page="live-activity"] .live-map-dev-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  body[data-page="live-activity"] .live-map-dev-controls label {
+    grid-template-columns: 4.75rem 3.3rem minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 860px) {
+  
+body[data-page="live-activity"] .live-map-dev-panel[hidden] {
+  display: none !important;
+}
+
+body[data-page="live-activity"] .live-map-dev-panel {
+    left: 0.85rem;
+    right: 0.85rem;
+    top: 0.85rem;
+    width: auto;
+  }
+}
+
+
+/* =========================================================
+   Live activity map dev toolbox viewport docking fix
+   Keep the closed tab attached to the map, but lift the open
+   toolbox out of the map frame so it cannot be clipped.
+   ========================================================= */
+body[data-page="live-activity"] .live-map-dev-panel.is-open {
+  position: fixed;
+  top: clamp(0.85rem, 5.5vh, 4.5rem);
+  right: max(1rem, calc((100vw - 1240px) / 2));
+  left: auto;
+  z-index: 10000;
+  width: min(26rem, calc(100vw - 2rem));
+  max-height: calc(100vh - 2rem);
+  pointer-events: auto;
+}
+
+body[data-page="live-activity"] .live-map-dev-panel.is-open .live-map-dev-body {
+  max-height: calc(100vh - 5.4rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+body[data-page="live-activity"] .live-map-dev-panel.is-open .live-map-dev-toggle {
+  margin-left: auto;
+}
+
+body[data-page="live-activity"] .live-map-dev-panel.is-open .live-map-dev-regions {
+  max-height: 8.25rem;
+}
+
+@media (max-width: 860px) {
+  body[data-page="live-activity"] .live-map-dev-panel:not(.is-open) {
+    left: 0.85rem;
+    right: 0.85rem;
+    top: 0.85rem;
+    width: auto;
+  }
+
+  body[data-page="live-activity"] .live-map-dev-panel.is-open {
+    position: fixed;
+    left: 1rem;
+    right: 1rem;
+    top: auto;
+    bottom: 1rem;
+    width: auto;
+    max-height: calc(100vh - 2rem);
+  }
+
+  body[data-page="live-activity"] .live-map-dev-panel.is-open .live-map-dev-body {
+    max-height: calc(100vh - 5.8rem);
+  }
+}
+
+/* ------------------------------------------------------------------
+   Stable shared header: page-local refresh / last-updated controls
+   ------------------------------------------------------------------ */
+
+.page-last-updated {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    min-width: 12.5rem;
+    color: rgba(232, 222, 191, 0.72);
+    font-family: "Baskervville", Georgia, serif;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    line-height: 1.2;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.lobby-panel-tabs-row {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+}
+
+.lobby-panel-tab-actions {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    flex: 0 0 auto;
+    min-width: 19rem;
+    margin: 0 0 -1px auto;
+    padding: 0 0.15rem 0.36rem;
+}
+
+.lobby-last-updated {
+    min-height: 2.35rem;
+    padding-top: 0.16rem;
+}
+
+.lobby-refresh-button {
+    min-height: 2.35rem;
+    padding: 0.42rem 1.15rem;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+.live-last-updated {
+    justify-content: flex-start;
+    min-width: 0;
+    margin-top: -0.15rem;
+    color: rgba(247, 243, 232, 0.68);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.72);
+}
+
+@media (max-width: 980px) {
+    .lobby-panel-tabs-row {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.7rem;
+    }
+
+    .lobby-panel-tab-actions {
+        justify-content: flex-start;
+        width: 100%;
+        min-width: 0;
+        margin-left: 0;
+        padding-bottom: 0;
+    }
+
+    .page-last-updated {
+        justify-content: flex-start;
+        min-width: 0;
+    }
+}
+
+@media (max-width: 560px) {
+    .lobby-panel-tab-actions {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+/* Live activity embedded as the first lobby tab. */
+body[data-page="lobby-browser"] .live-tab-panel {
+    overflow: visible;
+}
+
+body[data-page="lobby-browser"] .live-lobby-atlas-shell {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-atlas-stage {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-world-panel {
+    display: block;
+    padding: clamp(18px, 2.2vw, 30px);
+    overflow: hidden;
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-activity-scoreboard {
+    display: grid;
+    grid-template-columns: minmax(260px, 0.82fr) minmax(310px, 1fr);
+    align-items: baseline;
+    gap: clamp(22px, 4vw, 58px);
+    margin-bottom: 22px;
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-eyebrow,
+body[data-page="lobby-browser"] .live-tab-panel .live-rune-card span,
+body[data-page="lobby-browser"] .live-tab-panel .live-region-strip h2,
+body[data-page="lobby-browser"] .live-tab-panel .live-queue-card h2 {
+    font-family: Baskerville, "Libre Baskerville", "Baskervville", Georgia, serif;
+    font-weight: 640;
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-primary-number,
+body[data-page="lobby-browser"] .live-tab-panel .live-primary-number strong {
+    color: #f7efd7;
+    font-family: Baskerville, "Libre Baskerville", "Baskervville", Georgia, serif;
+    font-size: clamp(2.45rem, 4.9vw, 5.15rem);
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    line-height: 0.96;
+    text-shadow:
+        0 2px 0 rgba(0, 0, 0, 0.82),
+        0 0 18px rgba(214, 168, 79, 0.16);
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-primary-number {
+    display: flex;
+    align-items: baseline;
+    gap: 0.66rem;
+    margin: 0;
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-primary-number span {
+    color: rgba(242, 221, 168, 0.9);
+    font-family: Baskerville, "Libre Baskerville", "Baskervville", Georgia, serif;
+    font-size: clamp(0.9rem, 1.25vw, 1.25rem);
+    font-weight: 600;
+    letter-spacing: 0.17em;
+    text-transform: uppercase;
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-primary-caption {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: baseline;
+    gap: 0.45rem 0.9rem;
+    margin: 0 0 0 auto;
+    color: rgba(246, 235, 204, 0.88);
+    font-family: Baskerville, "Libre Baskerville", "Baskervville", Georgia, serif;
+    font-size: clamp(1.25rem, 2.25vw, 2.25rem);
+    font-weight: 560;
+    letter-spacing: -0.025em;
+    line-height: 1;
+    text-align: right;
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-primary-caption strong {
+    color: #fff0b5;
+    font-size: 1.24em;
+    font-weight: 620;
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-map-frame {
+    position: relative;
+    margin-top: 10px;
+    padding: 13px;
+    border: 1px solid rgba(210, 170, 82, 0.18);
+    border-radius: 4px;
+    background:
+        linear-gradient(180deg, rgba(255, 231, 165, 0.045), rgba(0, 0, 0, 0.02)),
+        rgba(0, 0, 0, 0.28);
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 229, 154, 0.035),
+        0 18px 40px rgba(0, 0, 0, 0.34);
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-map-frame > .widget-frame-ornaments {
+    pointer-events: none;
+    z-index: 4;
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-activity-map.live-night-map {
+    position: relative;
+    width: 100%;
+    height: clamp(405px, 39vw, 585px);
+    overflow: hidden;
+    border: 1px solid rgba(219, 182, 91, 0.14);
+    border-radius: 3px;
+    background: #07111d;
+    box-shadow:
+        inset 0 0 46px rgba(0, 0, 0, 0.42),
+        inset 0 0 0 1px rgba(255, 232, 154, 0.035);
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-earth-night-image,
+body[data-page="lobby-browser"] .live-tab-panel .live-activity-canvas,
+body[data-page="lobby-browser"] .live-tab-panel .live-map-vignette {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-earth-night-image {
+    display: block;
+    object-fit: fill;
+    opacity: 1;
+    filter: saturate(1.28) contrast(1.08) brightness(1.2);
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-activity-canvas {
+    z-index: 2;
+    pointer-events: none;
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-map-vignette {
+    z-index: 3;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 50% 46%, rgba(255, 246, 198, 0.035) 0, transparent 50%, rgba(0, 0, 0, 0.10) 83%, rgba(0, 0, 0, 0.28) 100%),
+        linear-gradient(90deg, rgba(0, 0, 0, 0.14), transparent 12%, transparent 88%, rgba(0, 0, 0, 0.14));
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-rune-grid {
+    width: 100%;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-region-strip {
+    margin-top: 18px;
+    padding: 16px 18px 18px;
+    border: 1px solid rgba(215, 181, 99, 0.16);
+    border-radius: 12px;
+    background:
+        linear-gradient(180deg, rgba(255, 230, 167, 0.055), transparent 70%),
+        rgba(2, 6, 13, 0.46);
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-region-list {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-queue-grid {
+    grid-template-columns: minmax(320px, 920px);
+    justify-content: center;
+}
+
+@media (max-width: 980px) {
+    body[data-page="lobby-browser"] .live-tab-panel .live-activity-scoreboard {
+        grid-template-columns: 1fr;
+    }
+
+    body[data-page="lobby-browser"] .live-tab-panel .live-primary-caption {
+        justify-content: flex-start;
+        margin-left: 0;
+        text-align: left;
+    }
+
+    body[data-page="lobby-browser"] .live-tab-panel .live-region-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    body[data-page="lobby-browser"] .live-tab-panel .live-world-panel {
+        padding: 12px;
+    }
+
+    body[data-page="lobby-browser"] .live-tab-panel .live-map-frame {
+        padding: 8px;
+    }
+
+    body[data-page="lobby-browser"] .live-tab-panel .live-rune-grid,
+    body[data-page="lobby-browser"] .live-tab-panel .live-region-list {
+        grid-template-columns: 1fr;
+    }
+}

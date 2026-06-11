@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Prostagma? | Age of Mythology: Retold Tools{% endblock %}
+{% block body_class %}prostagma-landing-page{% endblock %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+{% endblock %}
+
+{% block site_header %}
+  {% include "partials/header.html" with active_page="home" %}
+{% endblock %}
+
+{% block content %}
+  <main class="landing-shell">
+    <section class="landing-hero" aria-labelledby="landing-title">
+      <div class="landing-hero-backdrop" aria-hidden="true">
+        <picture>
+          <source
+            srcset="{% static 'assets/optimized/images/Background.webp' %}"
+            type="image/webp"
+          >
+          <img
+            src="{% static 'assets/images/Background.png' %}"
+            alt=""
+            loading="eager"
+          >
+        </picture>
+      </div>
+
+      <div class="landing-hero-art" aria-hidden="true">
+        <picture>
+          <source
+            srcset="{% static 'assets/optimized/images/ui/prostagma_arkantos.brand.webp' %}"
+            type="image/webp"
+          >
+          <img
+            src="{% static 'assets/images/ui/prostagma_arkantos.png' %}"
+            alt=""
+            loading="eager"
+            width="320"
+            height="320"
+          >
+        </picture>
+      </div>
+
+      <div class="landing-hero-content">
+        <p class="landing-kicker">Age of Mythology: Retold tools</p>
+        <h1 id="landing-title">Prostagma?</h1>
+        <p class="landing-copy">
+          Live lobby tracking, build order archives, and community tools for sharper games.
+        </p>
+
+        <nav class="landing-actions" aria-label="Featured Prostagma destinations">
+          <a class="landing-primary-action" href="/lobbies/">
+            <span>Open Lobbies</span>
+            <strong>Live browser</strong>
+          </a>
+          <a href="/build_orders/">
+            <span>Build Orders</span>
+            <strong>Pantheons and gods</strong>
+          </a>
+          <a href="/agora/">
+            <span>Agora</span>
+            <strong>Community hub</strong>
+          </a>
+        </nav>
+      </div>
+    </section>
+
+    <section class="landing-tool-band" aria-label="Prostagma sections">
+      <a class="landing-tool-card" href="/lobbies/">
+        <span class="landing-tool-index">01</span>
+        <h2>Live Activity</h2>
+        <p>Global activity, open lobbies, custom matches, and ranked games in one panel.</p>
+      </a>
+
+      <a class="landing-tool-card" href="/build_orders/">
+        <span class="landing-tool-index">02</span>
+        <h2>Build Orders</h2>
+        <p>Browse openings by pantheon and major god with fast paths into each build.</p>
+      </a>
+
+      <a class="landing-tool-card" href="/agora/">
+        <span class="landing-tool-index">03</span>
+        <h2>Agora</h2>
+        <p>A quieter space for player tools, discussion, and the next set of site features.</p>
+      </a>
+    </section>
+  </main>
+{% endblock %}
