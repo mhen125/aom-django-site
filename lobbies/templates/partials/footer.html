@@ -1,8 +1,20 @@
 {% load static %}
 <footer class="site-footer" aria-label="Site footer">
   <div class="site-footer-inner">
-    <span>Prostagma? · Unofficial Age of Mythology: Retold tools</span>
+    <a class="site-footer-brand" href="/">
+      <picture>
+        <source srcset="{% static 'assets/optimized/images/ui/prostagma_arkantos.brand.webp' %}" type="image/webp">
+        <img src="{% static 'assets/images/ui/prostagma_arkantos.png' %}" alt="" width="44" height="44" loading="lazy">
+      </picture>
+      <span>
+        <strong>Prostagma?</strong>
+        <small>For the players. By the community.</small>
+      </span>
+    </a>
     <nav class="site-footer-links" aria-label="Footer navigation">
+      <a href="/lobbies/">Lobbies</a>
+      <a href="/build_orders/">Build Orders</a>
+      <a href="/agora/">Agora</a>
       <a href="/about/">About</a>
       <a href="/faq/">FAQ</a>
     </nav>

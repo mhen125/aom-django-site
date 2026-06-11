@@ -36,9 +36,6 @@ urlpatterns = [
         name="faq",
     ),
 
-    # Landing page, live lobby/API routes, and activity dashboard.
-    path("", include("lobbies.urls")),
-
     # Canonical build-order section URL.
     path("build_orders/", include("builds.urls")),
 
@@ -56,6 +53,9 @@ urlpatterns = [
     path("data.json", build_views.data_js, name="legacy_build_data"),
     path("api/builds/save/", build_views.api_save_build, name="legacy_api_save_build"),
     path("api/builds/delete/", build_views.api_delete_build, name="legacy_api_delete_build"),
+
+    # Landing page, live lobby/API routes, and activity dashboard.
+    path("", include("lobbies.urls")),
 ]
 
 if settings.DEBUG:

@@ -144,19 +144,37 @@
 
       <div class="landing-community-grid">
         <article class="landing-community-card landing-panel">
-          <span class="landing-card-kicker">Creator Spotlight</span>
-          <h3>Featured guides and streams</h3>
-          <p>Reserved for top creators, tournament coverage, and community build-order highlights.</p>
+          <div class="landing-community-media">
+            <img src="{% static 'assets/optimized/images/gods/zeus_portrait.card.webp' %}" alt="" width="320" height="180" loading="lazy">
+          </div>
+          <div class="landing-community-copy">
+            <span class="landing-card-kicker">Creator Spotlight</span>
+            <h3>Featured guides and streams</h3>
+            <p>Reserved for top creators, tournament coverage, and community build-order highlights.</p>
+            <span class="landing-community-meta">Guides · Streams · Tournaments</span>
+          </div>
         </article>
         <article class="landing-community-card landing-panel">
-          <span class="landing-card-kicker">Latest Video</span>
-          <h3>Strategy features</h3>
-          <p>Short-form guide and matchup content can slot in here once the source list is finalized.</p>
+          <div class="landing-community-media">
+            <img src="{% static 'assets/optimized/images/gods/odin_portrait.card.webp' %}" alt="" width="320" height="180" loading="lazy">
+          </div>
+          <div class="landing-community-copy">
+            <span class="landing-card-kicker">Latest Video</span>
+            <h3>Strategy features</h3>
+            <p>Short-form guide and matchup content can slot in here once the source list is finalized.</p>
+            <span class="landing-community-meta">Builds · Matchups · Openings</span>
+          </div>
         </article>
         <article class="landing-community-card landing-panel">
-          <span class="landing-card-kicker">Competitive</span>
-          <h3>Ranked and event signals</h3>
-          <p>Leaderboards, queue stats, and featured events will have a natural home in this space.</p>
+          <div class="landing-community-media">
+            <img src="{% static 'assets/optimized/images/gods/Huitzilopochtli_portrait.card.webp' %}" alt="" width="320" height="180" loading="lazy">
+          </div>
+          <div class="landing-community-copy">
+            <span class="landing-card-kicker">Competitive</span>
+            <h3>Ranked and event signals</h3>
+            <p>Leaderboards, queue stats, and featured events will have a natural home in this space.</p>
+            <span class="landing-community-meta">Rankings · Queues · Events</span>
+          </div>
         </article>
       </div>
     </section>
@@ -212,6 +230,10 @@
       </div>
     </section>
   </main>
+{% endblock %}
+
+{% block site_footer %}
+  {% include "partials/footer.html" %}
 {% endblock %}
 
 {% block scripts %}

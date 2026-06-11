@@ -447,13 +447,96 @@ body.agora-page .site-section-heading p {
 }
 
 .site-footer {
-  min-height: 2.25rem;
-  padding: 1.25rem var(--site-page-gutter);
-  color: rgba(231, 218, 182, 0.62);
+  position: relative;
+  overflow: hidden;
+  min-height: 7rem;
+  margin-top: clamp(2rem, 4vw, 4rem);
+  padding: clamp(1.4rem, 2.6vw, 2.2rem) var(--site-page-gutter);
+  border-top: 1px solid rgba(218, 180, 99, 0.16);
+  color: rgba(231, 218, 182, 0.72);
+  background:
+    radial-gradient(circle at 14% 0%, rgba(232, 196, 111, 0.08), transparent 28%),
+    linear-gradient(180deg, rgba(3, 8, 16, 0.2), rgba(2, 7, 16, 0.88));
   font-family: var(--site-font-body);
   font-size: 0.78rem;
+}
+
+.site-footer-inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  width: min(var(--site-shell-width), 100%);
+  margin: 0 auto;
+}
+
+.site-footer-brand {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  gap: 0.72rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.site-footer-brand picture {
+  flex: 0 0 auto;
+}
+
+.site-footer-brand img {
+  display: block;
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  filter:
+    drop-shadow(0 0 7px rgba(230, 190, 88, 0.16))
+    drop-shadow(0 8px 14px rgba(0, 0, 0, 0.34));
+}
+
+.site-footer-brand span {
+  display: grid;
+  min-width: 0;
+  gap: 0.16rem;
+}
+
+.site-footer-brand strong {
+  color: #f4d891;
+  font-family: var(--site-font-title);
+  font-size: 1.35rem;
+  font-weight: 760;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+.site-footer-brand small {
+  color: rgba(232, 218, 184, 0.68);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.site-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.45rem 1rem;
+}
+
+.site-footer-links a {
+  color: rgba(237, 224, 190, 0.72);
+  font-size: 0.74rem;
+  font-weight: 850;
   letter-spacing: 0.08em;
-  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 150ms ease;
+}
+
+.site-footer-links a:hover,
+.site-footer-links a:focus-visible {
+  color: #f3c46e;
 }
 
 @media (max-width: 1360px) {
@@ -536,6 +619,15 @@ body.agora-page .site-section-heading p {
 
   .site-section-heading {
     padding-left: 0;
+  }
+
+  .site-footer-inner {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .site-footer-links {
+    justify-content: flex-start;
   }
 }
 
