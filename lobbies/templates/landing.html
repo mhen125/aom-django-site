@@ -41,6 +41,39 @@
         <div class="landing-map-vignette"></div>
       </div>
 
+      <aside id="homeMapDevPanel" class="landing-map-dev-panel" aria-label="Homepage map developer tools" hidden>
+        <button id="homeMapDevToggle" class="landing-map-dev-toggle" type="button" aria-expanded="false">
+          Map Dev
+        </button>
+        <div class="landing-map-dev-body">
+          <div class="landing-map-dev-head">
+            <strong>Homepage map</strong>
+            <span>local tuning</span>
+          </div>
+          <label>
+            <span>Map brightness</span>
+            <output id="homeMapBrightnessValue">1.16</output>
+            <input id="homeMapBrightness" type="range" min="0.85" max="1.45" step="0.01" value="1.16">
+          </label>
+          <label>
+            <span>Beacon intensity</span>
+            <output id="homeMapBeaconIntensityValue">1.00</output>
+            <input id="homeMapBeaconIntensity" type="range" min="0.55" max="1.65" step="0.01" value="1.00">
+          </label>
+          <label>
+            <span>Beacon size</span>
+            <output id="homeMapBeaconSizeValue">1.00</output>
+            <input id="homeMapBeaconSize" type="range" min="0.65" max="1.55" step="0.01" value="1.00">
+          </label>
+          <label>
+            <span>Ambient lights</span>
+            <output id="homeMapAmbientValue">0.82</output>
+            <input id="homeMapAmbient" type="range" min="0" max="1.35" step="0.01" value="0.82">
+          </label>
+          <button id="homeMapDevReset" class="landing-map-dev-reset" type="button">Reset tuning</button>
+        </div>
+      </aside>
+
       <div class="landing-hero-grid">
         <div class="landing-hero-copy">
           <p class="landing-kicker site-kicker">Age of Mythology: Retold Hub</p>

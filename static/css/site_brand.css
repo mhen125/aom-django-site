@@ -5,14 +5,28 @@
 .site-shell-header {
   position: relative;
   z-index: 5000;
-  padding: clamp(0.62rem, 1vw, 0.82rem) var(--site-page-gutter);
-  border-bottom: 1px solid var(--site-border);
+  padding: clamp(0.74rem, 1.12vw, 0.98rem) var(--site-page-gutter);
+  border-top: 1px solid rgba(255, 233, 176, 0.12);
+  border-bottom: 2px solid rgba(195, 145, 60, 0.4);
   color: var(--site-text);
   background:
-    radial-gradient(circle at 12% 0%, rgba(232, 196, 111, 0.1), transparent 30%),
-    linear-gradient(180deg, rgba(3, 8, 16, 0.97), rgba(3, 8, 16, 0.84));
-  box-shadow: 0 14px 38px rgba(0, 0, 0, 0.26);
+    radial-gradient(circle at 12% 0%, rgba(232, 196, 111, 0.13), transparent 31%),
+    linear-gradient(180deg, rgba(8, 15, 28, 0.98), rgba(4, 10, 19, 0.88));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 244, 205, 0.12),
+    inset 0 -1px 0 rgba(255, 220, 130, 0.18),
+    0 16px 42px rgba(0, 0, 0, 0.32);
   backdrop-filter: blur(6px);
+}
+
+.site-shell-header::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 -2px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, rgba(232, 190, 94, 0.76) 16%, rgba(255, 236, 167, 0.9) 50%, rgba(232, 190, 94, 0.76) 84%, transparent);
+  opacity: 0.58;
+  pointer-events: none;
 }
 
 .site-shell-header-agora,
@@ -25,7 +39,7 @@ body.agora-page .site-shell-header {
 
 .site-header-inner {
   display: grid;
-  grid-template-columns: minmax(250px, max-content) minmax(0, 1fr) auto;
+  grid-template-columns: minmax(280px, max-content) minmax(0, 1fr) auto;
   align-items: center;
   gap: clamp(0.9rem, 1.7vw, 1.75rem);
   width: min(var(--site-shell-width), 100%);
@@ -43,8 +57,8 @@ body.agora-page .site-shell-header {
 
 .site-brand-icon {
   display: block;
-  width: clamp(44px, 3.7vw, 58px);
-  height: clamp(44px, 3.7vw, 58px);
+  width: clamp(50px, 4vw, 64px);
+  height: clamp(50px, 4vw, 64px);
   object-fit: contain;
   filter:
     drop-shadow(0 0 7px rgba(230, 190, 88, 0.2))
@@ -61,7 +75,7 @@ body.agora-page .site-shell-header {
   display: block;
   color: #071125;
   font-family: var(--site-font-title);
-  font-size: clamp(1.65rem, 2.35vw, 2.65rem);
+  font-size: clamp(1.82rem, 2.55vw, 2.9rem);
   font-weight: 900;
   letter-spacing: 0;
   line-height: 0.86;
@@ -78,7 +92,7 @@ body.agora-page .site-shell-header {
   display: block;
   color: rgba(232, 210, 154, 0.8);
   font-family: var(--site-font-body);
-  font-size: clamp(0.55rem, 0.72vw, 0.72rem);
+  font-size: clamp(0.58rem, 0.74vw, 0.76rem);
   font-weight: 800;
   letter-spacing: 0.18em;
   line-height: 1.2;
@@ -134,14 +148,14 @@ body.agora-page .site-brand-tagline {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 2.25rem;
-  padding: 0.34rem 0.38rem;
+  min-height: 2.55rem;
+  padding: 0.42rem 0.48rem;
   border: 0;
   border-radius: 0;
   color: rgba(244, 229, 184, 0.84);
   background: transparent;
   cursor: pointer;
-  font-size: clamp(0.58rem, 0.63vw, 0.72rem);
+  font-size: clamp(0.66rem, 0.72vw, 0.82rem);
   line-height: 1;
   white-space: nowrap;
   transition: color 160ms ease, background 160ms ease, box-shadow 160ms ease, transform 160ms ease;
@@ -152,12 +166,30 @@ body.agora-page .site-brand-tagline {
   cursor: default;
 }
 
+.site-primary-nav a::before,
+.site-primary-nav button::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0.18rem;
+  width: calc(100% - 0.52rem);
+  max-width: 4.75rem;
+  height: 2px;
+  border-radius: var(--site-radius-pill);
+  background: linear-gradient(90deg, transparent, #f2c361 18%, #fff0bc 50%, #f2c361 82%, transparent);
+  box-shadow: 0 0 10px rgba(240, 190, 86, 0.52);
+  opacity: 0;
+  transform: translateX(-50%) scaleX(0.64);
+  transition: opacity 160ms ease, transform 160ms ease;
+  pointer-events: none;
+}
+
 .site-primary-nav a::after,
 .site-primary-nav button::after {
   content: "";
   position: absolute;
   left: 50%;
-  bottom: -0.78rem;
+  bottom: -0.86rem;
   width: 5.6rem;
   height: 20px;
   background: url("../assets/optimized/images/homepage/Main_Menu_Selection_Highlight_Underlay.webp") center / 100% 100% no-repeat;
@@ -188,6 +220,17 @@ body.agora-page .site-brand-tagline {
 .site-primary-nav button[aria-current="page"]::after,
 .site-nav-dropdown:hover .site-nav-dropdown-button::after {
   opacity: 0.9;
+  transform: translateX(-50%) scaleX(1);
+}
+
+.site-primary-nav a:hover::before,
+.site-primary-nav a:focus-visible::before,
+.site-primary-nav a[aria-current="page"]::before,
+.site-primary-nav button:hover::before,
+.site-primary-nav button:focus-visible::before,
+.site-primary-nav button[aria-current="page"]::before,
+.site-nav-dropdown:hover .site-nav-dropdown-button::before {
+  opacity: 1;
   transform: translateX(-50%) scaleX(1);
 }
 
@@ -541,13 +584,13 @@ body.agora-page .site-section-heading p {
 
 @media (max-width: 1360px) {
   .site-header-inner {
-    grid-template-columns: minmax(220px, max-content) minmax(0, 1fr) auto;
+    grid-template-columns: minmax(240px, max-content) minmax(0, 1fr) auto;
     gap: 0.75rem;
   }
 
   .site-brand-icon {
-    width: 52px;
-    height: 52px;
+    width: 54px;
+    height: 54px;
   }
 
   .site-brand-wordmark {
@@ -557,8 +600,8 @@ body.agora-page .site-section-heading p {
   .site-primary-nav a,
   .site-primary-nav button,
   .site-nav-disabled {
-    padding-inline: 0.22rem;
-    font-size: 0.58rem;
+    padding-inline: 0.28rem;
+    font-size: 0.62rem;
   }
 }
 

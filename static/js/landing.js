@@ -5,6 +5,18 @@
   const activityUrl = config.activityUrl || "/api/activity/live";
   const newsUrl = config.newsUrl || "/api/home/news/";
   const fallbackNewsImage = config.fallbackNewsImage || "";
+  const activityNumberPollMs = 6000;
+  const homeMapRefreshMs = 20000;
+  const homeMapStyleStorageKey = "prostagma.homeMapStyle";
+  const homeMapDevStorageKey = "prostagma.homeMapDevOpen";
+  const defaultHomeMapStyle = {
+    brightness: 1.16,
+    intensity: 1,
+    size: 1,
+    ambient: 0.82,
+  };
+  let latestActivityPayload = null;
+  let homeMapController = null;
 
   const numberFormatter = new Intl.NumberFormat("en-US");
   const dateFormatter = new Intl.DateTimeFormat("en-US", {
@@ -70,12 +82,61 @@
     };
   }
 
-  function drawGlow(context, x, y, radius, alpha, pulse = 1) {
-    const outer = radius * (6 + pulse * 2.2);
+  function clampNumber(value, fallback, min, max) {
+    const number = Number(value);
+
+    if (!Number.isFinite(number)) {
+      return fallback;
+    }
+
+    return Math.max(min, Math.min(max, number));
+  }
+
+  function loadHomeMapStyle() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(homeMapStyleStorageKey) || "{}");
+      return {
+        brightness: clampNumber(saved.brightness, defaultHomeMapStyle.brightness, 0.85, 1.45),
+        intensity: clampNumber(saved.intensity, defaultHomeMapStyle.intensity, 0.55, 1.65),
+        size: clampNumber(saved.size, defaultHomeMapStyle.size, 0.65, 1.55),
+        ambient: clampNumber(saved.ambient, defaultHomeMapStyle.ambient, 0, 1.35),
+      };
+    } catch (_error) {
+      return { ...defaultHomeMapStyle };
+    }
+  }
+
+  function saveHomeMapStyle(style) {
+    try {
+      localStorage.setItem(homeMapStyleStorageKey, JSON.stringify(style));
+    } catch (_error) {
+      // Ignore storage errors.
+    }
+  }
+
+  function setHomeMapStyleProperties(frame, style) {
+    if (!frame) {
+      return;
+    }
+
+    frame.style.setProperty("--home-map-brightness", style.brightness.toFixed(2));
+  }
+
+  function drawGlow(context, x, y, radius, alpha, style, isAmbient = false) {
+    const intensity = isAmbient ? style.ambient : style.intensity;
+    const size = isAmbient ? 0.92 : style.size;
+    const adjustedAlpha = alpha * intensity;
+    const adjustedRadius = radius * size;
+    const outer = adjustedRadius * (isAmbient ? 6.4 : 7.8);
+
+    if (adjustedAlpha <= 0 || outer <= 0) {
+      return;
+    }
+
     const gradient = context.createRadialGradient(x, y, 0, x, y, outer);
-    gradient.addColorStop(0, `rgba(255, 242, 166, ${alpha})`);
-    gradient.addColorStop(0.16, `rgba(247, 203, 84, ${alpha * 0.78})`);
-    gradient.addColorStop(0.38, `rgba(214, 155, 45, ${alpha * 0.32})`);
+    gradient.addColorStop(0, `rgba(255, 244, 178, ${Math.min(0.95, adjustedAlpha)})`);
+    gradient.addColorStop(0.18, `rgba(249, 205, 83, ${Math.min(0.78, adjustedAlpha * 0.76)})`);
+    gradient.addColorStop(0.42, `rgba(218, 160, 45, ${Math.min(0.42, adjustedAlpha * 0.34)})`);
     gradient.addColorStop(1, "rgba(214, 155, 45, 0)");
 
     context.fillStyle = gradient;
@@ -83,9 +144,9 @@
     context.arc(x, y, outer, 0, Math.PI * 2);
     context.fill();
 
-    context.fillStyle = `rgba(255, 235, 139, ${Math.min(1, alpha * 1.45)})`;
+    context.fillStyle = `rgba(255, 238, 145, ${Math.min(0.92, adjustedAlpha * 1.28)})`;
     context.beginPath();
-    context.arc(x, y, Math.max(1, radius * 0.74), 0, Math.PI * 2);
+    context.arc(x, y, Math.max(1, adjustedRadius * 0.72), 0, Math.PI * 2);
     context.fill();
   }
 
@@ -127,11 +188,11 @@
 
     for (const region of regions) {
       const share = Math.max(0.06, Number(region.activityWeight || 0) / totalWeight);
-      const count = Math.max(10, Math.min(62, Math.round(share * 180)));
+      const count = Math.max(8, Math.min(58, Math.round(share * 172)));
       const anchor = projectPoint(region.lat, region.lon, width, height);
-      const random = createSeededRandom(`home-region:${region.id || region.label}:${count}`);
 
       for (let index = 0; index < count; index += 1) {
+        const random = createSeededRandom(`home-region:${region.id || region.label}:${index}`);
         const spreadX = width * (0.025 + share * 0.038);
         const spreadY = height * (0.018 + share * 0.026);
         const x = anchor.x + (random() - 0.5) * spreadX;
@@ -141,7 +202,6 @@
           y,
           radius: 0.75 + random() * 1.25,
           alpha: 0.34 + random() * 0.42,
-          phase: random() * Math.PI * 2,
         });
       }
     }
@@ -163,7 +223,6 @@
           ...point,
           radius: 0.45 + random() * 0.8,
           alpha: 0.13 + random() * 0.22,
-          phase: random() * Math.PI * 2,
         });
       }
     }
@@ -171,11 +230,68 @@
     return points;
   }
 
-  function initHomeMap(payload) {
+  function getHomeMapSignature(payload, width, height, style) {
+    const regions = getActivityRegions(payload)
+      .map((region) => `${region.id || region.label}:${Math.round(Number(region.activityWeight || 0))}`)
+      .join("|");
+
+    return [
+      width,
+      height,
+      style.intensity.toFixed(2),
+      style.size.toFixed(2),
+      style.ambient.toFixed(2),
+      regions,
+    ].join(":");
+  }
+
+  function isHomeMapDevEnabled() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("homeMapDev") === "1" || params.get("mapDev") === "1";
+  }
+
+  function updateHomeMapDevOutputs(style) {
+    const pairs = [
+      ["homeMapBrightnessValue", style.brightness],
+      ["homeMapBeaconIntensityValue", style.intensity],
+      ["homeMapBeaconSizeValue", style.size],
+      ["homeMapAmbientValue", style.ambient],
+    ];
+
+    for (const [id, value] of pairs) {
+      const output = document.getElementById(id);
+
+      if (output) {
+        output.textContent = value.toFixed(2);
+      }
+    }
+  }
+
+  function setHomeMapDevPanelOpen(panel, toggle, isOpen) {
+    if (!panel || !toggle || !isHomeMapDevEnabled()) {
+      return;
+    }
+
+    panel.classList.toggle("is-open", isOpen);
+    toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+
+    try {
+      localStorage.setItem(homeMapDevStorageKey, isOpen ? "1" : "0");
+    } catch (_error) {
+      // Ignore storage errors.
+    }
+  }
+
+  function initHomeMap(payload, options = {}) {
     const canvas = document.getElementById("homeActivityCanvas");
     const frame = canvas?.parentElement;
 
     if (!canvas || !frame) {
+      return;
+    }
+
+    if (homeMapController) {
+      homeMapController.updatePayload(payload, options);
       return;
     }
 
@@ -184,6 +300,9 @@
     let height = 0;
     let ambientPoints = [];
     let beaconPoints = [];
+    let currentPayload = payload;
+    let style = loadHomeMapStyle();
+    let lastSignature = "";
 
     function resize() {
       const rect = frame.getBoundingClientRect();
@@ -203,36 +322,119 @@
       canvas.style.height = `${height}px`;
       context.setTransform(ratio, 0, 0, ratio, 0, 0);
 
-      const regions = getActivityRegions(payload);
       ambientPoints = createAmbientPoints(width, height);
-      beaconPoints = createBeaconPoints(regions, width, height);
+      lastSignature = "";
     }
 
-    function render(time) {
+    function rebuildBeacons(force = false) {
+      const signature = getHomeMapSignature(currentPayload, width, height, style);
+
+      if (!force && signature === lastSignature) {
+        return;
+      }
+
+      const regions = getActivityRegions(currentPayload);
+      beaconPoints = createBeaconPoints(regions, width, height);
+      lastSignature = signature;
+    }
+
+    function render(force = false) {
       resize();
+      rebuildBeacons(force);
+      setHomeMapStyleProperties(frame, style);
       context.clearRect(0, 0, width, height);
       context.globalCompositeOperation = "lighter";
 
       for (const point of ambientPoints) {
-        const pulse = 0.84 + Math.sin(time * 0.0012 + point.phase) * 0.16;
-        drawGlow(context, point.x, point.y, point.radius, point.alpha * pulse, pulse);
+        drawGlow(context, point.x, point.y, point.radius, point.alpha, style, true);
       }
 
       for (const point of beaconPoints) {
-        const pulse = 1 + Math.sin(time * 0.0018 + point.phase) * 0.22;
-        drawGlow(context, point.x, point.y, point.radius * pulse, point.alpha, pulse);
+        drawGlow(context, point.x, point.y, point.radius, point.alpha, style, false);
       }
 
       context.globalCompositeOperation = "source-over";
-      window.requestAnimationFrame(render);
     }
 
+    function bindDevPanel() {
+      const panel = document.getElementById("homeMapDevPanel");
+      const toggle = document.getElementById("homeMapDevToggle");
+      const reset = document.getElementById("homeMapDevReset");
+      const controls = {
+        brightness: document.getElementById("homeMapBrightness"),
+        intensity: document.getElementById("homeMapBeaconIntensity"),
+        size: document.getElementById("homeMapBeaconSize"),
+        ambient: document.getElementById("homeMapAmbient"),
+      };
+
+      if (!panel || !toggle) {
+        return;
+      }
+
+      if (!isHomeMapDevEnabled()) {
+        panel.hidden = true;
+        return;
+      }
+
+      panel.hidden = false;
+      panel.classList.add("is-enabled");
+      controls.brightness.value = style.brightness.toFixed(2);
+      controls.intensity.value = style.intensity.toFixed(2);
+      controls.size.value = style.size.toFixed(2);
+      controls.ambient.value = style.ambient.toFixed(2);
+      updateHomeMapDevOutputs(style);
+      setHomeMapDevPanelOpen(panel, toggle, localStorage.getItem(homeMapDevStorageKey) !== "0");
+
+      toggle.addEventListener("click", () => {
+        setHomeMapDevPanelOpen(panel, toggle, !panel.classList.contains("is-open"));
+      });
+
+      const updateStyleFromControls = () => {
+        style = {
+          brightness: clampNumber(controls.brightness.value, defaultHomeMapStyle.brightness, 0.85, 1.45),
+          intensity: clampNumber(controls.intensity.value, defaultHomeMapStyle.intensity, 0.55, 1.65),
+          size: clampNumber(controls.size.value, defaultHomeMapStyle.size, 0.65, 1.55),
+          ambient: clampNumber(controls.ambient.value, defaultHomeMapStyle.ambient, 0, 1.35),
+        };
+
+        updateHomeMapDevOutputs(style);
+        saveHomeMapStyle(style);
+        render(true);
+      };
+
+      Object.values(controls)
+        .filter(Boolean)
+        .forEach((control) => control.addEventListener("input", updateStyleFromControls));
+
+      reset?.addEventListener("click", () => {
+        style = { ...defaultHomeMapStyle };
+        controls.brightness.value = style.brightness.toFixed(2);
+        controls.intensity.value = style.intensity.toFixed(2);
+        controls.size.value = style.size.toFixed(2);
+        controls.ambient.value = style.ambient.toFixed(2);
+        updateHomeMapDevOutputs(style);
+        saveHomeMapStyle(style);
+        render(true);
+      });
+    }
+
+    homeMapController = {
+      updatePayload(nextPayload, updateOptions = {}) {
+        currentPayload = nextPayload || currentPayload;
+
+        if (updateOptions.refreshBeacons || !beaconPoints.length) {
+          render(true);
+        }
+      },
+    };
+
     resize();
-    window.requestAnimationFrame(render);
-    window.addEventListener("resize", resize, { passive: true });
+    bindDevPanel();
+    render(true);
+    window.addEventListener("resize", () => render(true), { passive: true });
   }
 
-  async function loadActivity() {
+  async function loadActivity(options = {}) {
     try {
       const response = await fetch(activityUrl, { headers: { Accept: "application/json" } });
 
@@ -242,18 +444,20 @@
 
       const payload = await response.json();
       const summary = payload.summary || {};
+      latestActivityPayload = payload;
 
       setText("homePlayersOnline", formatNumber(summary.steamPlayersOnline));
       setText("homePlayersInMatches", formatNumber(summary.playersInMatches || summary.playersInLobbies || summary.activePlayers));
       setText("homeOpenLobbies", formatNumber(summary.openLobbies || summary.publicMpLobbies));
       setText("homePlayersInQueue", formatNumber(summary.playersInQueue || summary.queueSignals || 0));
-      initHomeMap(payload);
+      initHomeMap(payload, { refreshBeacons: Boolean(options.refreshMap) });
     } catch (_error) {
       setText("homePlayersOnline", "--");
       setText("homePlayersInMatches", "--");
       setText("homeOpenLobbies", "--");
       setText("homePlayersInQueue", "--");
-      initHomeMap({ regions: fallbackRegions, summary: {} });
+      latestActivityPayload = { regions: fallbackRegions, summary: {} };
+      initHomeMap(latestActivityPayload, { refreshBeacons: Boolean(options.refreshMap) });
     }
   }
 
@@ -384,7 +588,16 @@
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    loadActivity();
+    loadActivity({ refreshMap: true });
+    window.setInterval(() => loadActivity({ refreshMap: false }), activityNumberPollMs);
+    window.setInterval(() => {
+      if (homeMapController && latestActivityPayload) {
+        homeMapController.updatePayload(latestActivityPayload, { refreshBeacons: true });
+        return;
+      }
+
+      loadActivity({ refreshMap: true });
+    }, homeMapRefreshMs);
     loadNews();
   });
 }());
