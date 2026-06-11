@@ -46,7 +46,7 @@
       </div>
 
       <div class="landing-hero-content">
-        <p class="landing-kicker">Age of Mythology: Retold tools</p>
+        <p class="landing-kicker site-kicker">Age of Mythology: Retold tools</p>
         <h1 id="landing-title">Prostagma?</h1>
         <p class="landing-copy">
           Live lobby tracking, build order archives, and community tools for sharper games.
@@ -54,14 +54,22 @@
 
         <nav class="landing-actions" aria-label="Featured Prostagma destinations">
           <a class="landing-primary-action" href="/lobbies/">
+            <img src="{% static 'assets/optimized/images/homepage/Watch_On.webp' %}" alt="" width="34" height="34" loading="eager">
             <span>Open Lobbies</span>
             <strong>Live browser</strong>
           </a>
+          <a href="/activity/">
+            <img src="{% static 'assets/optimized/images/homepage/leaderboard.webp' %}" alt="" width="34" height="34" loading="eager">
+            <span>Activity</span>
+            <strong>Global dashboard</strong>
+          </a>
           <a href="/build_orders/">
+            <img src="{% static 'assets/optimized/images/homepage/TechTree_On.webp' %}" alt="" width="34" height="34" loading="eager">
             <span>Build Orders</span>
             <strong>Pantheons and gods</strong>
           </a>
           <a href="/agora/">
+            <img src="{% static 'assets/optimized/images/homepage/chat.webp' %}" alt="" width="34" height="34" loading="eager">
             <span>Agora</span>
             <strong>Community hub</strong>
           </a>
@@ -70,20 +78,38 @@
     </section>
 
     <section class="landing-tool-band" aria-label="Prostagma sections">
-      <a class="landing-tool-card" href="/lobbies/">
-        <span class="landing-tool-index">01</span>
-        <h2>Live Activity</h2>
-        <p>Global activity, open lobbies, custom matches, and ranked games in one panel.</p>
+      <a class="landing-tool-card site-panel" href="/lobbies/">
+        <span class="landing-tool-meta">
+          <img src="{% static 'assets/optimized/images/homepage/Watch_On.webp' %}" alt="" width="38" height="38" loading="lazy">
+          <span class="landing-tool-index">01</span>
+        </span>
+        <h2>Open Lobbies</h2>
+        <p>Scan public custom rooms by map, region, player slots, and lobby settings.</p>
       </a>
 
-      <a class="landing-tool-card" href="/build_orders/">
-        <span class="landing-tool-index">02</span>
+      <a class="landing-tool-card site-panel" href="/activity/">
+        <span class="landing-tool-meta">
+          <img src="{% static 'assets/optimized/images/homepage/leaderboard.webp' %}" alt="" width="38" height="38" loading="lazy">
+          <span class="landing-tool-index">02</span>
+        </span>
+        <h2>Global Activity</h2>
+        <p>Watch live player activity, queue counts, match totals, and active regions.</p>
+      </a>
+
+      <a class="landing-tool-card site-panel" href="/build_orders/">
+        <span class="landing-tool-meta">
+          <img src="{% static 'assets/optimized/images/homepage/TechTree_On.webp' %}" alt="" width="38" height="38" loading="lazy">
+          <span class="landing-tool-index">03</span>
+        </span>
         <h2>Build Orders</h2>
         <p>Browse openings by pantheon and major god with fast paths into each build.</p>
       </a>
 
-      <a class="landing-tool-card" href="/agora/">
-        <span class="landing-tool-index">03</span>
+      <a class="landing-tool-card site-panel" href="/agora/">
+        <span class="landing-tool-meta">
+          <img src="{% static 'assets/optimized/images/homepage/chat.webp' %}" alt="" width="38" height="38" loading="lazy">
+          <span class="landing-tool-index">04</span>
+        </span>
         <h2>Agora</h2>
         <p>A quieter space for player tools, discussion, and the next set of site features.</p>
       </a>

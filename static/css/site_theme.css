@@ -1,0 +1,99 @@
+:root {
+  color-scheme: dark;
+
+  --site-bg: #050812;
+  --site-bg-raised: rgba(10, 15, 26, 0.86);
+  --site-bg-panel: rgba(12, 18, 30, 0.76);
+  --site-border: rgba(213, 177, 101, 0.26);
+  --site-border-strong: rgba(235, 199, 119, 0.54);
+
+  --site-text: #f6ead0;
+  --site-text-muted: rgba(241, 228, 198, 0.74);
+  --site-text-soft: rgba(241, 228, 198, 0.58);
+  --site-gold: #e8c46f;
+  --site-gold-strong: #fff0bc;
+  --site-blue: #9fc8e8;
+
+  --site-font-title: Cinzel, Baskervville, Georgia, serif;
+  --site-font-body: Baskervville, Georgia, serif;
+
+  --site-radius-sm: 6px;
+  --site-radius-md: 8px;
+  --site-radius-lg: 12px;
+  --site-radius-pill: 999px;
+
+  --site-shadow-soft: 0 18px 42px rgba(0, 0, 0, 0.28);
+  --site-shadow-menu: 0 22px 54px rgba(0, 0, 0, 0.44);
+  --site-shell-width: 1680px;
+  --site-content-width: 1420px;
+  --site-page-gutter: clamp(1rem, 4vw, 4.5rem);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background: var(--site-bg);
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  color: var(--site-text);
+  background: var(--site-bg);
+  font-family: var(--site-font-body);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+img,
+svg,
+canvas,
+video {
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid rgba(245, 210, 128, 0.88);
+  outline-offset: 3px;
+}
+
+::selection {
+  color: #071125;
+  background: rgba(245, 210, 128, 0.86);
+}
+
+.site-kicker {
+  margin: 0;
+  color: var(--site-gold);
+  font-family: var(--site-font-body);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.site-panel {
+  border: 1px solid var(--site-border);
+  border-radius: var(--site-radius-md);
+  background:
+    linear-gradient(180deg, rgba(255, 236, 176, 0.055), rgba(0, 0, 0, 0.08)),
+    var(--site-bg-panel);
+  box-shadow: var(--site-shadow-soft);
+}

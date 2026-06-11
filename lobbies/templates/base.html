@@ -32,11 +32,11 @@
     rel="stylesheet"
   >
 
-  {# Page CSS loads first so the shared header/account CSS can always win. #}
+  <link rel="stylesheet" href="{% static 'css/site_theme.css' %}">
   {% block styles %}{% endblock %}
-  <link rel="stylesheet" href="{% static 'css/site_brand.css' %}">
   <link rel="stylesheet" href="{% static 'css/site_auth.css' %}">
   <link rel="stylesheet" href="{% static 'css/site_auth_append.css' %}">
+  <link rel="stylesheet" href="{% static 'css/site_brand.css' %}">
   {% block extra_head %}{% endblock %}
 </head>
 

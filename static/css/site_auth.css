@@ -260,12 +260,6 @@ body.agora-page .site-user-dropdown,
     linear-gradient(180deg, rgba(24, 42, 58, 0.98), rgba(14, 27, 39, 0.98));
 }
 
-@media (max-width: 1360px) {
-  .site-user-auth {
-    display: none;
-  }
-}
-
 /* Shared account profile pages */
 .account-auth-shell {
   width: min(960px, calc(100% - 2rem));
