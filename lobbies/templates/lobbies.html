@@ -103,14 +103,20 @@
               </div>
 
               <div id="liveActivityMap" class="live-activity-map live-night-map">
-                <img
-                  id="liveEarthNightImage"
-                  class="live-earth-night-image"
-                  src="{% static 'assets/images/live/earth_beacon_base_map.png' %}"
-                  alt=""
-                  aria-hidden="true"
-                  loading="lazy"
-                />
+                <picture>
+                  <source
+                    srcset="{% static 'assets/optimized/images/live/earth_beacon_base_map.webp' %}"
+                    type="image/webp"
+                  >
+                  <img
+                    id="liveEarthNightImage"
+                    class="live-earth-night-image"
+                    src="{% static 'assets/images/live/earth_beacon_base_map.png' %}"
+                    alt=""
+                    aria-hidden="true"
+                    loading="lazy"
+                  />
+                </picture>
                 <canvas id="liveActivityCanvas" class="live-activity-canvas" aria-hidden="true"></canvas>
                 <div class="live-map-vignette" aria-hidden="true"></div>
               </div>

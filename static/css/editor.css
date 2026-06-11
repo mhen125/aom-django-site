@@ -1588,7 +1588,10 @@ body.editor-has-unsaved-changes .editor-save-button {
 }
 
 .editor-confirm-strip-glow {
-  background-image: url("../assets/images/ui/Count_Down_Strip_Glow.png");
+  background-image: image-set(
+    url("../assets/optimized/images/ui/Count_Down_Strip_Glow.webp") type("image/webp"),
+    url("../assets/images/ui/Count_Down_Strip_Glow.png") type("image/png")
+  );
   opacity: 0.96;
   filter:
     saturate(1.08)
@@ -1597,7 +1600,10 @@ body.editor-has-unsaved-changes .editor-save-button {
 }
 
 .editor-confirm-strip-base {
-  background-image: url("../assets/images/ui/Count_Down_Strip.png");
+  background-image: image-set(
+    url("../assets/optimized/images/ui/Count_Down_Strip.webp") type("image/webp"),
+    url("../assets/images/ui/Count_Down_Strip.png") type("image/png")
+  );
   opacity: 1;
 }
 

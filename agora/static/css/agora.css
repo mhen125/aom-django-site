@@ -1,7 +1,10 @@
 body.agora-page {
   min-height: 100vh;
   color: #edf6ff;
-  background-image: url("/static/assets/images/backgrounds/background_japanese.png");
+  background-image: image-set(
+    url("../assets/optimized/images/backgrounds/background_japanese.webp") type("image/webp"),
+    url("../assets/images/backgrounds/background_japanese.png") type("image/png")
+  );
   background-size: 165% auto;
   background-position: center center;
   background-attachment: fixed;

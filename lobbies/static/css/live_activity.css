@@ -282,7 +282,7 @@
     height: 13px;
     margin-left: 7px;
     vertical-align: -2px;
-    background-image: url("/static/assets/images/ui/Icon_Sort_Off.png");
+    background-image: url("../assets/images/ui/Icon_Sort_Off.png");
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
@@ -291,13 +291,13 @@
 
 #customTab .lobby-table th.sorted-asc::after,
 #customTab .lobby-table th[data-sort-direction="asc"]::after {
-    background-image: url("/static/assets/images/ui/Icon_Sort_Up.png");
+    background-image: url("../assets/images/ui/Icon_Sort_Up.png");
     opacity: 1;
 }
 
 #customTab .lobby-table th.sorted-desc::after,
 #customTab .lobby-table th[data-sort-direction="desc"]::after {
-    background-image: url("/static/assets/images/ui/Icon_Sort_Down.png");
+    background-image: url("../assets/images/ui/Icon_Sort_Down.png");
     opacity: 1;
 }
 
