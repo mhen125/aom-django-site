@@ -6,7 +6,7 @@
 {% block body_attrs %}data-page="lobby-browser"{% endblock %}
 
 {% block styles %}
-  <link rel="stylesheet" href="{% static 'css/lobbies.css' %}?v=20260610-map-icons-2">
+  <link rel="stylesheet" href="{% static 'css/lobbies.css' %}?v=20260610-live-tab">
 {% endblock %}
 
 {% block extra_head %}
@@ -30,6 +30,10 @@
 
       <div class="lobby-panel-tabs-row">
         <nav class="lobby-panel-tabs" aria-label="Lobby browser sections">
+          <button class="tab-button lobby-panel-tab" type="button" data-tab="live">
+            Live Activity
+          </button>
+
           <button class="tab-button lobby-panel-tab active" type="button" data-tab="custom">
             Open Lobbies
           </button>
@@ -57,6 +61,100 @@
         </div>
       </div>
     </header>
+
+    <section id="liveTab" class="tab-panel live-tab-panel">
+      <div class="live-atlas-shell live-lobby-atlas-shell">
+        <section class="live-atlas-stage">
+          <div class="widget-frame-ornaments" aria-hidden="true">
+            <span class="widget-corner widget-corner-tl"></span>
+            <span class="widget-corner widget-corner-tr"></span>
+            <span class="widget-corner widget-corner-bl"></span>
+            <span class="widget-corner widget-corner-br"></span>
+            <span class="widget-edge widget-edge-top"></span>
+            <span class="widget-edge widget-edge-bottom"></span>
+            <span class="widget-edge-side widget-edge-left"></span>
+            <span class="widget-edge-side widget-edge-right"></span>
+          </div>
+
+          <section class="live-world-panel" aria-label="Global activity map">
+            <div class="live-activity-scoreboard" aria-label="Live activity summary">
+              <div class="live-online-panel">
+                <span class="live-eyebrow"><span class="live-dot" aria-hidden="true"></span> Steam activity</span>
+                <div id="liveBusynessLabel" class="live-primary-number">-</div>
+              </div>
+
+              <div id="liveBusynessDetail" class="live-match-panel live-primary-caption">
+                Loading live match data...
+              </div>
+            </div>
+
+            <div class="live-map-frame" aria-label="Static earth activity beacon map">
+              <div class="widget-frame-ornaments" aria-hidden="true">
+                <span class="widget-corner widget-corner-tl"></span>
+                <span class="widget-corner widget-corner-tr"></span>
+                <span class="widget-corner widget-corner-bl"></span>
+                <span class="widget-corner widget-corner-br"></span>
+                <span class="widget-edge widget-edge-top"></span>
+                <span class="widget-edge widget-edge-bottom"></span>
+                <span class="widget-edge-side widget-edge-left"></span>
+                <span class="widget-edge-side widget-edge-right"></span>
+              </div>
+
+              <div id="liveActivityMap" class="live-activity-map live-night-map">
+                <img
+                  id="liveEarthNightImage"
+                  class="live-earth-night-image"
+                  src="{% static 'assets/images/live/earth_beacon_base_map.png' %}"
+                  alt=""
+                  aria-hidden="true"
+                  loading="lazy"
+                />
+                <canvas id="liveActivityCanvas" class="live-activity-canvas" aria-hidden="true"></canvas>
+                <div class="live-map-vignette" aria-hidden="true"></div>
+              </div>
+            </div>
+
+            <section class="live-region-strip" aria-label="Most active server regions">
+              <h2>Most active server regions</h2>
+              <div id="liveRegionsList" class="live-list live-region-list">
+                <div class="muted">Loading region activity...</div>
+              </div>
+            </section>
+          </section>
+        </section>
+
+        <section class="live-rune-grid" aria-label="Live activity figures">
+          <article class="live-rune-card">
+            <span>Ranked</span>
+            <div><strong id="liveRankedLobbies">-</strong><small>players</small></div>
+          </article>
+
+          <article class="live-rune-card">
+            <span>Custom</span>
+            <div><strong id="liveCustomLobbies">-</strong><small>players</small></div>
+          </article>
+
+          <article class="live-rune-card">
+            <span>In Lobbies</span>
+            <div><strong id="liveJoinableLobbies">-</strong><small>players</small></div>
+          </article>
+        </section>
+
+        <section class="live-ledger-grid live-queue-grid" aria-label="Queue activity breakdown">
+          <section class="live-ledger-card live-queue-card">
+            <h2>Players in queue</h2>
+            <div id="liveModesList" class="live-list live-queue-list">
+              <div class="muted">Loading queue data...</div>
+            </div>
+          </section>
+        </section>
+
+        <div id="livePublicLobbies" hidden></div>
+        <div id="livePlayersInLobbies" hidden></div>
+        <div id="liveSteamOnline" hidden></div>
+        <div id="liveTopRegion" hidden></div>
+      </div>
+    </section>
 
     <section id="customTab" class="tab-panel active">
       <section class="browser-layout">
@@ -315,5 +413,5 @@
 {% endblock %}
 
 {% block scripts %}
-  <script src="{% static 'js/lobbies.js' %}?v=20260610-active-lazy" defer></script>
+  <script src="{% static 'js/lobbies.js' %}?v=20260610-live-tab" defer></script>
 {% endblock %}

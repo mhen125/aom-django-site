@@ -2787,10 +2787,13 @@ function switchTab(tabName) {
   loadActiveMatchesForTab(tabName);
 
   if (tabName === "live" && !liveActivityLoaded) {
-    loadLiveActivity().catch((error) => {
-      console.error(error);
-      renderLiveActivityError(error);
-    });
+    loadLiveActivity()
+      .then(() => startLiveActivityAutoRefresh())
+      .catch((error) => {
+        console.error(error);
+        renderLiveActivityError(error);
+        startLiveActivityAutoRefresh();
+      });
   }
 
   hideTooltip();
@@ -4653,7 +4656,7 @@ if (currentPage === "lobby-browser") {
 
 attachEventListeners();
 
-if (currentPage === "live-activity") {
+if (currentPage === "live-activity" || liveActivityMapElement) {
   initializeLiveMapLandMask();
   bindLiveMapDevControls();
 
@@ -4661,7 +4664,9 @@ if (currentPage === "live-activity") {
     window.clearTimeout(window.liveActivityResizeTimer);
     window.liveActivityResizeTimer = window.setTimeout(redrawLiveActivityMap, 180);
   });
+}
 
+if (currentPage === "live-activity") {
   loadLiveActivity(false)
     .then(() => startLiveActivityAutoRefresh())
     .catch((error) => {

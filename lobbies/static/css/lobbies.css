@@ -8166,3 +8166,213 @@ body[data-page="live-activity"] .live-map-dev-panel.is-open .live-map-dev-region
         gap: 0.5rem;
     }
 }
+
+/* Live activity embedded as the first lobby tab. */
+body[data-page="lobby-browser"] .live-tab-panel {
+    overflow: visible;
+}
+
+body[data-page="lobby-browser"] .live-lobby-atlas-shell {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-atlas-stage {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-world-panel {
+    display: block;
+    padding: clamp(18px, 2.2vw, 30px);
+    overflow: hidden;
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-activity-scoreboard {
+    display: grid;
+    grid-template-columns: minmax(260px, 0.82fr) minmax(310px, 1fr);
+    align-items: baseline;
+    gap: clamp(22px, 4vw, 58px);
+    margin-bottom: 22px;
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-eyebrow,
+body[data-page="lobby-browser"] .live-tab-panel .live-rune-card span,
+body[data-page="lobby-browser"] .live-tab-panel .live-region-strip h2,
+body[data-page="lobby-browser"] .live-tab-panel .live-queue-card h2 {
+    font-family: Baskerville, "Libre Baskerville", "Baskervville", Georgia, serif;
+    font-weight: 640;
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-primary-number,
+body[data-page="lobby-browser"] .live-tab-panel .live-primary-number strong {
+    color: #f7efd7;
+    font-family: Baskerville, "Libre Baskerville", "Baskervville", Georgia, serif;
+    font-size: clamp(2.45rem, 4.9vw, 5.15rem);
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    line-height: 0.96;
+    text-shadow:
+        0 2px 0 rgba(0, 0, 0, 0.82),
+        0 0 18px rgba(214, 168, 79, 0.16);
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-primary-number {
+    display: flex;
+    align-items: baseline;
+    gap: 0.66rem;
+    margin: 0;
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-primary-number span {
+    color: rgba(242, 221, 168, 0.9);
+    font-family: Baskerville, "Libre Baskerville", "Baskervville", Georgia, serif;
+    font-size: clamp(0.9rem, 1.25vw, 1.25rem);
+    font-weight: 600;
+    letter-spacing: 0.17em;
+    text-transform: uppercase;
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-primary-caption {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: baseline;
+    gap: 0.45rem 0.9rem;
+    margin: 0 0 0 auto;
+    color: rgba(246, 235, 204, 0.88);
+    font-family: Baskerville, "Libre Baskerville", "Baskervville", Georgia, serif;
+    font-size: clamp(1.25rem, 2.25vw, 2.25rem);
+    font-weight: 560;
+    letter-spacing: -0.025em;
+    line-height: 1;
+    text-align: right;
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-primary-caption strong {
+    color: #fff0b5;
+    font-size: 1.24em;
+    font-weight: 620;
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-map-frame {
+    position: relative;
+    margin-top: 10px;
+    padding: 13px;
+    border: 1px solid rgba(210, 170, 82, 0.18);
+    border-radius: 4px;
+    background:
+        linear-gradient(180deg, rgba(255, 231, 165, 0.045), rgba(0, 0, 0, 0.02)),
+        rgba(0, 0, 0, 0.28);
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 229, 154, 0.035),
+        0 18px 40px rgba(0, 0, 0, 0.34);
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-map-frame > .widget-frame-ornaments {
+    pointer-events: none;
+    z-index: 4;
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-activity-map.live-night-map {
+    position: relative;
+    width: 100%;
+    height: clamp(405px, 39vw, 585px);
+    overflow: hidden;
+    border: 1px solid rgba(219, 182, 91, 0.14);
+    border-radius: 3px;
+    background: #07111d;
+    box-shadow:
+        inset 0 0 46px rgba(0, 0, 0, 0.42),
+        inset 0 0 0 1px rgba(255, 232, 154, 0.035);
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-earth-night-image,
+body[data-page="lobby-browser"] .live-tab-panel .live-activity-canvas,
+body[data-page="lobby-browser"] .live-tab-panel .live-map-vignette {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-earth-night-image {
+    display: block;
+    object-fit: fill;
+    opacity: 1;
+    filter: saturate(1.28) contrast(1.08) brightness(1.2);
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-activity-canvas {
+    z-index: 2;
+    pointer-events: none;
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-map-vignette {
+    z-index: 3;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 50% 46%, rgba(255, 246, 198, 0.035) 0, transparent 50%, rgba(0, 0, 0, 0.10) 83%, rgba(0, 0, 0, 0.28) 100%),
+        linear-gradient(90deg, rgba(0, 0, 0, 0.14), transparent 12%, transparent 88%, rgba(0, 0, 0, 0.14));
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-rune-grid {
+    width: 100%;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-region-strip {
+    margin-top: 18px;
+    padding: 16px 18px 18px;
+    border: 1px solid rgba(215, 181, 99, 0.16);
+    border-radius: 12px;
+    background:
+        linear-gradient(180deg, rgba(255, 230, 167, 0.055), transparent 70%),
+        rgba(2, 6, 13, 0.46);
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-region-list {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+}
+
+body[data-page="lobby-browser"] .live-tab-panel .live-queue-grid {
+    grid-template-columns: minmax(320px, 920px);
+    justify-content: center;
+}
+
+@media (max-width: 980px) {
+    body[data-page="lobby-browser"] .live-tab-panel .live-activity-scoreboard {
+        grid-template-columns: 1fr;
+    }
+
+    body[data-page="lobby-browser"] .live-tab-panel .live-primary-caption {
+        justify-content: flex-start;
+        margin-left: 0;
+        text-align: left;
+    }
+
+    body[data-page="lobby-browser"] .live-tab-panel .live-region-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    body[data-page="lobby-browser"] .live-tab-panel .live-world-panel {
+        padding: 12px;
+    }
+
+    body[data-page="lobby-browser"] .live-tab-panel .live-map-frame {
+        padding: 8px;
+    }
+
+    body[data-page="lobby-browser"] .live-tab-panel .live-rune-grid,
+    body[data-page="lobby-browser"] .live-tab-panel .live-region-list {
+        grid-template-columns: 1fr;
+    }
+}
