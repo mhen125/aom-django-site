@@ -240,7 +240,7 @@
   position: absolute;
   top: clamp(5.2rem, 8vw, 7.6rem);
   right: var(--site-page-gutter);
-  z-index: 8;
+  z-index: 6200;
   display: grid;
   justify-items: end;
   color: #f7e7bd;

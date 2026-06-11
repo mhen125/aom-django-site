@@ -9,6 +9,7 @@
   const homeMapRefreshMs = 20000;
   const homeMapStyleStorageKey = "prostagma.homeMapStyle";
   const homeMapDevStorageKey = "prostagma.homeMapDevOpen";
+  const homeMapDevEnabledStorageKey = "prostagma.homeMapDevEnabled";
   const defaultHomeMapStyle = {
     brightness: 1.16,
     intensity: 1,
@@ -247,7 +248,23 @@
 
   function isHomeMapDevEnabled() {
     const params = new URLSearchParams(window.location.search);
-    return params.get("homeMapDev") === "1" || params.get("mapDev") === "1";
+    const isEnabledByQuery = params.get("homeMapDev") === "1" || params.get("mapDev") === "1";
+
+    if (isEnabledByQuery) {
+      try {
+        localStorage.setItem(homeMapDevEnabledStorageKey, "1");
+      } catch (_error) {
+        // Ignore storage errors.
+      }
+
+      return true;
+    }
+
+    try {
+      return localStorage.getItem(homeMapDevEnabledStorageKey) === "1";
+    } catch (_error) {
+      return false;
+    }
   }
 
   function updateHomeMapDevOutputs(style) {

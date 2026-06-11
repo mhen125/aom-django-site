@@ -10,7 +10,7 @@ let liveActivityMapRenderedAt = 0;
 let liveActivityMapSeedBucket = null;
 let liveActivityMapBeaconSignature = "";
 const LIVE_ACTIVITY_REFRESH_MS = 15000;
-const LIVE_ACTIVITY_MAP_REFRESH_MS = 120000;
+const LIVE_ACTIVITY_MAP_REFRESH_MS = 20000;
 const LIVE_MAP_DEV_STORAGE_KEY = "prostagmaLiveMapDevOpen";
 const LIVE_MAP_BEACON_STYLE_STORAGE_KEY = "prostagmaLiveMapBeaconStyleV7";
 
@@ -1671,11 +1671,10 @@ function updateLiveActivityMap(payload, force = false) {
   const seedBucket = Math.floor(now / LIVE_ACTIVITY_MAP_REFRESH_MS);
   const mapIsStale = now - liveActivityMapRenderedAt >= LIVE_ACTIVITY_MAP_REFRESH_MS;
   const nextBeaconSignature = getLiveMapBeaconSignature(payload);
-  const beaconCountsChanged = nextBeaconSignature !== liveActivityMapBeaconSignature;
 
   liveActivityMapPayload = payload;
 
-  if (!force && liveActivityMapRenderedAt && !mapIsStale && !beaconCountsChanged) {
+  if (!force && liveActivityMapRenderedAt && !mapIsStale) {
     return;
   }
 

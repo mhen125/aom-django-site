@@ -5,28 +5,49 @@
 .site-shell-header {
   position: relative;
   z-index: 5000;
-  padding: clamp(0.74rem, 1.12vw, 0.98rem) var(--site-page-gutter);
-  border-top: 1px solid rgba(255, 233, 176, 0.12);
-  border-bottom: 2px solid rgba(195, 145, 60, 0.4);
+  padding: clamp(0.82rem, 1.18vw, 1.08rem) var(--site-page-gutter) clamp(1.08rem, 1.45vw, 1.32rem);
+  border-top: 2px solid rgba(255, 233, 176, 0.16);
+  border-bottom: 0;
   color: var(--site-text);
   background:
-    radial-gradient(circle at 12% 0%, rgba(232, 196, 111, 0.13), transparent 31%),
-    linear-gradient(180deg, rgba(8, 15, 28, 0.98), rgba(4, 10, 19, 0.88));
+    radial-gradient(circle at 12% 0%, rgba(232, 196, 111, 0.14), transparent 31%),
+    linear-gradient(180deg, rgba(10, 18, 32, 0.99), rgba(4, 10, 19, 0.92));
   box-shadow:
     inset 0 1px 0 rgba(255, 244, 205, 0.12),
-    inset 0 -1px 0 rgba(255, 220, 130, 0.18),
-    0 16px 42px rgba(0, 0, 0, 0.32);
+    inset 0 -1px 0 rgba(255, 220, 130, 0.12),
+    0 18px 46px rgba(0, 0, 0, 0.36);
   backdrop-filter: blur(6px);
 }
 
+.site-shell-header::before,
 .site-shell-header::after {
   content: "";
   position: absolute;
-  inset: auto 0 -2px;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, rgba(232, 190, 94, 0.76) 16%, rgba(255, 236, 167, 0.9) 50%, rgba(232, 190, 94, 0.76) 84%, transparent);
-  opacity: 0.58;
+  left: 0;
+  right: 0;
   pointer-events: none;
+}
+
+.site-shell-header::before {
+  bottom: -18px;
+  height: 26px;
+  background:
+    linear-gradient(90deg, transparent 0 3%, rgba(213, 158, 69, 0.24) 8%, rgba(255, 232, 157, 0.5) 50%, rgba(213, 158, 69, 0.24) 92%, transparent 97%),
+    linear-gradient(180deg, rgba(255, 238, 178, 0.34) 0, rgba(166, 103, 32, 0.58) 24%, rgba(58, 30, 12, 0.74) 52%, rgba(4, 9, 17, 0) 100%);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 1.35rem) 100%, 1.35rem 100%);
+  filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.42));
+}
+
+.site-shell-header::after {
+  bottom: -2px;
+  height: 8px;
+  background:
+    linear-gradient(90deg, transparent, rgba(232, 190, 94, 0.78) 12%, rgba(255, 239, 178, 0.96) 50%, rgba(232, 190, 94, 0.78) 88%, transparent),
+    linear-gradient(180deg, rgba(255, 239, 178, 0.72), rgba(117, 69, 20, 0.1));
+  box-shadow:
+    0 0 18px rgba(236, 184, 78, 0.24),
+    0 9px 20px rgba(0, 0, 0, 0.28);
+  opacity: 0.92;
 }
 
 .site-shell-header-agora,
@@ -171,13 +192,15 @@ body.agora-page .site-brand-tagline {
   content: "";
   position: absolute;
   left: 50%;
-  bottom: 0.18rem;
+  bottom: -0.12rem;
   width: calc(100% - 0.52rem);
   max-width: 4.75rem;
-  height: 2px;
+  height: 3px;
   border-radius: var(--site-radius-pill);
   background: linear-gradient(90deg, transparent, #f2c361 18%, #fff0bc 50%, #f2c361 82%, transparent);
-  box-shadow: 0 0 10px rgba(240, 190, 86, 0.52);
+  box-shadow:
+    0 0 10px rgba(240, 190, 86, 0.62),
+    0 0 22px rgba(240, 190, 86, 0.26);
   opacity: 0;
   transform: translateX(-50%) scaleX(0.64);
   transition: opacity 160ms ease, transform 160ms ease;
@@ -189,7 +212,7 @@ body.agora-page .site-brand-tagline {
   content: "";
   position: absolute;
   left: 50%;
-  bottom: -0.86rem;
+  bottom: -0.72rem;
   width: 5.6rem;
   height: 20px;
   background: url("../assets/optimized/images/homepage/Main_Menu_Selection_Highlight_Underlay.webp") center / 100% 100% no-repeat;
@@ -492,9 +515,9 @@ body.agora-page .site-section-heading p {
 .site-footer {
   position: relative;
   overflow: hidden;
-  min-height: 7rem;
+  min-height: 6rem;
   margin-top: clamp(2rem, 4vw, 4rem);
-  padding: clamp(1.4rem, 2.6vw, 2.2rem) var(--site-page-gutter);
+  padding: clamp(1.2rem, 2.2vw, 1.65rem) var(--site-page-gutter);
   border-top: 1px solid rgba(218, 180, 99, 0.16);
   color: rgba(231, 218, 182, 0.72);
   background:
@@ -560,26 +583,15 @@ body.agora-page .site-section-heading p {
   letter-spacing: 0;
 }
 
-.site-footer-links {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 0.45rem 1rem;
-}
-
-.site-footer-links a {
-  color: rgba(237, 224, 190, 0.72);
-  font-size: 0.74rem;
-  font-weight: 850;
-  letter-spacing: 0.08em;
-  text-decoration: none;
-  text-transform: uppercase;
-  transition: color 150ms ease;
-}
-
-.site-footer-links a:hover,
-.site-footer-links a:focus-visible {
-  color: #f3c46e;
+.site-footer-note {
+  max-width: 34rem;
+  margin: 0;
+  color: rgba(232, 218, 184, 0.62);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.45;
+  text-align: right;
 }
 
 @media (max-width: 1360px) {
@@ -621,7 +633,7 @@ body.agora-page .site-section-heading p {
 
 @media (max-width: 760px) {
   .site-shell-header {
-    padding: 0.75rem 0.95rem;
+    padding: 0.75rem 0.95rem 1rem;
   }
 
   .site-header-actions {
@@ -669,8 +681,8 @@ body.agora-page .site-section-heading p {
     flex-direction: column;
   }
 
-  .site-footer-links {
-    justify-content: flex-start;
+  .site-footer-note {
+    text-align: left;
   }
 }
 

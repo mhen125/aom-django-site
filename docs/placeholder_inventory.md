@@ -25,6 +25,11 @@ Last reviewed: 2026-06-11
   - Combat Simulator
   - Username Styling Tool
 
+## Footer
+
+- Footer is intentionally minimal for now.
+- The current footer note is placeholder copy until final footer links, community credits, and legal/support destinations are chosen.
+
 ## Data And Content
 
 - `static/js/data.js` still provides fallback/sample build-order data for local and empty-database states.
@@ -32,5 +37,5 @@ Last reviewed: 2026-06-11
 
 ## Notes
 
-- The homepage map dev panel is available only with `?homeMapDev=1` or `?mapDev=1`.
+- The homepage map dev panel is available with `?homeMapDev=1` or `?mapDev=1`. After opening once, that dev access is remembered in local storage.
 - The full live activity map dev panel remains available on the live activity surface with `?mapDev=1`.
