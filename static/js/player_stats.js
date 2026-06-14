@@ -346,28 +346,28 @@
     const evidence = [
       {
         label: "Recent form",
-        strong: recent.resolved ? `${recent.wins}-${recent.losses} in last ${recent.resolved}` : "No resolved sample",
-        body: recent.resolved ? `${formatPercent(recent.winRate)} win rate across the latest resolved matches.` : "There are not enough recent wins and losses returned to call the trend yet.",
+        strong: recent.resolved ? `${recent.wins}-${recent.losses} in last ${recent.resolved}` : "Recent form open",
+      body: recent.resolved ? `${formatPercent(recent.winRate)} win rate across the latest resolved matches.` : "Recent results are light for this queue.",
       },
       {
         label: "Queue strength",
         strong: Number.isFinite(rating) ? `${formatNumber(rating)} ELO in ${queueLabel}` : `No returned ${queueLabel} rating`,
-        body: primaryRating?.rank ? `Current listed rank: #${formatNumber(primaryRating.rank)}.` : "Rank data was not returned for this queue snapshot.",
+        body: primaryRating?.rank ? `Current listed rank: #${formatNumber(primaryRating.rank)}.` : "Queue rank is not listed.",
       },
       {
         label: "Signature god",
-        strong: topGod ? `${topGod.name} in ${formatPercent(topGod.percent)}` : "No god read yet",
-        body: topGod ? `${formatNumber(topGod.count)} recent matches with ${topGod.name} at ${formatPercent(topGod.win_rate)} win rate.` : "Recent god usage was not rich enough to isolate a signature pick.",
+        strong: topGod ? `${topGod.name} in ${formatPercent(topGod.percent)}` : "Mixed god pool",
+        body: topGod ? `${formatNumber(topGod.count)} recent matches with ${topGod.name} at ${formatPercent(topGod.win_rate)} win rate.` : "No single god is dominating this profile view.",
       },
       {
         label: "Map habit",
-        strong: topMap ? `${topMap.name} at ${formatPercent(topMap.percent)}` : "No map read yet",
-        body: topMap ? `${formatNumber(topMap.count)} recent games on ${topMap.name}.` : "The returned match slice did not produce a strong map tendency.",
+        strong: topMap ? `${topMap.name} at ${formatPercent(topMap.percent)}` : "Mixed map spread",
+        body: topMap ? `${formatNumber(topMap.count)} recent games on ${topMap.name}.` : "No single map stands out in this profile view.",
       },
     ];
 
     return {
-      badges: uniqueBadges.length ? uniqueBadges : ["PROFILE LOADING"],
+      badges: uniqueBadges.length ? uniqueBadges : ["PLAYER READ"],
       titleText,
       bodyText,
       evidence,
@@ -595,7 +595,7 @@
       searchResultsPanel.hidden = true;
     }
     profilePanel.hidden = false;
-    feedback.textContent = state.loadedProfile ? "Refreshing dedicated profile..." : "Loading dedicated profile...";
+    feedback.textContent = state.loadedProfile ? "Refreshing profile..." : "Loading profile...";
     profileName.textContent = state.loadedProfile ? profileName.textContent : "Loading...";
     profileMeta.textContent = "Fetching rating and match history";
 
@@ -711,9 +711,9 @@
 
   function handleReset() {
     searchForm.reset();
-    feedback.textContent = "Search for a player to load a dedicated profile.";
+    feedback.textContent = "Enter a player name or profile ID.";
     title.textContent = "Player Stats Hub";
-    lead.textContent = "Look up a player by name or profile ID, then inspect ladder rows, deeper recent match history, god selection, and map rotation from a dedicated profile view.";
+    lead.textContent = "Look up an Age of Mythology: Retold player profile with queue ratings, recent results, favorite gods, and map tendencies in one place.";
     profilePanel.hidden = true;
     if (searchResultsPanel) {
       searchResultsPanel.hidden = true;
@@ -723,14 +723,14 @@
     sourceBadge.textContent = "Source";
     identityLine.textContent = "Profile view for ladder tracking, recent results, and queue comparisons.";
     verdictTitle.textContent = "Load a player to generate a profile read";
-    verdictMeta.textContent = "Bold summary, supported by current queue data.";
-    verdictBody.textContent = "This panel will call out recent form, ladder strength, signature gods, and the clearest story from the returned profile data.";
-    verdictBadges.innerHTML = '<span class="player-stats-badge">Awaiting data</span>';
+    verdictMeta.textContent = "Queue read";
+    verdictBody.textContent = "Search a player to see their current ladder shape, best signals, and recent profile story.";
+    verdictBadges.innerHTML = '<span class="player-stats-badge">PLAYER READ</span>';
     verdictEvidence.innerHTML = `
       <article class="leaderboards-list-card">
         <span>Recent form</span>
-        <strong>Waiting for profile</strong>
-        <p>Load a player to turn recent results into a readable story.</p>
+        <strong>Search a profile</strong>
+        <p>Recent wins, losses, ratings, gods, and maps will appear here.</p>
       </article>
     `;
     matchesMeta.textContent = "Recent matches";

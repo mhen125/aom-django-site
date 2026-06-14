@@ -39,8 +39,8 @@
         <p class="leaderboards-kicker">Player Record</p>
         <h1 id="playerStatsPageTitle">Player Stats Hub</h1>
         <p id="playerStatsLead">
-          Load a real Prostagma player profile with queue-specific ratings, form reads, signature gods,
-          and recent match evidence that is actually easy to scan.
+          Look up an Age of Mythology: Retold player profile with queue ratings, recent results,
+          favorite gods, and map tendencies in one place.
         </p>
         <a class="leaderboards-ghost-link" href="{% url 'lobbies:leaderboard_home' %}">
           Back to leaderboards
@@ -56,11 +56,11 @@
 
         <label class="leaderboards-field">
           <span>Player name or profile ID</span>
-          <input id="playerStatsLookupInput" name="lookup" type="text" placeholder="crazydarnfoo or 1075470702" value="{{ initial_player|default:initial_profile_id }}">
+          <input id="playerStatsLookupInput" name="lookup" type="text" placeholder="Player name or profile ID" value="{{ initial_player|default:initial_profile_id }}">
         </label>
 
         <p class="leaderboards-meta-note">
-          Queue is chosen after the player is loaded. Profile ID is resolved automatically when possible.
+          Search by ladder name or paste a numeric profile ID.
         </p>
 
         <div class="leaderboards-search-actions">
@@ -69,7 +69,7 @@
         </div>
 
         <p id="playerStatsFeedback" class="leaderboards-feedback" aria-live="polite">
-          Search for a player to load a dedicated profile.
+          Enter a player name or profile ID.
         </p>
       </form>
     </section>
@@ -98,7 +98,7 @@
           <p class="leaderboards-kicker">Player Search</p>
           <h2>Choose a profile</h2>
         </div>
-        <span id="playerStatsSearchResultsMeta" class="leaderboards-meta-note">Waiting for search</span>
+        <span id="playerStatsSearchResultsMeta" class="leaderboards-meta-note">Profile results</span>
       </div>
 
       <div class="leaderboards-table-wrap">
@@ -128,7 +128,7 @@
             <p class="leaderboards-kicker">Overview</p>
             <h2 id="playerStatsName">Player</h2>
           </div>
-          <span id="playerStatsMeta" class="leaderboards-meta-note">Waiting for search</span>
+          <span id="playerStatsMeta" class="leaderboards-meta-note">Player profile</span>
         </div>
 
         <div class="player-stats-banner">
@@ -170,22 +170,22 @@
             <p class="leaderboards-kicker">Prostagma Read</p>
             <h2 id="playerStatsVerdictTitle">Load a player to generate a profile read</h2>
           </div>
-          <span id="playerStatsVerdictMeta" class="leaderboards-meta-note">Bold summary, supported by current queue data.</span>
+          <span id="playerStatsVerdictMeta" class="leaderboards-meta-note">Queue read</span>
         </div>
 
         <div id="playerStatsVerdictBadges" class="player-stats-verdict-badges">
-          <span class="player-stats-badge">Awaiting data</span>
+          <span class="player-stats-badge">PLAYER READ</span>
         </div>
 
         <p id="playerStatsVerdictBody" class="player-stats-verdict-body">
-          This panel will call out recent form, ladder strength, signature gods, and the clearest story from the returned profile data.
+          Search a player to see their current ladder shape, best signals, and recent profile story.
         </p>
 
         <div id="playerStatsVerdictEvidence" class="player-stats-verdict-evidence">
           <article class="leaderboards-list-card">
             <span>Recent form</span>
-            <strong>Waiting for profile</strong>
-            <p>Load a player to turn recent results into a readable story.</p>
+            <strong>Search a profile</strong>
+            <p>Recent wins, losses, ratings, gods, and maps will appear here.</p>
           </article>
         </div>
       </article>
