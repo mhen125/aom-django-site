@@ -508,12 +508,14 @@
 
     const badge = document.getElementById("homeFeaturedNewsBadge");
     const date = document.getElementById("homeFeaturedNewsDate");
+    const source = document.getElementById("homeFeaturedNewsSource");
     const title = document.getElementById("homeFeaturedNewsTitle");
     const summary = document.getElementById("homeFeaturedNewsSummary");
     const link = document.getElementById("homeFeaturedNewsLink");
     const image = document.getElementById("homeFeaturedNewsImage");
 
     if (badge) badge.textContent = item.isFresh ? "Fresh Update" : "Latest News";
+    if (source) source.textContent = item.author ? `Official Update · ${item.author}` : "Official Steam Feed";
     if (date) {
       date.textContent = formatDate(item.publishedAt);
       date.dateTime = item.publishedAt || "";
@@ -565,6 +567,58 @@
     return article;
   }
 
+  function animateNewsCards(cards) {
+    if (!cards.length) {
+      return;
+    }
+
+    cards.forEach((card, index) => {
+      card.style.setProperty("--landing-news-stagger", `${index * 90}ms`);
+    });
+
+    window.requestAnimationFrame(() => {
+      cards.forEach((card) => card.classList.add("is-visible"));
+    });
+  }
+
+  function bindRevealGroups() {
+    const groups = Array.from(document.querySelectorAll("[data-landing-reveal-group]"));
+
+    if (!groups.length) {
+      return;
+    }
+
+    const revealGroup = (group) => {
+      const children = Array.from(group.children);
+
+      children.forEach((child, index) => {
+        child.style.setProperty("--landing-reveal-stagger", `${index * 85}ms`);
+      });
+
+      window.requestAnimationFrame(() => {
+        children.forEach((child) => child.classList.add("is-visible"));
+      });
+    };
+
+    if (!("IntersectionObserver" in window)) {
+      groups.forEach(revealGroup);
+      return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) {
+          return;
+        }
+
+        revealGroup(entry.target);
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.16, rootMargin: "0px 0px -8% 0px" });
+
+    groups.forEach((group) => observer.observe(group));
+  }
+
   function renderNews(payload) {
     const items = Array.isArray(payload?.items) ? payload.items : [];
     const featured = payload?.featured || items[0] || null;
@@ -588,6 +642,7 @@
     }
 
     grid.replaceChildren(...cards);
+    animateNewsCards(cards);
   }
 
   async function loadNews() {
@@ -605,6 +660,7 @@
   }
 
   document.addEventListener("DOMContentLoaded", () => {
+    bindRevealGroups();
     loadActivity({ refreshMap: true });
     window.setInterval(() => loadActivity({ refreshMap: false }), activityNumberPollMs);
     window.setInterval(() => {

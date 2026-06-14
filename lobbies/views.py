@@ -7,14 +7,27 @@ import urllib.request
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
+from urllib.parse import urlencode
 
+from asgiref.sync import sync_to_async
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
+from django.urls import reverse
 
 from .services import CACHE_SECONDS, get_live_activity, get_normalized_lobbies
-from .leaderboard import fetch_player_rating, fetch_player_summary
+from .leaderboard import fetch_community_leaderboard2, fetch_player_rating, fetch_player_summary, search_leaderboard
+from .leaderboard_metadata import build_leaderboard_metadata_payload, get_queue_meta, get_ranked_queues
 from .stats import build_player_recent_stats
 from .aomstats import get_active_custom_matches, get_active_ranked_matches
+from stats.readers import (
+    get_imported_leaderboard_rows,
+    get_imported_player_rating,
+    get_imported_player_recent_stats,
+    get_imported_player_summary,
+)
 
 
 def _refresh_requested(request):
@@ -230,6 +243,93 @@ def landing_home(request):
     )
 
 
+def _get_authenticated_player_identity(user):
+    for relation_name in ["steam_profile", "xbox_profile"]:
+        try:
+            profile = getattr(user, relation_name)
+        except ObjectDoesNotExist:
+            profile = None
+
+        if not profile:
+            continue
+
+        profile_id = getattr(profile, "aom_profile_id", None)
+        if not profile_id:
+            continue
+
+        player_name = getattr(profile, "aom_alias", "") or getattr(profile, "display_name", "") or ""
+        return {
+            "profile_id": int(profile_id),
+            "player": player_name.strip(),
+        }
+
+    return None
+
+
+def leaderboard_home(request):
+    return render(
+        request,
+        "leaderboards.html",
+        {
+            "canonical_url": request.build_absolute_uri("/leaderboards/"),
+            "meta_description": (
+                "Browse Age of Mythology: Retold ranked ladders, search player profiles, "
+                "and review recent god and match statistics on Prostagma."
+            ),
+            "leaderboard_metadata": build_leaderboard_metadata_payload(),
+            "default_ranked_match_types": get_ranked_queues(),
+        },
+    )
+
+
+@login_required
+def my_player_stats_redirect(request):
+    identity = _get_authenticated_player_identity(request.user)
+
+    if identity is None:
+        messages.error(request, "Your account does not have a linked Age of Mythology profile yet.")
+
+        try:
+            request.user.steam_profile
+            return redirect(reverse("steam_auth:profile"))
+        except ObjectDoesNotExist:
+            pass
+
+        try:
+            request.user.xbox_profile
+            return redirect(reverse("xbox_auth:profile"))
+        except ObjectDoesNotExist:
+            pass
+
+        return redirect(reverse("lobbies:leaderboard_home"))
+
+    params = {
+        "profile_id": identity["profile_id"],
+        "player": identity["player"],
+    }
+    target = f"{reverse('stats:player_stats_home')}?{urlencode(params)}"
+    return redirect(target)
+
+
+def player_stats_home(request):
+    return render(
+        request,
+        "player_stats.html",
+        {
+            "canonical_url": request.build_absolute_uri("/stats/player/"),
+            "meta_description": (
+                "View Age of Mythology: Retold player ratings, recent matches, god usage, "
+                "and queue-specific performance on Prostagma."
+            ),
+            "leaderboard_metadata": build_leaderboard_metadata_payload(),
+            "default_ranked_match_types": get_ranked_queues(),
+            "initial_player": request.GET.get("player", "").strip(),
+            "initial_profile_id": request.GET.get("profile_id", "").strip(),
+            "initial_match_type": request.GET.get("match_type", "1").strip() or "1",
+        },
+    )
+
+
 def api_home_news(request):
     refresh = _refresh_requested(request)
     payload = _get_home_news(force_refresh=refresh)
@@ -429,17 +529,117 @@ async def api_player_rating(request):
             force_transport=transport,
         )
     except Exception as error:
-        return JsonResponse(
-            {
-                "ok": False,
-                "error": str(error),
-                "rating": None,
-                "ratings": [],
-            },
-            status=502,
-        )
+        payload = {
+            "ok": False,
+            "error": str(error),
+            "rating": None,
+            "ratings": [],
+        }
+
+    if payload.get("ok") and payload.get("rating"):
+        return JsonResponse(payload)
+
+    imported_payload = await sync_to_async(get_imported_player_rating)(
+        profile_id=profile_id,
+        player=player,
+        match_type=match_type,
+    )
+    if imported_payload is not None:
+        return JsonResponse(imported_payload)
+
+    if payload.get("error"):
+        return JsonResponse(payload, status=502)
 
     return JsonResponse(payload)
+
+
+async def api_leaderboard_search(request):
+    player = request.GET.get("player", "").strip()
+    raw_match_type = request.GET.get("match_type", "1")
+    raw_page = request.GET.get("page", "1")
+    raw_count = request.GET.get("count", "25")
+    refresh = _refresh_requested(request)
+    transport = request.GET.get("transport", "auto")
+
+    try:
+        match_type = int(raw_match_type)
+    except ValueError:
+        match_type = 1
+
+    try:
+        page = int(raw_page)
+    except ValueError:
+        page = 1
+
+    try:
+        count = int(raw_count)
+    except ValueError:
+        count = 25
+
+    page = max(1, min(page, 50))
+    count = max(1, min(count, 100))
+
+    try:
+        if not player:
+            queue_meta = get_queue_meta(match_type) or {}
+            leaderboard_id = queue_meta.get("id")
+            if leaderboard_id is not None:
+                payload = await fetch_community_leaderboard2(
+                    leaderboard_id=int(leaderboard_id),
+                    page=page,
+                    count=count,
+                    refresh=refresh,
+                )
+            else:
+                payload = await search_leaderboard(
+                    player=player,
+                    match_type=match_type,
+                    page=page,
+                    count=count,
+                    refresh=refresh,
+                    force_transport=transport,
+                )
+        else:
+            payload = await search_leaderboard(
+                player=player,
+                match_type=match_type,
+                page=page,
+                count=count,
+                refresh=refresh,
+                force_transport=transport,
+            )
+    except Exception as error:
+        payload = {
+            "ok": False,
+            "error": str(error),
+            "matches": [],
+        }
+
+    if payload.get("ok") and payload.get("match_count"):
+        return JsonResponse(payload)
+
+    imported_payload = await sync_to_async(get_imported_leaderboard_rows)(
+        match_type=match_type,
+        page=page,
+        count=count,
+        player=player,
+    )
+    if imported_payload.get("match_count"):
+        return JsonResponse(imported_payload)
+
+    if payload.get("error"):
+        return JsonResponse(payload, status=502)
+
+    return JsonResponse(payload)
+
+
+def api_leaderboard_metadata(request):
+    refresh = _refresh_requested(request)
+    payload = {
+        "ok": True,
+        **build_leaderboard_metadata_payload(),
+    }
+    return _json_cache_response(payload, refresh=refresh, max_age=HOME_NEWS_CACHE_SECONDS)
 
 
 async def api_player_summary(request):
@@ -486,7 +686,7 @@ async def api_player_summary(request):
     except ValueError:
         recent_count = 10
 
-    recent_count = max(1, min(recent_count, 25))
+    recent_count = max(1, min(recent_count, 100))
 
     try:
         payload = await fetch_player_summary(
@@ -498,16 +698,28 @@ async def api_player_summary(request):
             force_transport=transport,
         )
     except Exception as error:
-        return JsonResponse(
-            {
-                "ok": False,
-                "error": str(error),
-                "summary": None,
-                "ratings": [],
-                "recent_matches": [],
-            },
-            status=502,
-        )
+        payload = {
+            "ok": False,
+            "error": str(error),
+            "summary": None,
+            "ratings": [],
+            "recent_matches": [],
+        }
+
+    if payload.get("ok") and (payload.get("ratings") or payload.get("recent_matches", {}).get("match_count")):
+        return JsonResponse(payload)
+
+    imported_payload = await sync_to_async(get_imported_player_summary)(
+        profile_id=profile_id,
+        player=player,
+        recent_match_type=recent_match_type,
+        recent_count=recent_count,
+    )
+    if imported_payload is not None:
+        return JsonResponse(imported_payload)
+
+    if payload.get("error"):
+        return JsonResponse(payload, status=502)
 
     return JsonResponse(payload)
 
@@ -515,6 +727,7 @@ async def api_player_god_stats(request):
     raw_profile_id = request.GET.get("profile_id")
     player = request.GET.get("player", "unknown user")
     raw_recent_count = request.GET.get("recent_count", "25")
+    raw_match_type = request.GET.get("match_type", "")
     refresh = _refresh_requested(request)
     transport = request.GET.get("transport", "curl")
 
@@ -544,26 +757,47 @@ async def api_player_god_stats(request):
         recent_count = 25
 
     recent_count = max(1, min(recent_count, 50))
+    match_types = None
+
+    if raw_match_type not in (None, ""):
+        try:
+            match_types = [int(raw_match_type)]
+        except ValueError:
+            match_types = None
 
     try:
         payload = await build_player_recent_stats(
             profile_id=profile_id,
             player=player,
             recent_count=recent_count,
+            match_types=match_types,
             refresh=refresh,
             force_transport=transport,
         )
     except Exception as error:
-        return JsonResponse(
-            {
-                "ok": False,
-                "error": str(error),
-                "summary": {},
-                "gods": [],
-                "maps": [],
-                "match_type_breakdown": [],
-            },
-            status=502,
+        payload = {
+            "ok": False,
+            "error": str(error),
+            "summary": {},
+            "gods": [],
+            "maps": [],
+            "match_type_breakdown": [],
+        }
+
+    if payload.get("ok") and (payload.get("gods") or payload.get("maps") or payload.get("summary")):
+        return JsonResponse(payload)
+
+    if match_types:
+        imported_payload = await sync_to_async(get_imported_player_recent_stats)(
+            profile_id=profile_id,
+            player=player,
+            recent_count=recent_count,
+            match_types=match_types,
         )
+        if imported_payload is not None:
+            return JsonResponse(imported_payload)
+
+    if payload.get("error"):
+        return JsonResponse(payload, status=502)
 
     return JsonResponse(payload)

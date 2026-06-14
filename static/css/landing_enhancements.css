@@ -1,0 +1,422 @@
+.landing-section-eyebrow {
+  display: inline-flex;
+  width: max-content;
+  margin-bottom: 0.45rem;
+  color: rgba(244, 210, 145, 0.84);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.landing-twitch-section {
+  position: relative;
+}
+
+.landing-twitch-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(0.95rem, 1.7vw, 1.25rem);
+}
+
+.landing-twitch-card {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-height: 100%;
+  overflow: hidden;
+  color: inherit;
+  isolation: isolate;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.landing-twitch-card::before,
+.landing-entry-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 0;
+  background:
+    linear-gradient(115deg, transparent 0 26%, rgba(255, 234, 178, 0.13) 42%, transparent 58%),
+    radial-gradient(circle at 16% 0%, rgba(244, 197, 105, 0.18), transparent 18rem);
+  transform: translateX(-18%);
+  pointer-events: none;
+  transition:
+    opacity 180ms ease,
+    transform 420ms ease;
+}
+
+.landing-twitch-card:hover,
+.landing-twitch-card:focus-within,
+.landing-entry-card:hover,
+.landing-entry-card:focus-visible {
+  transform: translateY(-4px);
+  border-color: rgba(255, 220, 130, 0.78);
+  background:
+    linear-gradient(180deg, rgba(255, 232, 158, 0.09), rgba(1, 8, 18, 0.12)),
+    radial-gradient(circle at 20% 0%, rgba(89, 160, 220, 0.12), transparent 17rem),
+    rgba(5, 17, 34, 0.92);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 236, 176, 0.08),
+    0 18px 44px rgba(0, 0, 0, 0.34),
+    0 0 26px rgba(225, 173, 76, 0.16);
+}
+
+.landing-twitch-card:hover::before,
+.landing-twitch-card:focus-within::before,
+.landing-entry-card:hover::before,
+.landing-entry-card:focus-visible::before {
+  opacity: 1;
+  transform: translateX(18%);
+}
+
+.landing-twitch-media {
+  position: relative;
+  z-index: 2;
+  display: block;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at center, rgba(240, 190, 90, 0.16), transparent 62%),
+    rgba(3, 14, 27, 0.88);
+  text-decoration: none;
+}
+
+.landing-twitch-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(1.05) contrast(1.06);
+  transform: scale(1.001);
+  transition:
+    transform 240ms ease,
+    filter 240ms ease;
+}
+
+.landing-twitch-card:hover .landing-twitch-media img,
+.landing-twitch-card:focus-within .landing-twitch-media img {
+  transform: scale(1.04);
+  filter: saturate(1.12) contrast(1.08);
+}
+
+.landing-twitch-duration {
+  position: absolute;
+  right: 0.7rem;
+  bottom: 0.7rem;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.45rem;
+  padding: 0.22rem 0.52rem;
+  border: 1px solid rgba(255, 226, 144, 0.36);
+  border-radius: 999px;
+  color: #fff3cf;
+  background: rgba(3, 9, 18, 0.78);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.34);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+}
+
+.landing-twitch-copy {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  align-content: start;
+  padding: clamp(1rem, 1.7vw, 1.25rem);
+}
+
+.landing-twitch-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.landing-twitch-language {
+  color: rgba(242, 219, 166, 0.78);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.landing-twitch-card h3 {
+  margin: 0.65rem 0 0;
+  color: #fff2c8;
+  font-family: var(--site-font-title);
+  font-size: clamp(1.08rem, 1.45vw, 1.28rem);
+  font-weight: 760;
+  letter-spacing: 0;
+  line-height: 1.16;
+}
+
+.landing-twitch-card h3 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.landing-twitch-card h3 a:hover,
+.landing-twitch-card h3 a:focus-visible {
+  color: #ffe4a5;
+}
+
+.landing-twitch-creator,
+.landing-twitch-meta {
+  margin: 0.72rem 0 0;
+  color: rgba(241, 228, 198, 0.78);
+  font-size: 0.92rem;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
+.landing-twitch-creator {
+  color: rgba(255, 242, 212, 0.9);
+}
+
+.landing-twitch-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.38rem;
+  color: rgba(242, 198, 105, 0.86);
+  font-size: 0.76rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.landing-twitch-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  width: max-content;
+  margin-top: 1rem;
+  color: #f3c46e;
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.landing-twitch-link:hover,
+.landing-twitch-link:focus-visible {
+  color: #ffe4a5;
+}
+
+.landing-twitch-fallback {
+  display: grid;
+  grid-template-columns: minmax(180px, 34%) minmax(0, 1fr);
+  overflow: hidden;
+}
+
+.landing-twitch-fallback-media {
+  position: relative;
+  min-height: 220px;
+  overflow: hidden;
+  background: rgba(3, 14, 27, 0.88);
+}
+
+.landing-twitch-fallback-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent 0 50%, rgba(5, 13, 27, 0.74)),
+    radial-gradient(circle at 48% 16%, rgba(245, 190, 92, 0.18), transparent 8rem);
+  pointer-events: none;
+}
+
+.landing-twitch-fallback-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.landing-twitch-fallback-copy {
+  display: grid;
+  align-content: center;
+  min-width: 0;
+  padding: clamp(1.1rem, 2vw, 1.5rem);
+}
+
+.landing-twitch-fallback-copy h3 {
+  margin: 0.7rem 0 0;
+  color: #fff2c8;
+  font-family: var(--site-font-title);
+  font-size: clamp(1.22rem, 2vw, 1.65rem);
+  font-weight: 760;
+  line-height: 1.12;
+}
+
+.landing-twitch-fallback-copy p {
+  max-width: 52rem;
+  margin: 0.8rem 0 0;
+  color: rgba(241, 228, 198, 0.78);
+  font-size: 0.96rem;
+  font-weight: 600;
+  line-height: 1.48;
+}
+
+.landing-entry-card {
+  overflow: hidden;
+  isolation: isolate;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 236, 176, 0.035),
+    0 14px 34px rgba(0, 0, 0, 0.24);
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.landing-entry-card > img,
+.landing-entry-card > span {
+  position: relative;
+  z-index: 2;
+}
+
+.landing-entry-card::after {
+  z-index: 2;
+  transition:
+    transform 180ms ease,
+    opacity 180ms ease,
+    color 180ms ease;
+}
+
+.landing-entry-card:hover::after,
+.landing-entry-card:focus-visible::after {
+  color: #ffe0a0;
+  transform: translate(3px, -50%);
+}
+
+.landing-entry-card img {
+  transition:
+    transform 180ms ease,
+    filter 180ms ease;
+}
+
+.landing-entry-card:hover img,
+.landing-entry-card:focus-visible img {
+  transform: translateY(-2px) scale(1.04);
+  filter:
+    drop-shadow(0 10px 16px rgba(0, 0, 0, 0.42))
+    drop-shadow(0 0 14px rgba(235, 188, 92, 0.2));
+}
+
+.landing-entry-card strong,
+.landing-entry-card small {
+  transition: color 180ms ease;
+}
+
+.landing-entry-card:hover strong,
+.landing-entry-card:focus-visible strong {
+  color: #ffe7ac;
+}
+
+.landing-entry-status {
+  display: inline-flex;
+  width: max-content;
+  margin-top: 0.7rem;
+  color: rgba(242, 198, 105, 0.9);
+  font-size: 0.68rem;
+  font-style: normal;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.landing-entry-card.is-disabled {
+  transform: none;
+  cursor: default;
+}
+
+.landing-entry-card.is-disabled:hover,
+.landing-entry-card.is-disabled:focus-visible {
+  transform: none;
+  border-color: rgba(221, 181, 94, 0.42);
+  background:
+    linear-gradient(180deg, rgba(255, 232, 158, 0.055), rgba(1, 8, 18, 0.15)),
+    rgba(3, 13, 27, 0.76);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 236, 176, 0.035),
+    0 18px 44px rgba(0, 0, 0, 0.3);
+}
+
+.landing-entry-card.is-disabled::before {
+  display: none;
+}
+
+.landing-entry-card.is-disabled img {
+  transform: none;
+}
+
+.landing-twitch-card a:focus-visible,
+.landing-twitch-link:focus-visible,
+.landing-entry-card:focus-visible {
+  outline: 2px solid rgba(255, 220, 130, 0.88);
+  outline-offset: 4px;
+}
+
+@media (max-width: 1180px) {
+  .landing-twitch-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .landing-twitch-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .landing-twitch-fallback {
+    grid-template-columns: 1fr;
+  }
+
+  .landing-twitch-fallback-media {
+    min-height: 170px;
+  }
+
+  .landing-twitch-fallback-media::after {
+    background:
+      linear-gradient(180deg, transparent 0 48%, rgba(5, 13, 27, 0.72)),
+      radial-gradient(circle at 48% 16%, rgba(245, 190, 92, 0.18), transparent 8rem);
+  }
+
+  .landing-entry-card {
+    grid-template-columns: 54px minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-twitch-card,
+  .landing-twitch-card::before,
+  .landing-twitch-media img,
+  .landing-entry-card,
+  .landing-entry-card::before,
+  .landing-entry-card::after,
+  .landing-entry-card img,
+  .landing-entry-card strong,
+  .landing-entry-card small {
+    transition: none;
+  }
+
+  .landing-twitch-card:hover,
+  .landing-twitch-card:focus-within,
+  .landing-entry-card:hover,
+  .landing-entry-card:focus-visible,
+  .landing-twitch-card:hover .landing-twitch-media img,
+  .landing-twitch-card:focus-within .landing-twitch-media img,
+  .landing-entry-card:hover img,
+  .landing-entry-card:focus-visible img {
+    transform: none;
+  }
+}

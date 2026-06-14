@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}AoM: Retold Player Stats | Prostagma{% endblock %}
+{% block body_class %}leaderboards-page player-stats-page{% endblock %}
+{% block body_attrs %}data-page="player-stats"{% endblock %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'css/leaderboards.css' %}">
+{% endblock %}
+
+{% block extra_head %}
+  {{ leaderboard_metadata|json_script:"playerStatsMetadata" }}
+  {{ default_ranked_match_types|json_script:"playerStatsDefaultQueues" }}
+  {{ initial_player|json_script:"playerStatsInitialPlayer" }}
+  {{ initial_profile_id|json_script:"playerStatsInitialProfileId" }}
+  {{ initial_match_type|json_script:"playerStatsInitialMatchType" }}
+  <script>
+    window.PROSTAGMA_PLAYER_STATS = {
+      playerSearchUrl: "{% url 'lobbies:api_leaderboard_search' %}",
+      ratingUrl: "{% url 'lobbies:api_player_rating' %}",
+      summaryUrl: "{% url 'lobbies:api_player_summary' %}",
+      godStatsUrl: "{% url 'lobbies:api_player_god_stats' %}",
+      leaderboardHomeUrl: "{% url 'lobbies:leaderboard_home' %}",
+      canonicalProfileUrl: "{% url 'stats:player_stats_home' %}",
+      canonicalProfileBaseUrl: "{% url 'stats:home' %}players/"
+    };
+  </script>
+{% endblock %}
+
+{% block site_header %}
+  {% include "partials/header.html" with active_page="leaderboards" show_game_logo=True header_subtitle="Dedicated player profiles with queue-specific ratings, recent matches, and god usage." %}
+{% endblock %}
+
+{% block content %}
+  <main class="leaderboards-shell player-stats-shell">
+    <section class="leaderboards-hero leaderboards-panel player-stats-hero">
+      <div class="leaderboards-hero-copy">
+        <p class="leaderboards-kicker">Player Record</p>
+        <h1 id="playerStatsPageTitle">Player Stats Hub</h1>
+        <p id="playerStatsLead">
+          Look up a player by name or profile ID, then inspect ladder rows, deeper recent match history,
+          god selection, and map rotation from a dedicated profile view.
+        </p>
+        <a class="leaderboards-ghost-link" href="{% url 'lobbies:leaderboard_home' %}">
+          Back to leaderboards
+          <span aria-hidden="true">›</span>
+        </a>
+      </div>
+
+      <form id="playerStatsSearchForm" class="leaderboards-search-card" autocomplete="off">
+        <div class="leaderboards-search-head">
+          <h2>Player Lookup</h2>
+          <span>Name or profile ID</span>
+        </div>
+
+        <label class="leaderboards-field">
+          <span>Player name or profile ID</span>
+          <input id="playerStatsLookupInput" name="lookup" type="text" placeholder="crazydarnfoo or 1075470702" value="{{ initial_player|default:initial_profile_id }}">
+        </label>
+
+        <p class="leaderboards-meta-note">
+          Queue is chosen after the player is loaded. Profile ID is resolved automatically when possible.
+        </p>
+
+        <div class="leaderboards-search-actions">
+          <button class="leaderboards-primary-button" type="submit">Search profiles</button>
+          <button id="playerStatsReset" class="leaderboards-secondary-button" type="button">Reset</button>
+        </div>
+
+        <p id="playerStatsFeedback" class="leaderboards-feedback" aria-live="polite">
+          Search for a player to load a dedicated profile.
+        </p>
+      </form>
+    </section>
+
+    <section id="playerStatsSearchResultsPanel" class="leaderboards-search-results leaderboards-panel" hidden>
+      <div class="leaderboards-section-head">
+        <div>
+          <p class="leaderboards-kicker">Player Search</p>
+          <h2>Choose a profile</h2>
+        </div>
+        <span id="playerStatsSearchResultsMeta" class="leaderboards-meta-note">Waiting for search</span>
+      </div>
+
+      <div class="leaderboards-table-wrap">
+        <table class="leaderboards-table">
+          <thead>
+            <tr>
+              <th>Player</th>
+              <th>Profile ID</th>
+              <th>Rating</th>
+              <th>Rank</th>
+              <th>Record</th>
+            </tr>
+          </thead>
+          <tbody id="playerStatsSearchResultsBody">
+            <tr>
+              <td colspan="5" class="leaderboards-table-empty">Search by name to compare matching profiles.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="playerStatsProfilePanel" class="leaderboards-profile-grid" hidden>
+      <article class="leaderboards-profile-overview leaderboards-panel">
+        <div class="leaderboards-section-head">
+          <div>
+            <p class="leaderboards-kicker">Overview</p>
+            <h2 id="playerStatsName">Player</h2>
+          </div>
+          <span id="playerStatsMeta" class="leaderboards-meta-note">Waiting for search</span>
+        </div>
+
+        <div class="player-stats-banner">
+          <div class="player-stats-identity">
+            <div id="playerStatsAvatar" class="player-stats-avatar" aria-hidden="true">PS</div>
+            <div class="player-stats-identity-copy">
+              <div class="player-stats-badges">
+                <span id="playerStatsQueueBadge" class="player-stats-badge">Queue</span>
+                <span id="playerStatsSourceBadge" class="player-stats-badge">Source</span>
+              </div>
+              <p id="playerStatsIdentityLine" class="player-stats-identity-line">
+                Profile view for ladder tracking, recent results, and queue comparisons.
+              </p>
+            </div>
+          </div>
+          <a id="playerStatsBackLink" class="leaderboards-ghost-link" href="{% url 'lobbies:leaderboard_home' %}">
+            Back to leaderboards
+            <span aria-hidden="true">›</span>
+          </a>
+        </div>
+
+        <div class="player-stats-queue-switcher">
+          <div class="leaderboards-section-head">
+            <div>
+              <p class="leaderboards-kicker">Queue View</p>
+              <h2>Switch ladders</h2>
+            </div>
+            <span class="leaderboards-meta-note">Queue changes update ratings, match history, and breakdowns.</span>
+          </div>
+          <div id="playerStatsQueueChips" class="leaderboards-queue-chips" aria-label="Player queue switcher"></div>
+        </div>
+
+        <div id="playerStatsCards" class="leaderboards-stat-grid"></div>
+      </article>
+
+      <article class="leaderboards-profile-overview leaderboards-panel">
+        <div class="leaderboards-section-head">
+          <div>
+            <p class="leaderboards-kicker">Queue Ratings</p>
+            <h2>Cross-queue ladder snapshot</h2>
+          </div>
+          <span class="leaderboards-meta-note">Available imported or live rating rows</span>
+        </div>
+
+        <div class="leaderboards-table-wrap">
+          <table class="leaderboards-table player-stats-ratings-table">
+            <thead>
+              <tr>
+                <th>Queue</th>
+                <th>Rating</th>
+                <th>Rank</th>
+                <th>Record</th>
+                <th>Peak</th>
+              </tr>
+            </thead>
+            <tbody id="playerStatsRatingsBody">
+              <tr>
+                <td colspan="5" class="leaderboards-table-empty">Search for a player to compare ladder rows.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="leaderboards-profile-matches leaderboards-panel">
+        <div class="leaderboards-section-head">
+          <div>
+            <p class="leaderboards-kicker">Recent Matches</p>
+            <h2>Match history</h2>
+          </div>
+          <span id="playerStatsMatchesMeta" class="leaderboards-meta-note">Recent matches</span>
+        </div>
+
+        <div class="leaderboards-table-wrap">
+          <table class="leaderboards-table leaderboards-matches-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Queue</th>
+                <th>God</th>
+                <th>Map</th>
+                <th>Result</th>
+                <th>ELO</th>
+              </tr>
+            </thead>
+            <tbody id="playerStatsMatchesBody">
+              <tr>
+                <td colspan="6" class="leaderboards-table-empty">Search for a player to load recent matches.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="leaderboards-pagination">
+          <button id="playerStatsPrevMatches" class="leaderboards-ghost-button" type="button">Previous</button>
+          <span id="playerStatsMatchesPageLabel" class="leaderboards-meta-note">Page 1</span>
+          <button id="playerStatsNextMatches" class="leaderboards-ghost-button" type="button">Next</button>
+        </div>
+      </article>
+
+      <article class="leaderboards-profile-gods leaderboards-panel">
+        <div class="leaderboards-section-head">
+          <div>
+            <p class="leaderboards-kicker">Recent God Usage</p>
+            <h2>Major gods</h2>
+          </div>
+          <span id="playerStatsGodsMeta" class="leaderboards-meta-note">Recent matches</span>
+        </div>
+
+        <div id="playerStatsGodsList" class="leaderboards-list-grid"></div>
+      </article>
+
+      <article class="leaderboards-profile-maps leaderboards-panel">
+        <div class="leaderboards-section-head">
+          <div>
+            <p class="leaderboards-kicker">Map Rotation</p>
+            <h2>Most played maps</h2>
+          </div>
+        </div>
+
+        <div id="playerStatsMapsList" class="leaderboards-list-grid"></div>
+      </article>
+    </section>
+  </main>
+{% endblock %}
+
+{% block site_footer %}
+  {% include "partials/footer.html" %}
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'js/player_stats.js' %}" defer></script>
+{% endblock %}

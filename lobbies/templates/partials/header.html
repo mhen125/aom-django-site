@@ -28,7 +28,7 @@
       <a href="/"{% if active_page == "home" %} aria-current="page"{% endif %}>Home</a>
       <a href="/lobbies/"{% if active_page == "lobbies" %} aria-current="page"{% endif %}>Lobbies</a>
       <a href="/build_orders/"{% if active_page == "builds" %} aria-current="page"{% endif %}>Build Orders</a>
-      <span class="site-nav-disabled" aria-disabled="true">Leaderboards</span>
+      <a href="/leaderboards/"{% if active_page == "leaderboards" %} aria-current="page"{% endif %}>Leaderboards</a>
       <a href="/agora/"{% if active_page == "agora" %} aria-current="page"{% endif %}>Agora</a>
 
       <div class="site-nav-dropdown">
@@ -134,6 +134,10 @@
                 </a>
               {% endif %}
 
+              <a href="{% url 'stats:my_player_stats' %}" role="menuitem">
+                My Stats
+              </a>
+
               <a class="site-user-signout" href="{% url 'steam_auth:logout' %}?next={{ request.path|urlencode }}" role="menuitem">
                 Sign out
               </a>
@@ -228,7 +232,7 @@
           <a href="/"{% if active_page == "home" %} aria-current="page"{% endif %}>Home</a>
           <a href="/lobbies/"{% if active_page == "lobbies" %} aria-current="page"{% endif %}>Lobbies</a>
           <a href="/build_orders/"{% if active_page == "builds" %} aria-current="page"{% endif %}>Build Orders</a>
-          <span class="site-mobile-menu-disabled">Leaderboards <small>Coming soon</small></span>
+          <a href="/leaderboards/"{% if active_page == "leaderboards" %} aria-current="page"{% endif %}>Leaderboards</a>
           <a href="/agora/"{% if active_page == "agora" %} aria-current="page"{% endif %}>Agora</a>
 
           <div class="site-mobile-menu-section">
@@ -253,6 +257,8 @@
               {% if request.user.is_staff %}
                 <a href="/admin/">Django Admin</a>
               {% endif %}
+
+              <a href="{% url 'stats:my_player_stats' %}">My Stats</a>
 
               <a href="{% url 'steam_auth:logout' %}?next={{ request.path|urlencode }}">Sign out</a>
             {% else %}

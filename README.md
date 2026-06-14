@@ -205,6 +205,10 @@ node --check lobbies/static/js/lobbies.js
 node --check agora/static/js/agora.js
 ```
 
+## Deployment Notes
+
+- Replay worker `systemd` setup: `docs/REPLAY_WORKER_SYSTEMD.md`
+
 ## Project Status
 
 This is an active personal project. Some features are experimental, and upstream AoM Retold data can change without notice.

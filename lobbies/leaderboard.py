@@ -1,11 +1,26 @@
+import base64
+import gzip
 import json
 import re
 import shutil
 import subprocess
 import time
+import zlib
+from datetime import datetime, timezone
 from typing import Any
 
 import httpx
+
+from .leaderboard_metadata import (
+    get_match_type_ids_for_leaderboard,
+    get_match_type_label,
+    get_queue_label,
+    get_ranked_queues,
+    get_ranked_match_type_ids,
+    resolve_community_civilization_name,
+    resolve_legacy_race_name,
+)
+from .normalizer import format_map_name
 
 
 class UpstreamLeaderboardError(Exception):
@@ -16,6 +31,8 @@ LEADERBOARD_URL = "https://api.ageofempires.com/api/agemyth/Leaderboard"
 FULL_STATS_URL = "https://api.ageofempires.com/api/GameStats/AgeMyth/GetFullStats"
 MATCH_LIST_URL = "https://api.ageofempires.com/api/GameStats/AgeMyth/GetMatchList"
 MATCH_DETAIL_URL = "https://api.ageofempires.com/api/GameStats/AgeMyth/GetMatchDetail"
+COMMUNITY_LEADERBOARD2_URL = "https://andromeda-live-release18-api.worldsedgelink.com/community/leaderboard/getLeaderboard2"
+COMMUNITY_RECENT_MATCH_HISTORY_URL = "https://andromeda-live-release18-api.worldsedgelink.com/community/leaderboard/getRecentMatchHistory"
 
 
 AVATAR_STAT_FOR_PROFILE_URL = "https://athens-live-api.worldsedgelink.com/community/leaderboard/GetAvatarStatForProfile"
@@ -211,7 +228,7 @@ def extract_alias_from_full_stats_sync(
     body = build_full_stats_body(
         profile_id=profile_id,
         gamertag=fallback_name or "unknown user",
-        match_types=[1, 2, 3, 4],
+        match_types=get_ranked_match_type_ids(),
     )
 
     response = post_json_with_curl(
@@ -288,6 +305,31 @@ def resolve_worldsedge_identity_sync(
 LEADERBOARD_CACHE_SECONDS = 300
 
 _leaderboard_cache: dict[tuple[Any, ...], dict[str, Any]] = {}
+
+
+def utc_timestamp() -> str:
+    return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+
+
+def build_source_meta(
+    *,
+    endpoint: str,
+    queue_id: int | None = None,
+    expanded_match_type_ids: list[int] | None = None,
+    cached: Any = None,
+    status_code: Any = None,
+    source: str | None = None,
+) -> dict[str, Any]:
+    return {
+        "source": source or endpoint,
+        "endpoint": endpoint,
+        "queue_id": queue_id,
+        "queue_label": get_queue_label(queue_id) if queue_id is not None else None,
+        "expanded_match_type_ids": expanded_match_type_ids or [],
+        "cached": bool(cached),
+        "status_code": status_code,
+        "fetched_at": utc_timestamp(),
+    }
 
 
 def build_leaderboard_body(
@@ -514,6 +556,86 @@ def post_json_with_curl(
                 "--header 'accept: application/json' "
                 "--header 'content-type: application/json' "
                 "--data '" + body_text + "'"
+            ),
+        },
+        "status_code": status_code,
+        "ok": completed.returncode == 0 and status_code is not None and 200 <= status_code < 300,
+        "return_code": completed.returncode,
+        "stderr": stderr,
+        "text_length": len(response_text),
+        "text_preview": response_text[:1000],
+        "shape": summarize_payload_shape(parsed),
+        "raw": parsed,
+    }
+
+
+def get_json_with_curl(
+    *,
+    url: str,
+    params: dict[str, Any],
+    label: str,
+    timeout_seconds: int = 30,
+) -> dict[str, Any]:
+    curl_path = shutil.which("curl")
+    if not curl_path:
+        return {
+            "transport": "curl",
+            "ok": False,
+            "status_code": None,
+            "error": "curl executable was not found on this system.",
+            "raw": None,
+        }
+
+    request_url = f"{url}?{httpx.QueryParams(params)}" if params else url
+
+    command = [
+        curl_path,
+        "--silent",
+        "--show-error",
+        "--location",
+        "--write-out",
+        "\n__HTTP_STATUS__:%{http_code}",
+        request_url,
+        "--header",
+        "accept: application/json",
+    ]
+
+    completed = subprocess.run(
+        command,
+        capture_output=True,
+        text=True,
+        timeout=timeout_seconds,
+        check=False,
+    )
+
+    stdout = completed.stdout or ""
+    stderr = completed.stderr or ""
+
+    status_code = None
+    response_text = stdout
+
+    marker = "\n__HTTP_STATUS__:"
+    if marker in stdout:
+        response_text, status_text = stdout.rsplit(marker, 1)
+        try:
+            status_code = int(status_text.strip())
+        except ValueError:
+            status_code = None
+
+    parsed = try_parse_json(response_text)
+
+    return {
+        "transport": "curl",
+        "endpoint": label,
+        "request": {
+            "url": request_url,
+            "headers": {
+                "accept": "application/json",
+            },
+            "params": params,
+            "command_preview": (
+                "curl --location '" + request_url + "' "
+                "--header 'accept: application/json'"
             ),
         },
         "status_code": status_code,
@@ -910,6 +1032,375 @@ async def search_leaderboard(
     }
 
 
+def build_community_leaderboard2_params(
+    *,
+    leaderboard_id: int,
+    count: int = 100,
+    start: int = 1,
+    title: str = "athens",
+) -> dict[str, Any]:
+    return {
+        "title": title,
+        "count": int(count),
+        "start": int(start),
+        "leaderboard_id": int(leaderboard_id),
+    }
+
+
+def normalize_community_leaderboard_row(
+    member: dict[str, Any],
+    stats_row: dict[str, Any],
+) -> dict[str, Any]:
+    wins = to_int_or_none(stats_row.get("wins"))
+    losses = to_int_or_none(stats_row.get("losses"))
+    games = None
+    if wins is not None or losses is not None:
+        games = int(wins or 0) + int(losses or 0)
+
+    win_rate = None
+    if games and games > 0:
+        win_rate = round((int(wins or 0) / games) * 100, 1)
+
+    profile_name = str(member.get("name") or "").strip()
+    platform = "unknown"
+    platform_id = ""
+    if profile_name.startswith("/steam/"):
+        platform = "steam"
+        platform_id = profile_name.removeprefix("/steam/")
+    elif profile_name.startswith("/xboxlive/"):
+        platform = "xbox"
+        platform_id = profile_name.removeprefix("/xboxlive/")
+
+    return {
+        "name": clean_leaderboard_name(member.get("alias")),
+        "raw_name": member.get("alias"),
+        "profile_id": to_int_or_none(member.get("profile_id")),
+        "rl_user_id": to_int_or_none(member.get("profile_id")),
+        "user_id": None,
+        "rank": to_int_or_none(stats_row.get("rank")),
+        "rank_total": to_int_or_none(stats_row.get("ranktotal")),
+        "rating": to_int_or_none(stats_row.get("rating")),
+        "elo": to_int_or_none(stats_row.get("rating")),
+        "elo_rating": None,
+        "highest_rating": to_int_or_none(stats_row.get("highestrating")),
+        "wins": wins,
+        "losses": losses,
+        "games": games,
+        "win_rate": win_rate,
+        "streak": to_int_or_none(stats_row.get("streak")),
+        "country": member.get("country"),
+        "region": to_int_or_none(member.get("leaderboardregion_id")),
+        "avatar_url": "",
+        "confidence": "page",
+        "platform": platform,
+        "platform_id": platform_id,
+        "clan": member.get("clanlist_name") or "",
+        "raw_keys": sorted({*member.keys(), *stats_row.keys()}),
+        "raw": {
+            "member": member,
+            "leaderboard_stats": stats_row,
+        },
+    }
+
+
+def build_personal_stat_params(
+    *,
+    profile_ids: list[int | str] | None = None,
+    profile_names: list[str] | None = None,
+    aliases: list[str] | None = None,
+    title: str = "athens",
+) -> dict[str, Any]:
+    params: dict[str, Any] = {
+        "title": title,
+    }
+
+    if profile_ids:
+        params["profile_ids"] = json.dumps([str(value) for value in profile_ids if value not in (None, "")])
+
+    if profile_names:
+        params["profile_names"] = json.dumps([str(value) for value in profile_names if value not in (None, "")])
+
+    if aliases:
+        params["aliases"] = json.dumps([str(value) for value in aliases if value not in (None, "")])
+
+    return params
+
+
+def normalize_personal_stat_record(
+    member: dict[str, Any],
+    stats_row: dict[str, Any],
+    *,
+    requested_match_type: int | None = None,
+) -> dict[str, Any]:
+    wins = to_int_or_none(stats_row.get("wins"))
+    losses = to_int_or_none(stats_row.get("losses"))
+    games = None
+    if wins is not None or losses is not None:
+        games = int(wins or 0) + int(losses or 0)
+
+    win_rate = None
+    if games and games > 0:
+        win_rate = round((int(wins or 0) / games) * 100, 1)
+
+    profile_name = str(member.get("name") or "").strip()
+    platform = "unknown"
+    platform_id = ""
+    if profile_name.startswith("/steam/"):
+        platform = "steam"
+        platform_id = profile_name.removeprefix("/steam/")
+    elif profile_name.startswith("/xbox/"):
+        platform = "xbox"
+        platform_id = profile_name.removeprefix("/xbox/")
+    elif profile_name.startswith("/xboxlive/"):
+        platform = "xbox"
+        platform_id = profile_name.removeprefix("/xboxlive/")
+
+    queue_id = to_int_or_none(stats_row.get("leaderboard_id"))
+    if queue_id is None:
+        queue_id = requested_match_type
+
+    return {
+        "source": "personal_stat",
+        "name": clean_leaderboard_name(member.get("alias")),
+        "raw_name": member.get("alias"),
+        "profile_id": to_int_or_none(member.get("profile_id")),
+        "rl_user_id": to_int_or_none(member.get("profile_id")),
+        "queue_id": queue_id,
+        "queue_label": get_queue_label(queue_id),
+        "leaderboard_id": queue_id,
+        "match_type": queue_id,
+        "match_type_label": get_queue_label(queue_id),
+        "rating": to_int_or_none(stats_row.get("rating")),
+        "elo": to_int_or_none(stats_row.get("rating")),
+        "highest_rating": to_int_or_none(stats_row.get("highestrating")),
+        "rank": to_int_or_none(stats_row.get("rank")),
+        "rank_total": to_int_or_none(stats_row.get("ranktotal")),
+        "wins": wins,
+        "losses": losses,
+        "games": games,
+        "win_rate": win_rate,
+        "streak": to_int_or_none(stats_row.get("streak")),
+        "avatar_url": "",
+        "country": member.get("country"),
+        "region": to_int_or_none(member.get("leaderboardregion_id")),
+        "platform": platform,
+        "platform_id": platform_id,
+        "clan": member.get("clanlist_name") or "",
+        "confidence": "id",
+        "raw_keys": sorted({*member.keys(), *stats_row.keys()}),
+        "raw": {
+            "member": member,
+            "leaderboard_stats": stats_row,
+        },
+    }
+
+
+async def fetch_personal_stat_raw(
+    *,
+    profile_id: int | None = None,
+    profile_names: list[str] | None = None,
+    aliases: list[str] | None = None,
+    refresh: bool = False,
+    title: str = "athens",
+) -> dict[str, Any]:
+    params = build_personal_stat_params(
+        profile_ids=[profile_id] if profile_id is not None else None,
+        profile_names=profile_names,
+        aliases=aliases,
+        title=title,
+    )
+    cache_key = (
+        "personal_stat",
+        str(profile_id or ""),
+        tuple(str(value) for value in (profile_names or [])),
+        tuple(str(value) for value in (aliases or [])),
+        str(title).casefold(),
+    )
+    now = time.time()
+
+    cached = _leaderboard_cache.get(cache_key)
+    if (
+        not refresh
+        and cached is not None
+        and now - float(cached.get("created_at", 0)) < LEADERBOARD_CACHE_SECONDS
+    ):
+        payload = dict(cached["payload"])
+        payload["cached"] = True
+        payload["cache_age_seconds"] = round(now - float(cached["created_at"]), 2)
+        return payload
+
+    result = get_json_with_curl(
+        url=PERSONAL_STAT_URL,
+        params=params,
+        label="personal_stat",
+        timeout_seconds=30,
+    )
+    result["cached"] = False
+    result["cache_age_seconds"] = 0
+
+    _leaderboard_cache[cache_key] = {
+        "created_at": now,
+        "payload": result,
+    }
+    return result
+
+
+async def fetch_personal_stat_summary(
+    *,
+    profile_id: int | None = None,
+    player: str = "",
+    profile_names: list[str] | None = None,
+    aliases: list[str] | None = None,
+    requested_match_type: int | None = None,
+    refresh: bool = False,
+) -> dict[str, Any]:
+    raw_response = await fetch_personal_stat_raw(
+        profile_id=profile_id,
+        profile_names=profile_names,
+        aliases=aliases,
+        refresh=refresh,
+    )
+    payload = raw_response.get("raw") if isinstance(raw_response.get("raw"), dict) else {}
+    stat_groups = payload.get("statGroups") if isinstance(payload, dict) else []
+    leaderboard_stats = payload.get("leaderboardStats") if isinstance(payload, dict) else []
+
+    members_by_statgroup_id: dict[int, dict[str, Any]] = {}
+    for group in stat_groups if isinstance(stat_groups, list) else []:
+        if not isinstance(group, dict):
+            continue
+        group_id = to_int_or_none(group.get("id"))
+        members = group.get("members")
+        if group_id is None or not isinstance(members, list) or not members:
+            continue
+        first_member = members[0]
+        if isinstance(first_member, dict):
+            members_by_statgroup_id[group_id] = first_member
+
+    ratings: list[dict[str, Any]] = []
+    for row in leaderboard_stats if isinstance(leaderboard_stats, list) else []:
+        if not isinstance(row, dict):
+            continue
+        statgroup_id = to_int_or_none(row.get("statgroup_id"))
+        member = members_by_statgroup_id.get(statgroup_id)
+        if not member:
+            continue
+        ratings.append(
+            normalize_personal_stat_record(
+                member,
+                row,
+                requested_match_type=requested_match_type,
+            )
+        )
+
+    ratings.sort(
+        key=lambda item: (
+            0 if requested_match_type is not None and item.get("queue_id") == requested_match_type else 1,
+            item.get("queue_id") if item.get("queue_id") is not None else 999999999,
+        )
+    )
+
+    display_name = ratings[0].get("name") if ratings else clean_leaderboard_name(player)
+
+    return {
+        "ok": bool(raw_response.get("ok")),
+        "source": "personal_stat",
+        "profile_id": profile_id or (ratings[0].get("profile_id") if ratings else None),
+        "player": player,
+        "display_name": display_name,
+        "avatar_url": "",
+        "ratings": ratings,
+        "request": raw_response.get("request"),
+        "status_code": raw_response.get("status_code"),
+        "cached": raw_response.get("cached"),
+        "shape": raw_response.get("shape"),
+        "raw": payload,
+    }
+
+
+async def fetch_community_leaderboard2(
+    *,
+    leaderboard_id: int,
+    page: int = 1,
+    count: int = 100,
+    title: str = "athens",
+    refresh: bool = False,
+) -> dict[str, Any]:
+    start = ((max(1, int(page)) - 1) * int(count)) + 1
+    params = build_community_leaderboard2_params(
+        leaderboard_id=leaderboard_id,
+        count=count,
+        start=start,
+        title=title,
+    )
+
+    cache_key = ("community_leaderboard2", int(leaderboard_id), int(page), int(count), str(title).casefold())
+    now = time.time()
+
+    cached = _leaderboard_cache.get(cache_key)
+    if (
+        not refresh
+        and cached is not None
+        and now - float(cached.get("created_at", 0)) < LEADERBOARD_CACHE_SECONDS
+    ):
+        payload = dict(cached["payload"])
+        payload["cached"] = True
+        payload["cache_age_seconds"] = round(now - float(cached["created_at"]), 2)
+        return payload
+
+    raw_response = get_json_with_curl(
+        url=COMMUNITY_LEADERBOARD2_URL,
+        params=params,
+        label="community_leaderboard2",
+        timeout_seconds=30,
+    )
+
+    payload = raw_response.get("raw") if isinstance(raw_response.get("raw"), dict) else {}
+    stat_groups = payload.get("statGroups") if isinstance(payload, dict) else []
+    leaderboard_stats = payload.get("leaderboardStats") if isinstance(payload, dict) else []
+
+    members_by_statgroup_id: dict[int, dict[str, Any]] = {}
+    for group in stat_groups if isinstance(stat_groups, list) else []:
+        if not isinstance(group, dict):
+            continue
+        group_id = to_int_or_none(group.get("id"))
+        members = group.get("members")
+        if group_id is None or not isinstance(members, list) or not members:
+            continue
+        first_member = members[0]
+        if isinstance(first_member, dict):
+            members_by_statgroup_id[group_id] = first_member
+
+    normalized_matches: list[dict[str, Any]] = []
+    for row in leaderboard_stats if isinstance(leaderboard_stats, list) else []:
+        if not isinstance(row, dict):
+            continue
+        statgroup_id = to_int_or_none(row.get("statgroup_id"))
+        member = members_by_statgroup_id.get(statgroup_id)
+        if not member:
+            continue
+        normalized_matches.append(normalize_community_leaderboard_row(member, row))
+
+    result = {
+        "request": raw_response.get("request"),
+        "transport": raw_response.get("transport"),
+        "status_code": raw_response.get("status_code"),
+        "ok": bool(raw_response.get("ok")),
+        "cached": False,
+        "shape": raw_response.get("shape"),
+        "rank_total": to_int_or_none(payload.get("rankTotal")) if isinstance(payload, dict) else None,
+        "match_count": len(normalized_matches),
+        "matches": normalized_matches,
+        "raw": payload,
+    }
+
+    _leaderboard_cache[cache_key] = {
+        "created_at": now,
+        "payload": result,
+    }
+
+    return result
+
+
 def build_full_stats_body(
     *,
     profile_id: int | str,
@@ -917,7 +1408,7 @@ def build_full_stats_body(
     match_types: list[int] | None = None,
 ) -> dict[str, Any]:
     if match_types is None:
-        match_types = [1, 2, 3, 4]
+        match_types = get_ranked_match_type_ids()
 
     return {
         "profileId": str(profile_id),
@@ -959,19 +1450,40 @@ def collect_stat_records(value: Any) -> list[dict[str, Any]]:
     return records
 
 
-def get_record_match_type(record: dict[str, Any]) -> int | None:
-    value = get_first_value(
+def get_record_match_type(
+    record: dict[str, Any],
+    *,
+    requested_match_type: int | None = None,
+) -> int | None:
+    direct_match_type = get_first_value(
         record,
         [
             "matchType",
+            "matchtype",
             "match_type",
             "matchTypeId",
+            "matchTypeID",
+            "matchtype_id",
             "match_type_id",
-            "leaderboardId",
-            "leaderboard_id",
         ],
     )
-    return to_int_or_none(value)
+    normalized_direct_match_type = to_int_or_none(direct_match_type)
+    if normalized_direct_match_type is not None:
+        return normalized_direct_match_type
+
+    leaderboard_id = to_int_or_none(
+        get_first_value(record, ["leaderboardId", "leaderboard_id"]))
+    if leaderboard_id is None:
+        return requested_match_type
+
+    leaderboard_match_types = get_match_type_ids_for_leaderboard(leaderboard_id)
+    if requested_match_type is not None and requested_match_type in leaderboard_match_types:
+        return requested_match_type
+
+    if leaderboard_match_types:
+        return leaderboard_match_types[0]
+
+    return requested_match_type
 
 
 def normalize_full_stats_record(
@@ -1034,7 +1546,12 @@ def normalize_full_stats_record(
     if win_rate_float is None and games_int and games_int > 0:
         win_rate_float = round((int(wins_int or 0) / games_int) * 100, 1)
 
-    match_type = get_record_match_type(record) or requested_match_type
+    match_type = get_record_match_type(
+        record,
+        requested_match_type=requested_match_type,
+    )
+    if match_type is None:
+        match_type = requested_match_type
 
     return {
         "source": "full_stats",
@@ -1059,16 +1576,6 @@ def normalize_full_stats_record(
         "raw_keys": sorted(record.keys()),
         "raw": record,
     }
-
-
-def get_match_type_label(match_type: int | None) -> str:
-    labels = {
-        1: "1v1 Supremacy",
-        2: "Team Supremacy",
-        3: "Deathmatch",
-        4: "Team Deathmatch",
-    }
-    return labels.get(int(match_type), f"Match Type {match_type}") if match_type is not None else "Unknown"
 
 
 def pick_best_full_stats_record(
@@ -1112,7 +1619,7 @@ async def fetch_full_stats_raw(
     body = build_full_stats_body(
         profile_id=profile_id,
         gamertag=player or "unknown user",
-        match_types=match_types or [1, 2, 3, 4],
+        match_types=match_types or get_ranked_match_type_ids(),
     )
     cache_key = ("full_stats", int(profile_id), str(
         player or "").casefold(), tuple(body["matchType"]), force_transport)
@@ -1156,39 +1663,69 @@ async def fetch_player_rating(
     refresh: bool = False,
     force_transport: str = "curl",
 ) -> dict[str, Any]:
-    full_stats_response: dict[str, Any] | None = None
-    full_stats_records: list[dict[str, Any]] = []
-    full_stats_best: dict[str, Any] | None = None
+    resolved_profile_id = profile_id
+    resolved_player = player
 
-    if profile_id is not None:
-        full_stats_response = await fetch_full_stats_raw(
-            profile_id=profile_id,
-            player=player or "unknown user",
-            match_types=[1, 2, 3, 4],
+    if resolved_profile_id is None and player and not str(player).startswith("/"):
+        leaderboard_search = await search_leaderboard(
+            player=player,
+            match_type=match_type,
             refresh=refresh,
             force_transport=force_transport,
         )
-        full_stats_records = collect_stat_records(
-            full_stats_response.get("raw"))
-        full_stats_best = pick_best_full_stats_record(
-            full_stats_records,
-            profile_id=profile_id,
-            player=player,
-            requested_match_type=match_type,
+        leaderboard_matches = leaderboard_search.get("matches", []) if isinstance(leaderboard_search, dict) else []
+        exact_match = next(
+            (
+                item for item in leaderboard_matches
+                if clean_leaderboard_name(item.get("name")).casefold() == clean_leaderboard_name(player).casefold()
+            ),
+            None,
         )
+        if exact_match:
+            resolved_profile_id = exact_match.get("profile_id") or resolved_profile_id
+            resolved_player = exact_match.get("name") or resolved_player
 
-    if full_stats_best and full_stats_best.get("rating") is not None:
+    profile_names = []
+    if resolved_player and str(resolved_player).startswith("/"):
+        profile_names.append(str(resolved_player))
+
+    aliases = [resolved_player] if resolved_player and not str(resolved_player).startswith("/") else []
+    personal_stat_response = await fetch_personal_stat_summary(
+        profile_id=resolved_profile_id,
+        player=resolved_player,
+        profile_names=profile_names,
+        aliases=aliases,
+        requested_match_type=match_type,
+        refresh=refresh,
+    )
+    personal_stat_ratings = personal_stat_response.get("ratings", []) if isinstance(personal_stat_response, dict) else []
+    personal_stat_best = next(
+        (
+            item for item in personal_stat_ratings
+            if item.get("queue_id") == match_type and item.get("rating") is not None
+        ),
+        None,
+    )
+
+    if personal_stat_best and personal_stat_best.get("rating") is not None:
         return {
             "ok": True,
-            "source": "full_stats",
-            "profile_id": profile_id,
-            "player": player,
+            "source": "personal_stat",
+            "data_source": build_source_meta(
+                endpoint="community/leaderboard/GetPersonalStat",
+                queue_id=match_type,
+                cached=personal_stat_response.get("cached"),
+                status_code=personal_stat_response.get("status_code"),
+                source="personal_stat",
+            ),
+            "profile_id": personal_stat_response.get("profile_id") or resolved_profile_id,
+            "player": resolved_player,
             "requested_match_type": match_type,
-            "requested_match_type_label": get_match_type_label(match_type),
-            "rating": full_stats_best,
-            "ratings": [full_stats_best],
-            "full_stats_status_code": full_stats_response.get("status_code") if full_stats_response else None,
-            "full_stats_shape": full_stats_response.get("shape") if full_stats_response else None,
+            "requested_match_type_label": get_queue_label(match_type),
+            "rating": personal_stat_best,
+            "ratings": personal_stat_ratings,
+            "personal_stat_status_code": personal_stat_response.get("status_code"),
+            "personal_stat_shape": personal_stat_response.get("shape"),
             "leaderboard_fallback_used": False,
         }
 
@@ -1197,7 +1734,7 @@ async def fetch_player_rating(
 
     if player:
         leaderboard_response = await search_leaderboard(
-            player=player,
+            player=resolved_player,
             match_type=match_type,
             refresh=refresh,
             force_transport=force_transport,
@@ -1212,64 +1749,85 @@ async def fetch_player_rating(
     if id_matches:
         best = id_matches[0]
         best = {**best, "source": "leaderboard", "match_type": match_type,
-                "match_type_label": get_match_type_label(match_type), "confidence": "id"}
+                "match_type_label": get_queue_label(match_type), "confidence": "id"}
         return {
             "ok": True,
             "source": "leaderboard",
-            "profile_id": profile_id,
-            "player": player,
+            "data_source": build_source_meta(
+                endpoint="api/agemyth/Leaderboard",
+                queue_id=match_type,
+                cached=leaderboard_response.get("cached") if leaderboard_response else None,
+                status_code=leaderboard_response.get("status_code") if leaderboard_response else None,
+                source="leaderboard",
+            ),
+            "profile_id": resolved_profile_id,
+            "player": resolved_player,
             "requested_match_type": match_type,
-            "requested_match_type_label": get_match_type_label(match_type),
+            "requested_match_type_label": get_queue_label(match_type),
             "rating": best,
             "ratings": [best],
-            "full_stats_status_code": full_stats_response.get("status_code") if full_stats_response else None,
-            "full_stats_shape": full_stats_response.get("shape") if full_stats_response else None,
+            "personal_stat_status_code": personal_stat_response.get("status_code") if personal_stat_response else None,
+            "personal_stat_shape": personal_stat_response.get("shape") if personal_stat_response else None,
             "leaderboard_fallback_used": True,
             "leaderboard_match_count": len(leaderboard_matches),
         }
 
     exact_name_matches = [
         match for match in leaderboard_matches
-        if clean_leaderboard_name(match.get("name")).casefold() == clean_leaderboard_name(player).casefold()
+        if clean_leaderboard_name(match.get("name")).casefold() == clean_leaderboard_name(resolved_player).casefold()
     ]
 
-    if profile_id is None and len(exact_name_matches) == 1:
+    if resolved_profile_id is None and len(exact_name_matches) == 1:
         best = {**exact_name_matches[0], "source": "leaderboard", "match_type": match_type,
-                "match_type_label": get_match_type_label(match_type), "confidence": "exact"}
+                "match_type_label": get_queue_label(match_type), "confidence": "exact"}
         return {
             "ok": True,
             "source": "leaderboard",
-            "profile_id": profile_id,
-            "player": player,
+            "data_source": build_source_meta(
+                endpoint="api/agemyth/Leaderboard",
+                queue_id=match_type,
+                cached=leaderboard_response.get("cached") if leaderboard_response else None,
+                status_code=leaderboard_response.get("status_code") if leaderboard_response else None,
+                source="leaderboard",
+            ),
+            "profile_id": resolved_profile_id,
+            "player": resolved_player,
             "requested_match_type": match_type,
-            "requested_match_type_label": get_match_type_label(match_type),
+            "requested_match_type_label": get_queue_label(match_type),
             "rating": best,
             "ratings": [best],
-            "full_stats_status_code": full_stats_response.get("status_code") if full_stats_response else None,
-            "full_stats_shape": full_stats_response.get("shape") if full_stats_response else None,
+            "personal_stat_status_code": personal_stat_response.get("status_code") if personal_stat_response else None,
+            "personal_stat_shape": personal_stat_response.get("shape") if personal_stat_response else None,
             "leaderboard_fallback_used": True,
             "leaderboard_match_count": len(leaderboard_matches),
         }
 
-    reason = "No rating returned by FullStats and no authoritative leaderboard ID match."
-    if full_stats_response is not None and not full_stats_response.get("ok"):
-        reason = "FullStats request failed and no authoritative leaderboard ID match was found."
-    elif profile_id is not None and full_stats_response is not None:
-        reason = f"FullStats returned {len(full_stats_records)} candidate record(s), but none contained a usable rating for profile_id {profile_id}."
+    reason = "No rating returned by GetPersonalStat and no authoritative leaderboard ID match."
+    if personal_stat_response is not None and not personal_stat_response.get("ok"):
+        reason = "GetPersonalStat request failed and no authoritative leaderboard ID match was found."
+    elif profile_id is not None and personal_stat_response is not None:
+        reason = f"GetPersonalStat returned {len(personal_stat_ratings)} candidate record(s), but none contained a usable rating for profile_id {profile_id}."
 
     return {
         "ok": False,
         "source": None,
-        "profile_id": profile_id,
-        "player": player,
+        "data_source": build_source_meta(
+            endpoint="community/leaderboard/GetPersonalStat",
+            queue_id=match_type,
+            cached=personal_stat_response.get("cached") if personal_stat_response else None,
+            status_code=personal_stat_response.get("status_code") if personal_stat_response else None,
+            source="personal_stat",
+        ),
+        "profile_id": resolved_profile_id,
+        "player": resolved_player,
         "requested_match_type": match_type,
-        "requested_match_type_label": get_match_type_label(match_type),
+        "requested_match_type_label": get_queue_label(match_type),
         "rating": None,
         "ratings": [],
         "reason": reason,
-        "full_stats_status_code": full_stats_response.get("status_code") if full_stats_response else None,
-        "full_stats_shape": full_stats_response.get("shape") if full_stats_response else None,
-        "full_stats_record_count": len(full_stats_records),
+        "personal_stat_status_code": personal_stat_response.get("status_code") if personal_stat_response else None,
+        "personal_stat_shape": personal_stat_response.get("shape") if personal_stat_response else None,
+        "personal_stat_record_count": len(personal_stat_ratings),
         "leaderboard_fallback_used": leaderboard_response is not None,
         "leaderboard_match_count": len(leaderboard_matches),
     }
@@ -1337,18 +1895,27 @@ def normalize_match_result(value: Any) -> str | None:
     return text
 
 
-def normalize_match_list_record(row: dict[str, Any]) -> dict[str, Any]:
+def normalize_match_list_record(
+    row: dict[str, Any],
+    *,
+    requested_match_type: int | None = None,
+) -> dict[str, Any]:
     match_id = get_nested_first_value(
         row, ["matchId", "match_id", "id", "gameId", "game_id"])
     date_time = get_nested_first_value(
         row, ["dateTime", "date_time", "started", "startTime", "start_time", "matchDate"])
     map_name = get_nested_first_value(
         row, ["map", "mapName", "map_name", "location", "scenario", "mapNameResolved", "scenarioName"])
+    decoded_map_name = get_nested_first_value(
+        row, ["mGameMapName", "gameMapName", "mapNameDecoded", "decodedMapName", "mGameFilename"])
     duration = get_nested_first_value(
         row, ["duration", "durationSeconds", "duration_seconds", "gameDuration"])
     result = get_nested_first_value(
         row, ["result", "outcome", "playerResult", "winner", "won", "isWinner", "victory"])
-    match_type = get_record_match_type(row)
+    match_type = get_record_match_type(
+        row,
+        requested_match_type=requested_match_type,
+    )
     rating_change = get_nested_first_value(
         row, ["eloChange", "elo_change", "ratingChange", "rating_change"])
     rating = get_nested_first_value(
@@ -1357,13 +1924,293 @@ def normalize_match_list_record(row: dict[str, Any]) -> dict[str, Any]:
     return {
         "match_id": str(match_id) if match_id is not None else None,
         "date_time": date_time,
-        "map": map_name,
+        "map": format_map_name(str(map_name) if map_name is not None else None, str(decoded_map_name) if decoded_map_name is not None else None),
         "duration": duration,
         "result": normalize_match_result(result),
         "match_type": match_type,
         "match_type_label": get_match_type_label(match_type),
         "rating": to_int_or_none(rating),
         "rating_change": to_int_or_none(rating_change),
+        "raw_keys": sorted(row.keys()),
+        "raw": row,
+    }
+
+
+def build_recent_match_history_params(
+    *,
+    profile_ids: list[int | str] | None = None,
+    profile_names: list[str] | None = None,
+) -> dict[str, Any]:
+    params: dict[str, Any] = {
+        "title": "athens",
+    }
+
+    if profile_ids:
+        params["profile_ids"] = json.dumps([str(value) for value in profile_ids if value not in (None, "")])
+
+    if profile_names:
+        params["profile_names"] = json.dumps([str(value) for value in profile_names if value not in (None, "")])
+
+    return params
+
+
+def build_recent_match_history_profile_lookup(raw_payload: Any) -> dict[int, dict[str, Any]]:
+    if not isinstance(raw_payload, dict):
+        return {}
+
+    profiles = raw_payload.get("profiles")
+    if not isinstance(profiles, list):
+        return {}
+
+    lookup: dict[int, dict[str, Any]] = {}
+
+    for item in profiles:
+        if not isinstance(item, dict):
+            continue
+
+        profile_id = to_int_or_none(item.get("profile_id") or item.get("profileId"))
+        if profile_id is None:
+            continue
+
+        lookup[profile_id] = item
+
+    return lookup
+
+
+def decode_base64_compressed_text(value: Any) -> dict[str, Any]:
+    text = str(value or "").strip()
+    if not text:
+        return {"decoded": False, "text": ""}
+
+    try:
+        compressed = base64.b64decode(text)
+    except Exception as error:
+        return {"decoded": False, "text": "", "error": str(error)}
+
+    last_error: Exception | None = None
+    for compression, decoder in (("gzip", gzip.decompress), ("zlib", zlib.decompress)):
+        try:
+            decoded = decoder(compressed)
+            return {
+                "decoded": True,
+                "compression": compression,
+                "byte_length": len(decoded),
+                "text": decoded.decode("utf-8", errors="replace").rstrip("\x00"),
+            }
+        except Exception as error:
+            last_error = error
+
+    return {"decoded": False, "text": "", "error": str(last_error) if last_error else "Unable to decompress payload."}
+
+
+def decoded_payload_meta(decoded: dict[str, Any]) -> dict[str, Any]:
+    return {key: value for key, value in decoded.items() if key != "text"}
+
+
+def parse_json_payload_text(text: str) -> Any:
+    cleaned = str(text or "").strip().rstrip("\x00")
+    if not cleaned:
+        return None
+
+    try:
+        return json.loads(cleaned)
+    except json.JSONDecodeError:
+        return None
+
+
+def parse_slot_info_text(text: str) -> dict[str, Any] | None:
+    cleaned = str(text or "").strip().rstrip("\x00")
+    if not cleaned:
+        return None
+
+    slot_count = None
+    payload_text = cleaned
+    if "," in cleaned:
+        possible_count, _, possible_payload = cleaned.partition(",")
+        try:
+            slot_count = int(possible_count)
+            payload_text = possible_payload
+        except ValueError:
+            payload_text = cleaned
+
+    parsed = parse_json_payload_text(payload_text)
+    if parsed is None:
+        return None
+
+    return {
+        "slot_count": slot_count,
+        "players": parsed if isinstance(parsed, list) else [],
+        "raw": parsed,
+    }
+
+
+def parse_report_counters(value: Any) -> dict[str, Any]:
+    if isinstance(value, dict):
+        return value
+
+    if not value:
+        return {}
+
+    try:
+        parsed = json.loads(str(value))
+    except json.JSONDecodeError:
+        return {}
+
+    return parsed if isinstance(parsed, dict) else {}
+
+
+def build_match_report_lookup(row: dict[str, Any]) -> dict[int, dict[str, Any]]:
+    reports = row.get("matchhistoryreportresults")
+    if not isinstance(reports, list):
+        return {}
+
+    lookup: dict[int, dict[str, Any]] = {}
+    for report in reports:
+        if not isinstance(report, dict):
+            continue
+
+        profile_id = to_int_or_none(report.get("profile_id"))
+        if profile_id is None:
+            continue
+
+        normalized = dict(report)
+        normalized["counters"] = parse_report_counters(report.get("counters"))
+        lookup[profile_id] = normalized
+
+    return lookup
+
+
+def get_match_type_filter_ids(match_type: int | None) -> list[int]:
+    if match_type is None:
+        return []
+
+    leaderboard_match_types = get_match_type_ids_for_leaderboard(match_type)
+    if leaderboard_match_types:
+        return leaderboard_match_types
+
+    return [int(match_type)]
+
+
+def normalize_recent_match_history_record(
+    row: dict[str, Any],
+    *,
+    profiles_by_id: dict[int, dict[str, Any]] | None = None,
+    requested_profile_id: int | None = None,
+    requested_match_type: int | None = None,
+) -> dict[str, Any]:
+    profiles_by_id = profiles_by_id or {}
+    member_rows = row.get("matchhistorymember") if isinstance(row.get("matchhistorymember"), list) else []
+    report_rows_by_profile_id = build_match_report_lookup(row)
+    decoded_options = decode_base64_compressed_text(row.get("options"))
+    decoded_slot_info = decode_base64_compressed_text(row.get("slotinfo") or row.get("slotInfo"))
+    options_payload = parse_json_payload_text(decoded_options.get("text", ""))
+    slot_info_payload = parse_slot_info_text(decoded_slot_info.get("text", ""))
+    slot_players = slot_info_payload.get("players", []) if isinstance(slot_info_payload, dict) else []
+    slot_players_by_profile_id = {
+        int(profile_id): slot
+        for slot in slot_players
+        if isinstance(slot, dict)
+        for profile_id in [to_int_or_none(slot.get("profileInfo.id") or slot.get("profile_id"))]
+        if profile_id is not None
+    }
+
+    match_id = row.get("id")
+    match_type = get_record_match_type(row, requested_match_type=requested_match_type)
+    start_time = to_int_or_none(row.get("startgametime"))
+    completion_time = to_int_or_none(row.get("completiontime"))
+    duration = None
+    if start_time is not None and completion_time is not None and completion_time >= start_time:
+        duration = completion_time - start_time
+
+    requested_member = None
+    if requested_profile_id is not None:
+        requested_member = next(
+            (
+                member for member in member_rows
+                if to_int_or_none(member.get("profile_id")) == int(requested_profile_id)
+            ),
+            None,
+        )
+
+    requested_report = report_rows_by_profile_id.get(int(requested_profile_id)) if requested_profile_id is not None else None
+    result = normalize_match_result(requested_member.get("outcome")) if requested_member else normalize_match_result(
+        requested_report.get("resulttype") if requested_report else None
+    )
+    rating = to_int_or_none(requested_member.get("newrating")) if requested_member else None
+    old_rating = to_int_or_none(requested_member.get("oldrating")) if requested_member else None
+    rating_change = None
+    if rating is not None and old_rating is not None:
+        rating_change = rating - old_rating
+    requested_counters = requested_report.get("counters", {}) if requested_report else {}
+    ranked_match = requested_counters.get("rankedMatch") if isinstance(requested_counters, dict) else None
+
+    players: list[dict[str, Any]] = []
+    for member in member_rows:
+        profile_id = to_int_or_none(member.get("profile_id"))
+        profile = profiles_by_id.get(profile_id or -1, {})
+        report = report_rows_by_profile_id.get(profile_id or -1, {})
+        counters = report.get("counters", {}) if isinstance(report, dict) else {}
+        slot = slot_players_by_profile_id.get(profile_id or -1, {})
+        player_rating = to_int_or_none(member.get("newrating"))
+        player_old_rating = to_int_or_none(member.get("oldrating"))
+        player_rating_change = None
+        if player_rating is not None and player_old_rating is not None:
+            player_rating_change = player_rating - player_old_rating
+
+        players.append(
+            {
+                "user_id": profile_id,
+                "profile_id": profile_id,
+                "name": clean_leaderboard_name(profile.get("alias") or profile.get("name")),
+                "platform_name": str(profile.get("name") or ""),
+                "avatar_url": "",
+                "team": to_int_or_none(member.get("teamid")),
+                "god": resolve_community_civilization_name(member.get("civilization_id")),
+                "elo": player_rating,
+                "rating_change": player_rating_change,
+                "result": normalize_match_result(member.get("outcome")),
+                "ranked_match": counters.get("rankedMatch") if isinstance(counters, dict) else None,
+                "counters": counters,
+                "country": str(profile.get("country") or ""),
+                "match_replay_available": False,
+                "slot_info": slot,
+                "raw_profile": profile,
+                "raw_member": member,
+                "raw_report": report,
+            }
+        )
+
+    if start_time is not None:
+        date_time = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(start_time))
+    else:
+        date_time = None
+
+    raw_map_name = row.get("mapname") or ""
+    decoded_map_name = ""
+    if not raw_map_name and isinstance(options_payload, dict):
+        decoded_map_name = str(options_payload.get("mGameMapName") or options_payload.get("mGameFilename") or "")
+    map_name = format_map_name(str(raw_map_name) if raw_map_name else None, decoded_map_name or None)
+
+    return {
+        "match_id": str(match_id) if match_id is not None else None,
+        "date_time": date_time,
+        "sort_timestamp": float(completion_time or start_time or 0),
+        "map": map_name,
+        "duration": duration,
+        "result": result,
+        "match_type": match_type,
+        "match_type_label": get_match_type_label(match_type),
+        "rating": rating,
+        "rating_change": rating_change,
+        "civilization": resolve_community_civilization_name(requested_member.get("civilization_id")) if requested_member else "",
+        "ranked_match": ranked_match,
+        "options": options_payload if isinstance(options_payload, dict) else {},
+        "slot_info": slot_info_payload or {},
+        "decoded_payloads": {
+            "options": decoded_payload_meta(decoded_options),
+            "slotinfo": decoded_payload_meta(decoded_slot_info),
+        },
+        "players": players,
         "raw_keys": sorted(row.keys()),
         "raw": row,
     }
@@ -1460,6 +2307,126 @@ async def fetch_match_list_raw(
     return result
 
 
+async def fetch_recent_match_history_raw(
+    *,
+    profile_ids: list[int | str] | None = None,
+    profile_names: list[str] | None = None,
+    count: int = 10,
+    start: int = 1,
+    refresh: bool = False,
+) -> dict[str, Any]:
+    params = build_recent_match_history_params(
+        profile_ids=profile_ids,
+        profile_names=profile_names,
+    )
+    cache_key = (
+        "community_recent_match_history",
+        tuple(str(value) for value in (profile_ids or [])),
+        tuple(str(value) for value in (profile_names or [])),
+        int(count),
+        int(start),
+    )
+    now = time.time()
+
+    cached = _leaderboard_cache.get(cache_key)
+    if (
+        not refresh
+        and cached is not None
+        and now - float(cached.get("created_at", 0)) < LEADERBOARD_CACHE_SECONDS
+    ):
+        payload = dict(cached["payload"])
+        payload["cached"] = True
+        payload["cache_age_seconds"] = round(now - float(cached["created_at"]), 2)
+        return payload
+
+    result = get_json_with_curl(
+        url=COMMUNITY_RECENT_MATCH_HISTORY_URL,
+        params=params,
+        label="community_recent_match_history",
+        timeout_seconds=30,
+    )
+    result["cached"] = False
+    result["cache_age_seconds"] = 0
+
+    _leaderboard_cache[cache_key] = {
+        "created_at": now,
+        "payload": result,
+    }
+    return result
+
+
+async def fetch_recent_match_history(
+    *,
+    profile_ids: list[int | str] | None = None,
+    profile_names: list[str] | None = None,
+    requested_profile_id: int | None = None,
+    match_type: int | None = None,
+    count: int = 10,
+    start: int = 1,
+    refresh: bool = False,
+) -> dict[str, Any]:
+    raw_response = await fetch_recent_match_history_raw(
+        profile_ids=profile_ids,
+        profile_names=profile_names,
+        count=count,
+        start=start,
+        refresh=refresh,
+    )
+    raw_payload = raw_response.get("raw")
+    profiles_by_id = build_recent_match_history_profile_lookup(raw_payload)
+    raw_records = []
+
+    if isinstance(raw_payload, dict) and isinstance(raw_payload.get("matchHistoryStats"), list):
+        raw_records = [item for item in raw_payload.get("matchHistoryStats", []) if isinstance(item, dict)]
+
+    matches = [
+        normalize_recent_match_history_record(
+            record,
+            profiles_by_id=profiles_by_id,
+            requested_profile_id=requested_profile_id,
+            requested_match_type=match_type,
+        )
+        for record in raw_records
+    ]
+
+    if match_type is not None:
+        allowed_match_types = set(get_match_type_filter_ids(match_type))
+        matches = [
+            match
+            for match in matches
+            if int(match.get("match_type") or -1) in allowed_match_types
+        ]
+
+    matches.sort(key=lambda item: item.get("sort_timestamp") or 0, reverse=True)
+    start_index = max(0, int(start) - 1)
+    end_index = start_index + max(1, int(count))
+
+    return {
+        "ok": bool(raw_response.get("ok")),
+        "source": "community_recent_match_history",
+        "data_source": build_source_meta(
+            endpoint="community/leaderboard/getRecentMatchHistory",
+            queue_id=match_type,
+            expanded_match_type_ids=get_match_type_filter_ids(match_type),
+            cached=raw_response.get("cached"),
+            status_code=raw_response.get("status_code"),
+            source="community_recent_match_history",
+        ),
+        "profile_ids": profile_ids or [],
+        "profile_names": profile_names or [],
+        "requested_profile_id": requested_profile_id,
+        "match_type": match_type,
+        "match_type_label": get_queue_label(match_type),
+        "match_type_filter_ids": get_match_type_filter_ids(match_type),
+        "status_code": raw_response.get("status_code"),
+        "cached": raw_response.get("cached"),
+        "shape": raw_response.get("shape"),
+        "match_count": len(matches),
+        "matches": matches[start_index:end_index],
+        "profiles_by_id": profiles_by_id,
+    }
+
+
 async def fetch_player_match_list(
     *,
     profile_id: int,
@@ -1470,6 +2437,27 @@ async def fetch_player_match_list(
     refresh: bool = False,
     force_transport: str = "curl",
 ) -> dict[str, Any]:
+    recent_profile_names = [player] if player and str(player).startswith("/") else None
+    recent_history = await fetch_recent_match_history(
+        profile_ids=[profile_id],
+        profile_names=recent_profile_names,
+        requested_profile_id=profile_id,
+        match_type=match_type,
+        count=record_count,
+        start=((max(1, int(page)) - 1) * int(record_count)) + 1,
+        refresh=refresh,
+    )
+    if recent_history.get("ok") and recent_history.get("matches"):
+        return {
+            **recent_history,
+            "profile_id": profile_id,
+            "player": player,
+            "match_type": match_type,
+            "match_type_label": get_queue_label(match_type),
+            "cached": recent_history.get("cached"),
+            "matches": recent_history.get("matches", []),
+        }
+
     raw_response = await fetch_match_list_raw(
         profile_id=profile_id,
         player=player,
@@ -1480,14 +2468,29 @@ async def fetch_player_match_list(
         force_transport=force_transport,
     )
     raw_records = collect_match_list_records(raw_response.get("raw"))
-    matches = [normalize_match_list_record(record) for record in raw_records]
+    matches = [
+        normalize_match_list_record(
+            record,
+            requested_match_type=match_type,
+        )
+        for record in raw_records
+    ]
 
     return {
         "ok": bool(raw_response.get("ok")),
+        "source": "match_list",
+        "data_source": build_source_meta(
+            endpoint="api/GameStats/AgeMyth/GetMatchList",
+            queue_id=match_type,
+            expanded_match_type_ids=[match_type],
+            cached=raw_response.get("cached"),
+            status_code=raw_response.get("status_code"),
+            source="match_list",
+        ),
         "profile_id": profile_id,
         "player": player,
         "match_type": match_type,
-        "match_type_label": get_match_type_label(match_type),
+        "match_type_label": get_queue_label(match_type),
         "status_code": raw_response.get("status_code"),
         "cached": raw_response.get("cached"),
         "shape": raw_response.get("shape"),
@@ -1632,7 +2635,26 @@ def collect_match_players(raw_detail: Any) -> list[dict[str, Any]]:
                 ),
                 "avatar_url": get_first_value(player, ["avatarUrl", "avatar_url"]),
                 "team": to_int_or_none(get_first_value(player, ["team", "teamId", "team_id"])),
-                "god": get_first_value(player, ["civName", "civilization", "civilizationName", "civ", "civName"]),
+                "god": resolve_legacy_race_name(
+                    get_first_value(
+                        player,
+                        [
+                            "civName",
+                            "civilization",
+                            "civilizationName",
+                            "civ",
+                            "race",
+                            "raceId",
+                            "race_id",
+                            "majorGod",
+                            "major_god",
+                        ],
+                    )
+                ),
+                "elo": to_int_or_none(get_first_value(player, ["elo", "rating", "playerElo", "player_rating"])),
+                "rating_change": to_int_or_none(
+                    get_first_value(player, ["eloChange", "elo_change", "ratingChange", "rating_change"])
+                ),
                 "result": normalize_match_result(
                     get_first_value(
                         player, ["winLoss", "result", "outcome", "playerResult", "won", "isWinner"])
@@ -1689,6 +2711,7 @@ def normalize_match_detail_for_player(
     raw_detail: Any,
     profile_id: int,
     match_id: str | int,
+    requested_match_type: int | None = None,
 ) -> dict[str, Any]:
     summary = get_match_summary(raw_detail)
     players = collect_match_players(raw_detail)
@@ -1702,10 +2725,14 @@ def normalize_match_detail_for_player(
         None,
     )
 
-    map_name = (
+    raw_map_name = (
         get_first_value(summary, [
                         "mapType", "mapName", "map_name", "map", "scenario", "scenarioName", "location"])
         or first_deep_value(raw_detail, ["mapType", "mapName", "map_name", "map", "scenario", "scenarioName", "location"])
+    )
+    decoded_map_name = (
+        get_first_value(summary, ["mGameMapName", "gameMapName", "mapNameDecoded", "decodedMapName", "mGameFilename"])
+        or first_deep_value(raw_detail, ["mGameMapName", "gameMapName", "mapNameDecoded", "decodedMapName", "mGameFilename"])
     )
     date_time = (
         get_first_value(summary, ["dateTime", "date_time",
@@ -1717,8 +2744,21 @@ def normalize_match_detail_for_player(
                         "winLoss", "result", "outcome", "playerResult", "won", "isWinner", "victory"])
         or first_deep_value(raw_detail, ["winLoss", "result", "outcome", "playerResult", "won", "isWinner", "victory"])
     )
-    rating_change = first_deep_value(
-        raw_detail, ["eloChange", "elo_change", "ratingChange", "rating_change"])
+    match_type = get_record_match_type(
+        summary,
+        requested_match_type=requested_match_type,
+    )
+    if match_type is None:
+        match_type = get_record_match_type(
+            raw_detail if isinstance(raw_detail, dict) else {},
+            requested_match_type=requested_match_type,
+        )
+    if match_type is None:
+        match_type = requested_match_type
+    rating_change = player_record.get("rating_change") if player_record and player_record.get(
+        "rating_change") is not None else first_deep_value(
+            raw_detail, ["eloChange", "elo_change", "ratingChange", "rating_change"]
+        )
     rating = player_record.get("elo") if player_record and player_record.get(
         "elo") is not None else first_deep_value(raw_detail, ["elo", "rating", "playerElo", "player_rating"])
     civilization = player_record.get("god") if player_record else None
@@ -1732,8 +2772,10 @@ def normalize_match_detail_for_player(
         "match_id": str(match_id),
         "date_time": date_time,
         "sort_timestamp": parse_match_sort_timestamp(date_time),
-        "map": map_name,
+        "map": format_map_name(str(raw_map_name) if raw_map_name is not None else None, str(decoded_map_name) if decoded_map_name is not None else None),
         "result": normalize_match_result(result),
+        "match_type": match_type,
+        "match_type_label": get_match_type_label(match_type),
         "rating": to_int_or_none(rating),
         "rating_change": to_int_or_none(rating_change),
         "civilization": civilization,
@@ -1779,6 +2821,7 @@ async def enrich_recent_matches_with_details(
             raw_detail=detail_response.get("raw"),
             profile_id=profile_id,
             match_id=match_id,
+            requested_match_type=to_int_or_none(match.get("match_type")),
         )
 
         # Keep the list endpoint's known values, then fill missing/weak fields
@@ -1789,7 +2832,7 @@ async def enrich_recent_matches_with_details(
             "detail_status_code": detail_response.get("status_code"),
         }
 
-        for key in ["map", "result", "rating", "rating_change", "civilization", "match_length", "players", "current_player", "sort_timestamp"]:
+        for key in ["map", "result", "match_type", "match_type_label", "rating", "rating_change", "civilization", "match_length", "players", "current_player", "sort_timestamp"]:
             if detail.get(key) not in (None, ""):
                 merged[key] = detail.get(key)
 
@@ -1821,7 +2864,8 @@ async def fetch_player_summary(
     force_transport: str = "curl",
 ) -> dict[str, Any]:
     ratings = []
-    for match_type in [1, 2, 3, 4]:
+    for queue in get_ranked_queues():
+        match_type = int(queue["id"])
         rating_response = await fetch_player_rating(
             profile_id=profile_id,
             player=player,
@@ -1832,9 +2876,10 @@ async def fetch_player_summary(
         ratings.append(
             {
                 "match_type": match_type,
-                "match_type_label": get_match_type_label(match_type),
+                "match_type_label": get_queue_label(match_type),
                 "ok": bool(rating_response.get("ok")),
                 "source": rating_response.get("source"),
+                "data_source": rating_response.get("data_source"),
                 "rating": rating_response.get("rating"),
                 "reason": rating_response.get("reason"),
             }
@@ -1850,7 +2895,7 @@ async def fetch_player_summary(
         force_transport=force_transport,
     )
 
-    if recent_matches.get("matches"):
+    if recent_matches.get("matches") and recent_matches.get("source") != "community_recent_match_history":
         recent_matches["matches"] = await enrich_recent_matches_with_details(
             profile_id=profile_id,
             matches=recent_matches.get("matches", []),
@@ -1880,6 +2925,14 @@ async def fetch_player_summary(
         "avatar_url": avatar_url,
         "ratings": ratings,
         "recent_match_type": recent_match_type,
-        "recent_match_type_label": get_match_type_label(recent_match_type),
+        "recent_match_type_label": get_queue_label(recent_match_type),
         "recent_matches": recent_matches,
+        "data_sources": {
+            "ratings": [
+                rating_bucket.get("data_source")
+                for rating_bucket in ratings
+                if rating_bucket.get("data_source")
+            ],
+            "recent_matches": recent_matches.get("data_source"),
+        },
     }

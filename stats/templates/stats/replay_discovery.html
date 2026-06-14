@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}AoM: Retold Replay Discovery | Prostagma{% endblock %}
+{% block body_class %}leaderboards-page stats-placeholder-page{% endblock %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'css/leaderboards.css' %}">
+{% endblock %}
+
+{% block site_header %}
+  {% include "partials/header.html" with active_page="leaderboards" header_subtitle="Replay-backed strategy search, study filters, and parser coverage." %}
+{% endblock %}
+
+{% block content %}
+  <main class="leaderboards-shell">
+    <section class="leaderboards-hero leaderboards-panel">
+      <div class="leaderboards-hero-copy">
+        <p class="leaderboards-kicker">Replay Laboratory</p>
+        <h1>/stats/replays/</h1>
+        <p>
+          This route is reserved for the study tool that normal match APIs cannot provide:
+          strategy tags, timing-based filters, composition searches, and “show me the games worth watching.”
+        </p>
+      </div>
+
+      <div class="leaderboards-search-card stats-placeholder-card">
+        <div class="leaderboards-search-head">
+          <h2>Replay Pipeline</h2>
+          <span>Temporary replay download, parse, extract, then delete.</span>
+        </div>
+
+        <div class="leaderboards-stat-grid stats-placeholder-stat-grid">
+          <article class="leaderboards-stat-card">
+            <span>Pending Parses</span>
+            <strong>{{ pending_parses }}</strong>
+          </article>
+          <article class="leaderboards-stat-card">
+            <span>Parsed Replays</span>
+            <strong>{{ parsed_replays }}</strong>
+          </article>
+          <article class="leaderboards-stat-card">
+            <span>Tagged Matches</span>
+            <strong>{{ tagged_matches }}</strong>
+          </article>
+          <article class="leaderboards-stat-card">
+            <span>Parser Status</span>
+            <strong>Scaffolded</strong>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="leaderboards-browse-panel leaderboards-panel">
+      <div class="leaderboards-section-head">
+        <div>
+          <p class="leaderboards-kicker">Target Filters</p>
+          <h2>What this page is being built to answer</h2>
+        </div>
+        <span class="leaderboards-meta-note">Fast Heroic, Long Classical, archer deathballs, and more.</span>
+      </div>
+
+      <div class="stats-badge-cloud">
+        {% for tag in strategy_tags %}
+          <span class="player-stats-badge">{{ tag }}</span>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="leaderboards-profile-grid">
+      <article class="leaderboards-profile-overview leaderboards-panel">
+        <div class="leaderboards-section-head">
+          <div>
+            <p class="leaderboards-kicker">Parsed Replays</p>
+            <h2>Live replay-backed reads</h2>
+          </div>
+          <span class="leaderboards-meta-note">These rows are coming from real parsed replay data, not placeholder copy.</span>
+        </div>
+
+        <div class="leaderboards-list-grid">
+          {% for replay in parsed_rows %}
+            <article class="leaderboards-list-card replay-match-card">
+              <span>{{ replay.match.map_name|default:"Unknown map" }} · Build {{ replay.extracted_facts.build_number|default:replay.match.patch_label|default:"Unknown" }}</span>
+              <strong>{{ replay.match.external_match_id }}</strong>
+              <p>
+                {{ replay.player_summaries.count }} player summaries ·
+                {% if replay.extracted_facts.game_length_secs %}{{ replay.extracted_facts.game_length_secs|floatformat:0 }} sec{% else %}duration unknown{% endif %} ·
+                parser {{ replay.parser_version|default:"unknown" }}
+              </p>
+
+              <div class="stats-badge-cloud replay-strategy-cloud">
+                {% for summary in replay.player_summaries.all %}
+                  {% if summary.primary_strategy %}
+                    <span class="player-stats-badge">{{ summary.primary_strategy }}</span>
+                  {% endif %}
+                {% endfor %}
+              </div>
+
+              <div class="replay-player-grid">
+                {% for summary in replay.player_summaries.all %}
+                  <section class="replay-player-card">
+                    <span>{{ summary.participant.civilization|default:"Unknown god" }} · {{ summary.participant.result|upper }}</span>
+                    <strong>{{ summary.participant.alias|default:summary.participant.profile_id }}</strong>
+                    <p>
+                      EAPM {{ summary.eapm|default:"-" }} ·
+                      primary unit {{ summary.primary_unit|default:"Unknown" }} ·
+                      Heroic {{ summary.age_up_heroic_seconds|default:"-" }}s
+                    </p>
+
+                    <div class="replay-unit-list">
+                      {% for unit in summary.unit_summaries.all|slice:":3" %}
+                        <span class="replay-unit-pill">{{ unit.unit_name }} x{{ unit.produced_count }}</span>
+                      {% endfor %}
+                    </div>
+                  </section>
+                {% endfor %}
+              </div>
+            </article>
+          {% empty %}
+            <article class="leaderboards-list-card stats-empty-state">
+              <span>No parsed replays yet</span>
+              <strong>The parsing pipeline is ready, but this environment does not have parsed queue rows to display yet.</strong>
+              <p>Once replay files are attached or fetched for pending matches, this section will become the first replay-backed study surface on Prostagma.</p>
+            </article>
+          {% endfor %}
+        </div>
+      </article>
+
+      <article class="leaderboards-profile-overview leaderboards-panel">
+        <div class="leaderboards-section-head">
+          <div>
+            <p class="leaderboards-kicker">Pending Queue</p>
+            <h2>Matches waiting on replay files or parsing</h2>
+          </div>
+          <span class="leaderboards-meta-note">This is the batch we can keep draining once replay acquisition is wired.</span>
+        </div>
+
+        <div class="leaderboards-table-wrap">
+          <table class="leaderboards-table">
+            <thead>
+              <tr>
+                <th>Match</th>
+                <th>Map</th>
+                <th>Started</th>
+                <th>Replay Flag</th>
+                <th>Replay URL</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for replay in pending_rows %}
+                <tr>
+                  <td>{{ replay.match.external_match_id }}</td>
+                  <td>{{ replay.match.map_name|default:"Unknown" }}</td>
+                  <td>{% if replay.match.started_at %}{{ replay.match.started_at|date:"M j, Y H:i" }}{% else %}-{% endif %}</td>
+                  <td>{% if replay.extracted_facts.replay_available or replay.match.replay_available %}Ready upstream{% else %}Unknown{% endif %}</td>
+                  <td>{% if replay.replay_url or replay.match.replay_url %}Present{% else %}Missing{% endif %}</td>
+                  <td>{{ replay.status|title }}</td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="6" class="leaderboards-table-empty">No pending replay rows right now.</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="leaderboards-profile-overview leaderboards-panel">
+        <div class="leaderboards-section-head">
+          <div>
+            <p class="leaderboards-kicker">Planned Search Stories</p>
+            <h2>Queries the UI should make obvious</h2>
+          </div>
+        </div>
+
+        <div class="leaderboards-list-grid">
+          <article class="leaderboards-list-card">
+            <span>Balance Check</span>
+            <strong>Classical archer deathballs after Ballistics</strong>
+            <p>Find long-Classical current-patch 1v1 games with archer-heavy production and compare win rates against faster age-up lines.</p>
+          </article>
+          <article class="leaderboards-list-card">
+            <span>God Identity</span>
+            <strong>Huitzilopochtli Eagle Warrior pressure</strong>
+            <p>Surface wins where Eagle Warriors were the dominant trained unit and turn that into an evidence-backed public claim.</p>
+          </article>
+          <article class="leaderboards-list-card">
+            <span>Study Mode</span>
+            <strong>Show me the games worth watching</strong>
+            <p>Let players search for upset wins, high-EAPM games, clean Fast Heroic timings, or long macro slogs worth learning from.</p>
+          </article>
+        </div>
+      </article>
+    </section>
+  </main>
+{% endblock %}
+
+{% block site_footer %}
+  {% include "partials/footer.html" %}
+{% endblock %}

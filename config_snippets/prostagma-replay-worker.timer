@@ -1,0 +1,9 @@
+[Unit]
+Description=Start Prostagma replay worker on boot
+
+[Timer]
+OnBootSec=30s
+Unit=prostagma-replay-worker.service
+
+[Install]
+WantedBy=timers.target

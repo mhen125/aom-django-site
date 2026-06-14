@@ -1,0 +1,109 @@
+{% load static %}
+
+<section class="landing-section landing-community-section landing-twitch-section" aria-labelledby="landing-community-title">
+  <div class="landing-section-heading">
+    <div>
+      <span class="landing-section-eyebrow">Community Spotlight</span>
+      <h2 id="landing-community-title">From the Agora</h2>
+    </div>
+
+    <a href="https://www.twitch.tv/directory/category/age-of-mythology-retold/videos/all" target="_blank" rel="noopener noreferrer">
+      Watch on Twitch
+      <span aria-hidden="true">›</span>
+    </a>
+  </div>
+
+  {% if twitch_spotlight.ok and twitch_spotlight.videos %}
+    <div class="landing-twitch-grid">
+      {% for video in twitch_spotlight.videos %}
+        <article class="landing-twitch-card landing-panel">
+          <a class="landing-twitch-media" href="{{ video.url }}" target="_blank" rel="noopener noreferrer" aria-label="Watch {{ video.title }} by {{ video.creator }} on Twitch">
+            {% if video.thumbnail_url %}
+              <img
+                src="{{ video.thumbnail_url }}"
+                alt="Thumbnail for {{ video.title }}"
+                width="640"
+                height="360"
+                loading="lazy"
+              >
+            {% else %}
+              <img
+                src="{% static 'assets/optimized/images/homepage/Gods_Portrait_Window_Multi.webp' %}"
+                alt="Age of Mythology: Retold community broadcast"
+                width="640"
+                height="360"
+                loading="lazy"
+              >
+            {% endif %}
+
+            {% if video.duration %}
+              <span class="landing-twitch-duration">{{ video.duration }}</span>
+            {% endif %}
+          </a>
+
+          <div class="landing-twitch-copy">
+            <div class="landing-twitch-meta-row">
+              <span class="landing-card-kicker">Twitch</span>
+              {% if video.language %}
+                <span class="landing-twitch-language">{{ video.language }}</span>
+              {% endif %}
+            </div>
+
+            <h3>
+              <a href="{{ video.url }}" target="_blank" rel="noopener noreferrer">
+                {{ video.title }}
+              </a>
+            </h3>
+
+            <p class="landing-twitch-creator">
+              {{ video.creator }}
+            </p>
+
+            <p class="landing-twitch-meta">
+              {{ video.view_count_label }}
+              <span aria-hidden="true">·</span>
+              {{ video.published_label }}
+            </p>
+
+            <a class="landing-twitch-link" href="{{ video.url }}" target="_blank" rel="noopener noreferrer">
+              Watch on Twitch
+              <span aria-hidden="true">›</span>
+            </a>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="landing-twitch-fallback landing-panel">
+      <div class="landing-twitch-fallback-media">
+        <img
+          src="{% static 'assets/optimized/images/homepage/Gods_Portrait_Window_Multi.webp' %}"
+          alt=""
+          width="640"
+          height="360"
+          loading="lazy"
+        >
+      </div>
+
+      <div class="landing-twitch-fallback-copy">
+        <span class="landing-card-kicker">Twitch</span>
+        <h3>Mythic broadcasts are being gathered.</h3>
+
+        {% if twitch_spotlight.configured %}
+          <p>
+            Twitch did not return videos right now, so Prostagma is showing this fallback instead of leaving an empty community section.
+          </p>
+        {% else %}
+          <p>
+            Add Twitch credentials on the server to surface popular Age of Mythology: Retold videos here.
+          </p>
+        {% endif %}
+
+        <a class="landing-twitch-link" href="https://www.twitch.tv/directory/category/age-of-mythology-retold/videos/all" target="_blank" rel="noopener noreferrer">
+          Browse AoM: Retold on Twitch
+          <span aria-hidden="true">›</span>
+        </a>
+      </div>
+    </div>
+  {% endif %}
+</section>

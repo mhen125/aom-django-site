@@ -1,0 +1,18 @@
+[Unit]
+Description=Prostagma replay pipeline worker
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=mark
+Group=mark
+WorkingDirectory=/srv/prostagma/current
+EnvironmentFile=/srv/prostagma/current/.env
+ExecStart=/srv/prostagma/current/scripts/run_replay_worker.sh
+Restart=always
+RestartSec=15
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target

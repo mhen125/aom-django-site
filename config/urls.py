@@ -38,6 +38,7 @@ urlpatterns = [
 
     # Canonical build-order section URL.
     path("build_orders/", include("builds.urls")),
+    path("stats/", include("stats.urls")),
 
     # Human-friendly alias: redirect, don't duplicate canonical pages.
     path(

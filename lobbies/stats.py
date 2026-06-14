@@ -6,10 +6,10 @@ from typing import Any
 from .leaderboard import (
     enrich_recent_matches_with_details,
     fetch_player_match_list,
-    get_match_type_label,
 )
+from .leaderboard_metadata import get_queue_label, get_ranked_queues
 
-MATCH_TYPES = [1, 2, 3, 4]
+MATCH_TYPES = [int(item["id"]) for item in get_ranked_queues()]
 
 
 def _normalize_text(value: Any, fallback: str = "Unknown") -> str:
@@ -129,7 +129,7 @@ async def build_player_recent_stats(
 
         matches = response.get("matches") or []
 
-        if matches:
+        if matches and response.get("source") != "community_recent_match_history":
             matches = await enrich_recent_matches_with_details(
                 profile_id=profile_id,
                 matches=matches,
@@ -140,7 +140,7 @@ async def build_player_recent_stats(
         sources.append(
             {
                 "match_type": match_type,
-                "match_type_label": get_match_type_label(match_type),
+                "match_type_label": get_queue_label(match_type),
                 "ok": bool(response.get("ok")),
                 "match_count": len(matches),
                 "cached": response.get("cached"),
@@ -155,8 +155,12 @@ async def build_player_recent_stats(
 
             seen_match_ids.add(match_id)
             enriched_match = dict(match)
-            enriched_match["match_type"] = match_type
-            enriched_match["match_type_label"] = get_match_type_label(match_type)
+            enriched_match["queue_id"] = match_type
+            enriched_match["queue_label"] = get_queue_label(match_type)
+            if enriched_match.get("match_type") in (None, ""):
+                enriched_match["match_type"] = match_type
+            if enriched_match.get("match_type_label") in (None, ""):
+                enriched_match["match_type_label"] = get_queue_label(match_type)
             all_matches.append(enriched_match)
 
     all_matches.sort(
@@ -227,4 +231,7 @@ async def build_player_recent_stats(
         "match_type_breakdown": _serialize_counter(match_type_counts, total_matches),
         "results": dict(result_counts),
         "matches": all_matches,
+        "data_sources": {
+            "recent_stats": sources,
+        },
     }

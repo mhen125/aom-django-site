@@ -1,4 +1,20 @@
 (function initializeSiteMenus() {
+  function bindFooterShake() {
+    const options = Array.from(document.querySelectorAll("[data-site-footer-shake-option]"));
+
+    if (!options.length) {
+      return;
+    }
+
+    const isCompactViewport = window.matchMedia("(max-width: 460px)").matches;
+    const eligibleOptions = isCompactViewport
+      ? options.filter((option) => option.classList.contains("site-footer-shake-looking"))
+      : options;
+
+    options.forEach((option) => option.classList.remove("is-active"));
+    eligibleOptions[Math.floor(Math.random() * eligibleOptions.length)]?.classList.add("is-active");
+  }
+
   function closeMenu(menu) {
     if (!menu) {
       return;
@@ -66,6 +82,8 @@
         }
       });
     });
+
+    bindFooterShake();
   }
 
   document.addEventListener("click", (event) => {

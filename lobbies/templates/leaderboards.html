@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}AoM: Retold Leaderboards | Prostagma{% endblock %}
+{% block body_class %}leaderboards-page{% endblock %}
+{% block body_attrs %}data-page="leaderboards"{% endblock %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'css/leaderboards.css' %}">
+{% endblock %}
+
+{% block extra_head %}
+  {{ leaderboard_metadata|json_script:"leaderboardMetadata" }}
+  {{ default_ranked_match_types|json_script:"leaderboardDefaultQueues" }}
+  <script>
+    window.PROSTAGMA_LEADERBOARDS = {
+      browseUrl: "{% url 'lobbies:api_leaderboard_search' %}",
+      metadataUrl: "{% url 'lobbies:api_leaderboard_metadata' %}",
+      ratingUrl: "{% url 'lobbies:api_player_rating' %}",
+      summaryUrl: "{% url 'lobbies:api_player_summary' %}",
+      godStatsUrl: "{% url 'lobbies:api_player_god_stats' %}",
+      playerStatsUrl: "{% url 'stats:player_stats_home' %}",
+      playerStatsProfileBaseUrl: "{% url 'stats:home' %}players/"
+    };
+  </script>
+{% endblock %}
+
+{% block site_header %}
+  {% include "partials/header.html" with active_page="leaderboards" show_game_logo=True header_subtitle="Browse ranked ladders, inspect player profiles, and review recent god and match statistics." %}
+{% endblock %}
+
+{% block content %}
+  <main class="leaderboards-shell">
+    <section class="leaderboards-hero leaderboards-panel">
+      <div class="leaderboards-hero-copy">
+        <p class="leaderboards-kicker">Ranked Command Table</p>
+        <h1>Leaderboards &amp; Player Stats</h1>
+        <p>
+          Browse live-ranked ladders, pivot across queue formats, and drill into a player’s recent gods,
+          maps, and results without leaving Prostagma.
+        </p>
+      </div>
+
+      <form id="leaderboardSearchForm" class="leaderboards-search-card" autocomplete="off">
+        <div class="leaderboards-search-head">
+          <h2>Player Lookup</h2>
+          <span>Name or profile ID</span>
+        </div>
+
+        <label class="leaderboards-field">
+          <span>Player</span>
+          <input id="leaderboardLookupInput" name="player_lookup" type="text" placeholder="crazydarnfoo or 1075470702">
+        </label>
+
+        <p class="leaderboards-search-note">
+          Queue is chosen from the leaderboard table or player profile after lookup.
+        </p>
+
+        <div class="leaderboards-search-actions">
+          <button class="leaderboards-primary-button" type="submit">Search profiles</button>
+          <button id="leaderboardSearchReset" class="leaderboards-secondary-button" type="button">Reset</button>
+        </div>
+
+        <p id="leaderboardSearchFeedback" class="leaderboards-feedback" aria-live="polite">
+          Search for a player to load ratings, recent matches, and god usage.
+        </p>
+      </form>
+    </section>
+
+    <section id="leaderboardSearchResultsPanel" class="leaderboards-search-results leaderboards-panel" hidden>
+      <div class="leaderboards-section-head">
+        <div>
+          <p class="leaderboards-kicker">Player Search</p>
+          <h2>Choose a profile</h2>
+        </div>
+        <span id="leaderboardSearchResultsMeta" class="leaderboards-meta-note">Waiting for search</span>
+      </div>
+
+      <div class="leaderboards-table-wrap">
+        <table class="leaderboards-table">
+          <thead>
+            <tr>
+              <th>Player</th>
+              <th>Profile ID</th>
+              <th>Rating</th>
+              <th>Rank</th>
+              <th>Record</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboardSearchResultsBody">
+            <tr>
+              <td colspan="5" class="leaderboards-table-empty">Search by name to compare matching profiles.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="leaderboards-browse-panel leaderboards-panel" aria-labelledby="leaderboardsBrowseTitle">
+      <div class="leaderboards-section-head">
+        <div>
+          <p class="leaderboards-kicker">Ranked Browse</p>
+          <h2 id="leaderboardsBrowseTitle">Queue snapshots</h2>
+        </div>
+        <div class="leaderboards-browse-actions">
+          <span id="leaderboardBrowseMeta" class="leaderboards-meta-note">Loading rankings...</span>
+          <button id="leaderboardRefreshBrowse" class="leaderboards-ghost-button" type="button">Refresh</button>
+        </div>
+      </div>
+
+      <div id="leaderboardQueueChips" class="leaderboards-queue-chips" aria-label="Leaderboard queues"></div>
+
+      <div class="leaderboards-table-wrap">
+        <table class="leaderboards-table">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Player</th>
+              <th>Rating</th>
+              <th>Record</th>
+              <th>Peak</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboardBrowseTableBody">
+            <tr>
+              <td colspan="5" class="leaderboards-table-empty">Loading leaderboard rows...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="leaderboards-pagination" aria-label="Leaderboard pages">
+        <button id="leaderboardPrevPage" class="leaderboards-ghost-button" type="button">Previous</button>
+        <span id="leaderboardPageLabel" class="leaderboards-meta-note">Page 1</span>
+        <button id="leaderboardNextPage" class="leaderboards-ghost-button" type="button">Next</button>
+      </div>
+    </section>
+
+    <section id="leaderboardProfilePanel" class="leaderboards-profile-grid" hidden>
+      <article class="leaderboards-profile-overview leaderboards-panel">
+        <div class="leaderboards-section-head">
+          <div>
+            <p class="leaderboards-kicker">Player Overview</p>
+            <h2 id="leaderboardProfileName">Player</h2>
+          </div>
+          <div class="leaderboards-profile-head-actions">
+            <span id="leaderboardProfileMeta" class="leaderboards-meta-note">Waiting for search</span>
+            <a id="leaderboardFullProfileLink" class="leaderboards-ghost-link" href="{% url 'stats:player_stats_home' %}" hidden>
+              Open dedicated stats
+              <span aria-hidden="true">›</span>
+            </a>
+          </div>
+        </div>
+
+        <div id="leaderboardProfileCards" class="leaderboards-stat-grid"></div>
+      </article>
+
+      <article class="leaderboards-profile-gods leaderboards-panel">
+        <div class="leaderboards-section-head">
+          <div>
+            <p class="leaderboards-kicker">Recent God Usage</p>
+            <h2>Major gods</h2>
+          </div>
+          <span id="leaderboardGodsMeta" class="leaderboards-meta-note">Recent matches</span>
+        </div>
+
+        <div id="leaderboardGodsList" class="leaderboards-list-grid"></div>
+      </article>
+
+      <article class="leaderboards-profile-maps leaderboards-panel">
+        <div class="leaderboards-section-head">
+          <div>
+            <p class="leaderboards-kicker">Map Rotation</p>
+            <h2>Most played maps</h2>
+          </div>
+        </div>
+
+        <div id="leaderboardMapsList" class="leaderboards-list-grid"></div>
+      </article>
+
+      <article class="leaderboards-profile-matches leaderboards-panel">
+        <div class="leaderboards-section-head">
+          <div>
+            <p class="leaderboards-kicker">Recent Matches</p>
+            <h2>Latest results</h2>
+          </div>
+        </div>
+
+        <div class="leaderboards-table-wrap">
+          <table class="leaderboards-table leaderboards-matches-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Queue</th>
+                <th>God</th>
+                <th>Map</th>
+                <th>Result</th>
+                <th>ELO</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboardRecentMatchesBody">
+              <tr>
+                <td colspan="6" class="leaderboards-table-empty">Search for a player to load recent matches.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+  </main>
+{% endblock %}
+
+{% block site_footer %}
+  {% include "partials/footer.html" %}
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'js/leaderboards.js' %}" defer></script>
+{% endblock %}

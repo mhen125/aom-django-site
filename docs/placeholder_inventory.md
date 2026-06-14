@@ -2,24 +2,18 @@
 
 This file tracks temporary content, fake assets, disabled pages, and dummy surfaces that should be replaced or wired up before they are treated as finished product areas.
 
-Last reviewed: 2026-06-11
+Last reviewed: 2026-06-13
 
 ## Homepage
 
 - Fresh update fallback art uses `static/assets/optimized/images/homepage/Gods_Portrait_Window_Multi.webp` when the Steam feed item has no image.
-- Community Pulse cards are placeholder content. They currently use god portrait cards as temporary media:
-  - `static/assets/optimized/images/gods/zeus_portrait.card.webp`
-  - `static/assets/optimized/images/gods/odin_portrait.card.webp`
-  - `static/assets/optimized/images/gods/Huitzilopochtli_portrait.card.webp`
-- Community Pulse copy is placeholder text for future creator, video, ranked, and event feeds.
+- Community spotlight falls back to static art when Twitch credentials are missing or the Twitch API returns no videos.
 - Explore Prostagma includes disabled future areas:
-  - Leaderboards
   - Compendium
   - Combat Simulator
 
 ## Header And Navigation
 
-- Leaderboards is shown as a disabled "Coming soon" item.
 - Tools dropdown contains disabled future pages:
   - Compendium
   - Combat Simulator
@@ -34,6 +28,10 @@ Last reviewed: 2026-06-11
 
 - `static/js/data.js` still provides fallback/sample build-order data for local and empty-database states.
 - Build-order editor placeholder text uses example values such as "3:30 Athena Rush" and example resource/action rows.
+
+## Stats And Leaderboards
+
+- Stats and leaderboards now use returned live API data when available. Any empty states should describe missing returned data directly rather than implying estimated or inferred community trends.
 
 ## Notes
 

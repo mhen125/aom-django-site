@@ -85,14 +85,14 @@ GOD_BY_RACE_ID = {
     12: "Gaia",
     13: "Freyr",
     14: "Fuxi",
-    15: "Nüwa",
+    15: "Nuwa",
     16: "Shennong",
     17: "Amaterasu",
     18: "Tsukuyomi",
     19: "Susanoo",
     20: "Demeter",
-    21: "Tezcatlipoca",
-    22: "Huitzilopochtli",
+    21: "Huitzilopochtli",
+    22: "Tezcatlipoca",
     23: "Quetzalcoatl",
 }
 

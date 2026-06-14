@@ -1,11 +1,13 @@
 {% extends "base.html" %}
 {% load static %}
+{% load twitch_content %}
 
 {% block title %}Prostagma? | Age of Mythology: Retold Hub{% endblock %}
 {% block body_class %}prostagma-landing-page{% endblock %}
 
 {% block styles %}
   <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+  <link rel="stylesheet" href="{% static 'css/landing_enhancements.css' %}">
 {% endblock %}
 
 {% block extra_head %}
@@ -104,16 +106,26 @@
             >
           </div>
           <div class="landing-feature-copy">
-            <span id="homeFeaturedNewsBadge" class="landing-badge">Latest News</span>
-            <time id="homeFeaturedNewsDate" datetime="">Loading official feed</time>
+            <div class="landing-feature-meta">
+              <span id="homeFeaturedNewsBadge" class="landing-badge">Latest News</span>
+              <div class="landing-feature-meta-block">
+                <span id="homeFeaturedNewsSource" class="landing-feature-source">Official Steam Feed</span>
+                <time id="homeFeaturedNewsDate" datetime="">Loading official feed</time>
+              </div>
+            </div>
             <h2 id="homeFeaturedNewsTitle">Checking for fresh updates...</h2>
             <p id="homeFeaturedNewsSummary">
               Official Age of Mythology: Retold updates will appear here when the Steam feed is available.
             </p>
-            <a id="homeFeaturedNewsLink" class="landing-feature-link" href="https://steamcommunity.com/games/1934680/announcements/" target="_blank" rel="noopener noreferrer">
-              View News
-              <span aria-hidden="true">›</span>
-            </a>
+            <div class="landing-feature-actions">
+              <a id="homeFeaturedNewsLink" class="landing-feature-link" href="https://steamcommunity.com/games/1934680/announcements/" target="_blank" rel="noopener noreferrer">
+                View News
+                <span aria-hidden="true">›</span>
+              </a>
+              <a class="landing-feature-subaction" href="https://steamcommunity.com/games/1934680/announcements/" target="_blank" rel="noopener noreferrer">
+                All Patch Notes
+              </a>
+            </div>
           </div>
         </article>
       </div>
@@ -170,54 +182,14 @@
       </div>
     </section>
 
-    <section class="landing-section landing-community-section" aria-labelledby="landing-community-title">
-      <div class="landing-section-heading">
-        <h2 id="landing-community-title">Community Pulse</h2>
-      </div>
-
-      <div class="landing-community-grid">
-        <article class="landing-community-card landing-panel">
-          <div class="landing-community-media">
-            <img src="{% static 'assets/optimized/images/gods/zeus_portrait.card.webp' %}" alt="" width="320" height="180" loading="lazy">
-          </div>
-          <div class="landing-community-copy">
-            <span class="landing-card-kicker">Creator Spotlight</span>
-            <h3>Featured guides and streams</h3>
-            <p>Reserved for top creators, tournament coverage, and community build-order highlights.</p>
-            <span class="landing-community-meta">Guides · Streams · Tournaments</span>
-          </div>
-        </article>
-        <article class="landing-community-card landing-panel">
-          <div class="landing-community-media">
-            <img src="{% static 'assets/optimized/images/gods/odin_portrait.card.webp' %}" alt="" width="320" height="180" loading="lazy">
-          </div>
-          <div class="landing-community-copy">
-            <span class="landing-card-kicker">Latest Video</span>
-            <h3>Strategy features</h3>
-            <p>Short-form guide and matchup content can slot in here once the source list is finalized.</p>
-            <span class="landing-community-meta">Builds · Matchups · Openings</span>
-          </div>
-        </article>
-        <article class="landing-community-card landing-panel">
-          <div class="landing-community-media">
-            <img src="{% static 'assets/optimized/images/gods/Huitzilopochtli_portrait.card.webp' %}" alt="" width="320" height="180" loading="lazy">
-          </div>
-          <div class="landing-community-copy">
-            <span class="landing-card-kicker">Competitive</span>
-            <h3>Ranked and event signals</h3>
-            <p>Leaderboards, queue stats, and featured events will have a natural home in this space.</p>
-            <span class="landing-community-meta">Rankings · Queues · Events</span>
-          </div>
-        </article>
-      </div>
-    </section>
+    {% twitch_spotlight limit=6 %}
 
     <section class="landing-section landing-explore-section" aria-labelledby="landing-explore-title">
       <div class="landing-section-heading landing-section-heading-centered">
         <h2 id="landing-explore-title">Explore Prostagma</h2>
       </div>
 
-      <div class="landing-explore-grid">
+      <div class="landing-explore-grid" data-landing-reveal-group="explore">
         <a class="landing-entry-card landing-panel" href="/lobbies/">
           <img src="{% static 'assets/optimized/images/homepage/Watch_On.webp' %}" alt="" width="48" height="48" loading="lazy">
           <span>
@@ -232,13 +204,13 @@
             <small>Browse openings by pantheon and god.</small>
           </span>
         </a>
-        <span class="landing-entry-card landing-panel is-disabled" aria-disabled="true">
+        <a class="landing-entry-card landing-panel" href="/leaderboards/">
           <img src="{% static 'assets/optimized/images/homepage/leaderboard.webp' %}" alt="" width="48" height="48" loading="lazy">
           <span>
             <strong>Leaderboards</strong>
-            <small>Rankings and player stats coming soon.</small>
+            <small>Browse ladders and inspect player stats.</small>
           </span>
-        </span>
+        </a>
         <span class="landing-entry-card landing-panel is-disabled" aria-disabled="true">
           <img src="{% static 'assets/optimized/images/homepage/compendium.webp' %}" alt="" width="48" height="48" loading="lazy">
           <span>

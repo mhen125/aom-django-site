@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}AoM: Retold Meta Stats | Prostagma{% endblock %}
+{% block body_class %}leaderboards-page stats-placeholder-page{% endblock %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'css/leaderboards.css' %}">
+{% endblock %}
+
+{% block site_header %}
+  {% include "partials/header.html" with active_page="leaderboards" header_subtitle="Decisive meta verdicts, snapshot tracking, and bold Prostagma claims." %}
+{% endblock %}
+
+{% block content %}
+  <main class="leaderboards-shell">
+    <section class="leaderboards-hero leaderboards-panel">
+      <div class="leaderboards-hero-copy">
+        <p class="leaderboards-kicker">Meta Command Room</p>
+        <h1>/stats/meta/</h1>
+        <p>
+          This is the foundation for Prostagma’s public meta verdicts. The page is ready to surface
+          strong claims first, then back them with snapshots, matchup slices, and replay-backed evidence.
+        </p>
+      </div>
+
+      <div class="leaderboards-search-card stats-placeholder-card">
+        <div class="leaderboards-search-head">
+          <h2>Current State</h2>
+          <span>Stats foundation is live, claim generation comes next.</span>
+        </div>
+
+        <div class="leaderboards-stat-grid stats-placeholder-stat-grid">
+          <article class="leaderboards-stat-card">
+            <span>Imported Matches</span>
+            <strong>{{ match_count }}</strong>
+          </article>
+          <article class="leaderboards-stat-card">
+            <span>Public Claims</span>
+            <strong>{{ claim_count }}</strong>
+          </article>
+          <article class="leaderboards-stat-card">
+            <span>Snapshots</span>
+            <strong>{{ snapshot_count }}</strong>
+          </article>
+          <article class="leaderboards-stat-card">
+            <span>Active Window</span>
+            <strong>{% if active_window %}{{ active_window.label }}{% else %}Not built yet{% endif %}</strong>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="leaderboards-browse-panel leaderboards-panel">
+      <div class="leaderboards-section-head">
+        <div>
+          <p class="leaderboards-kicker">Claim Badges</p>
+          <h2>Public voice the page is built for</h2>
+        </div>
+        <span class="leaderboards-meta-note">Strong labels, careful backend rules.</span>
+      </div>
+
+      <div class="stats-badge-cloud">
+        {% for badge in badge_catalog %}
+          <span class="player-stats-badge">{{ badge }}</span>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="leaderboards-profile-grid">
+      <article class="leaderboards-profile-overview leaderboards-panel">
+        <div class="leaderboards-section-head">
+          <div>
+            <p class="leaderboards-kicker">Featured Claims</p>
+            <h2>Ready when the rules engine is</h2>
+          </div>
+        </div>
+
+        <div class="leaderboards-list-grid">
+          {% for claim in featured_claims %}
+            <article class="leaderboards-list-card">
+              <span>{{ claim.verdict }}</span>
+              <strong>{{ claim.headline }}</strong>
+              <p>{{ claim.subject }}{% if claim.stat_window %} · {{ claim.stat_window.label }}{% endif %}</p>
+            </article>
+          {% empty %}
+            <article class="leaderboards-list-card stats-empty-state">
+              <span>No public claims yet</span>
+              <strong>The page is waiting for generated verdicts.</strong>
+              <p>Once `rebuild_meta_stats` and `generate_meta_claims` exist, this section becomes the lead story instead of a placeholder.</p>
+            </article>
+          {% endfor %}
+        </div>
+      </article>
+
+      <article class="leaderboards-profile-gods leaderboards-panel">
+        <div class="leaderboards-section-head">
+          <div>
+            <p class="leaderboards-kicker">Snapshot Feed</p>
+            <h2>Recent god slices</h2>
+          </div>
+        </div>
+
+        <div class="leaderboards-list-grid">
+          {% for snapshot in recent_snapshots %}
+            <article class="leaderboards-list-card">
+              <span>{{ snapshot.elo_bracket|default:"All ELO" }}</span>
+              <strong>{{ snapshot.god_name }}</strong>
+              <p>{{ snapshot.games }} games · {{ snapshot.win_rate|default:"-" }} win rate</p>
+            </article>
+          {% empty %}
+            <article class="leaderboards-list-card stats-empty-state">
+              <span>No snapshots yet</span>
+              <strong>Aggregate tables are modeled but not generated yet.</strong>
+              <p>The importer groundwork is in place so we can add precomputed patch windows next without changing the public route structure.</p>
+            </article>
+          {% endfor %}
+        </div>
+      </article>
+    </section>
+  </main>
+{% endblock %}
+
+{% block site_footer %}
+  {% include "partials/footer.html" %}
+{% endblock %}

@@ -189,14 +189,15 @@
 .landing-feature-card {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(132px, 38%);
+  grid-template-rows: minmax(190px, 220px) minmax(0, 1fr);
   align-self: end;
-  min-height: 286px;
+  min-height: 420px;
   overflow: hidden;
   background:
     linear-gradient(180deg, rgba(255, 232, 158, 0.055), rgba(1, 8, 18, 0.1)),
     rgba(5, 16, 31, 0.66);
   backdrop-filter: blur(4px);
+  transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
 }
 
 .landing-feature-card::before {
@@ -205,13 +206,32 @@
   inset: 0;
   z-index: 1;
   background:
-    linear-gradient(90deg, rgba(6, 16, 31, 0.94) 0 54%, rgba(6, 16, 31, 0.5) 82%, rgba(6, 16, 31, 0.12)),
-    radial-gradient(circle at 92% 10%, rgba(97, 174, 225, 0.2), transparent 18rem);
+    radial-gradient(circle at 86% 10%, rgba(97, 174, 225, 0.2), transparent 18rem),
+    linear-gradient(180deg, rgba(5, 12, 24, 0) 0 34%, rgba(5, 12, 24, 0.44) 52%, rgba(5, 12, 24, 0.94) 100%);
   pointer-events: none;
 }
 
+.landing-feature-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(120deg, transparent 0 62%, rgba(255, 241, 200, 0.12) 72%, transparent 82%);
+  opacity: 0.34;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.landing-feature-card:hover,
+.landing-feature-card:focus-within {
+  transform: translateY(-4px);
+  border-color: rgba(255, 220, 130, 0.66);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 236, 176, 0.05),
+    0 22px 54px rgba(0, 0, 0, 0.34);
+}
+
 .landing-feature-media {
-  grid-column: 2;
   grid-row: 1;
   min-height: 100%;
 }
@@ -223,17 +243,41 @@
   object-fit: cover;
   opacity: 0.86;
   filter: saturate(1.05) contrast(1.07);
+  transform: scale(1.02);
+  animation: landingFeatureDrift 16s ease-in-out infinite alternate;
 }
 
 .landing-feature-copy {
   position: relative;
   z-index: 2;
-  grid-column: 1 / -1;
-  grid-row: 1;
+  grid-row: 2;
   display: grid;
-  align-content: center;
-  width: min(72%, 27rem);
-  padding: clamp(1.25rem, 2.3vw, 2rem);
+  align-content: start;
+  gap: 0;
+  width: 100%;
+  padding: clamp(1.15rem, 2vw, 1.7rem);
+}
+
+.landing-feature-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.landing-feature-meta-block {
+  display: grid;
+  justify-items: end;
+  gap: 0.2rem;
+}
+
+.landing-feature-source {
+  color: rgba(242, 219, 166, 0.62);
+  font-size: 0.68rem;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 .landing-map-dev-panel {
@@ -344,7 +388,6 @@
 
 .landing-feature-copy time,
 .landing-news-date {
-  margin-top: 0.8rem;
   color: rgba(242, 219, 166, 0.78);
   font-size: 0.72rem;
   font-weight: 800;
@@ -373,9 +416,32 @@
 .landing-feature-link {
   justify-self: start;
   min-height: 2.55rem;
-  margin-top: 1.15rem;
   padding-inline: 0.95rem;
   font-size: 0.72rem;
+}
+
+.landing-feature-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+  margin-top: 1.15rem;
+}
+
+.landing-feature-subaction {
+  color: rgba(241, 222, 184, 0.78);
+  font-size: 0.74rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 170ms ease, transform 170ms ease;
+}
+
+.landing-feature-subaction:hover,
+.landing-feature-subaction:focus-visible {
+  color: #f3c46e;
+  transform: translateX(2px);
 }
 
 .landing-live-strip {
@@ -495,6 +561,19 @@
   grid-template-rows: 170px minmax(0, 1fr);
   min-height: 355px;
   overflow: hidden;
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 320ms ease,
+    transform 320ms ease,
+    border-color 180ms ease,
+    background 180ms ease;
+  transition-delay: var(--landing-news-stagger, 0ms);
+}
+
+.landing-news-card.is-visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .landing-news-card-image {
@@ -575,7 +654,21 @@
   grid-template-columns: minmax(112px, 34%) minmax(0, 1fr);
   min-height: 190px;
   overflow: hidden;
+  opacity: 0;
+  transform: translateY(16px);
   transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+  transition:
+    opacity 340ms ease,
+    transform 340ms ease,
+    border-color 180ms ease,
+    background 180ms ease;
+  transition-delay: var(--landing-reveal-stagger, 0ms);
+}
+
+.landing-community-card.is-visible,
+.landing-entry-card.is-visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .landing-community-card:hover,
@@ -654,7 +747,15 @@
   gap: 1rem;
   min-height: 118px;
   padding: 1rem;
+  opacity: 0;
+  transform: translateY(16px);
   transition: transform 170ms ease, border-color 170ms ease, background 170ms ease;
+  transition:
+    opacity 340ms ease,
+    transform 340ms ease,
+    border-color 170ms ease,
+    background 170ms ease;
+  transition-delay: var(--landing-reveal-stagger, 0ms);
 }
 
 .landing-entry-card::after {
@@ -760,7 +861,8 @@
 
   .landing-feature-card {
     grid-template-columns: 1fr;
-    min-height: 360px;
+    grid-template-rows: minmax(176px, 200px) minmax(0, 1fr);
+    min-height: 352px;
   }
 
   .landing-map-dev-panel {
@@ -769,19 +871,17 @@
   }
 
   .landing-feature-media {
-    grid-column: 1;
-    min-height: 180px;
+    min-height: 176px;
   }
 
   .landing-feature-card::before {
     background:
-      linear-gradient(180deg, rgba(5, 13, 27, 0.34), rgba(5, 13, 27, 0.98) 58%),
+      linear-gradient(180deg, rgba(5, 13, 27, 0.12), rgba(5, 13, 27, 0.92) 68%),
       radial-gradient(circle at 80% 0%, rgba(89, 159, 224, 0.22), transparent 16rem);
   }
 
   .landing-feature-copy {
-    align-content: end;
-    width: 100%;
+    align-content: start;
   }
 
   .landing-live-strip,
@@ -821,5 +921,44 @@
     background:
       linear-gradient(180deg, transparent 0 48%, rgba(5, 13, 27, 0.72)),
       radial-gradient(circle at 48% 16%, rgba(245, 190, 92, 0.18), transparent 8rem);
+  }
+}
+
+@keyframes landingFeatureDrift {
+  0% {
+    transform: scale(1.02) translate3d(0, 0, 0);
+  }
+
+  100% {
+    transform: scale(1.06) translate3d(0, -8px, 0);
+  }
+}
+
+@keyframes landingLivePulse {
+  0% {
+    box-shadow:
+      0 0 0 0 rgba(244, 197, 111, 0.48),
+      0 0 12px rgba(244, 197, 111, 0.42);
+  }
+
+  70% {
+    box-shadow:
+      0 0 0 0.52rem rgba(244, 197, 111, 0),
+      0 0 18px rgba(244, 197, 111, 0.22);
+  }
+
+  100% {
+    box-shadow:
+      0 0 0 0 rgba(244, 197, 111, 0),
+      0 0 12px rgba(244, 197, 111, 0.12);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-feature-card,
+  .landing-feature-media img {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
   }
 }
