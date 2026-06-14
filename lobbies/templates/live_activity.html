@@ -12,7 +12,7 @@
 
 {% block extra_head %}
   <script>
-    window.AOM_STATIC_URL = "{% static '' %}";
+    window.AOM_STATIC_URL = "{% get_static_prefix %}";
     window.AOM_API_BASE_URL = "";
   </script>
 {% endblock %}

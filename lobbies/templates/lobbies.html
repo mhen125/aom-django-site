@@ -11,7 +11,7 @@
 
 {% block extra_head %}
   <script>
-    window.AOM_STATIC_URL = "{% static '' %}";
+    window.AOM_STATIC_URL = "{% get_static_prefix %}";
     window.AOM_API_BASE_URL = "";
     window.AOM_ACTIVE_MATCHES_API_URL = "{% url 'lobbies:api_active_matches' %}";
     window.AOM_ACTIVE_CUSTOM_MATCHES_API_URL = "{% url 'lobbies:api_active_custom_matches' %}";

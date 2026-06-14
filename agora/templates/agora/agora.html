@@ -13,7 +13,7 @@
   <script>
     window.AOM_AGORA_MESSAGES_URL = "{% url 'agora:api_messages' %}";
     window.AOM_AGORA_POST_URL = "{% url 'agora:api_post_message' %}";
-    window.AOM_STATIC_URL = "{% static '' %}";
+    window.AOM_STATIC_URL = "{% get_static_prefix %}";
     window.AOM_AGORA_USER = {
       isAuthenticated: {{ request.user.is_authenticated|yesno:"true,false" }},
       displayName: "{% if request.user.is_authenticated %}{{ request.user.steam_profile.persona_name|default:request.user.username|escapejs }}{% endif %}",
