@@ -6,6 +6,7 @@ from django.core.management.base import BaseCommand
 from django.utils.text import slugify
 
 from builds.models import BuildOrder, BuildOrderStep, MajorGod, Pantheon
+from builds.views import strip_manifest_hash
 
 
 class Command(BaseCommand):
@@ -194,7 +195,7 @@ class Command(BaseCommand):
 
         for prefix in ("/static/", "static/"):
             if value.startswith(prefix):
-                return value.replace(prefix, "", 1)
+                return strip_manifest_hash(value.replace(prefix, "", 1))
 
         while value.startswith("../"):
             value = value[3:]
@@ -202,7 +203,7 @@ class Command(BaseCommand):
         if value.startswith("/"):
             value = value[1:]
 
-        return value
+        return strip_manifest_hash(value)
 
     def safe_int(self, value):
         try:

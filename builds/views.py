@@ -9,6 +9,7 @@ from django.conf import settings
 from django.templatetags.static import static
 
 import json
+import re
 
 from .models import BuildOrder, BuildOrderStep, MajorGod, Pantheon
 from .fallback_data import FALLBACK_AOM_DATA
@@ -515,6 +516,21 @@ def absolute_url(request, path):
     return request.build_absolute_uri(path)
 
 
+def strip_manifest_hash(path):
+    value = str(path or "").strip()
+
+    if not value:
+        return ""
+
+    head, separator, tail = value.rpartition("/")
+    cleaned_tail = re.sub(r"\.([0-9a-f]{12})(\.[^.]+)$", r"\2", tail, flags=re.IGNORECASE)
+
+    if not separator:
+        return cleaned_tail
+
+    return f"{head}{separator}{cleaned_tail}"
+
+
 def asset_url(path, fallback=""):
     value = str(path or "").strip()
 
@@ -533,7 +549,7 @@ def asset_url(path, fallback=""):
     while value.startswith("../"):
         value = value[3:]
 
-    return static(value.lstrip("/"))
+    return static(strip_manifest_hash(value).lstrip("/"))
 
 
 def static_relative_path(path):
@@ -550,7 +566,7 @@ def static_relative_path(path):
     while value.startswith("../"):
         value = value[3:]
 
-    return value.lstrip("/")
+    return strip_manifest_hash(value.lstrip("/"))
 
 
 def resolve_static_asset_path(path):
@@ -1294,7 +1310,7 @@ def clean_static_path(value):
 
     for prefix in ("/static/", "static/"):
         if value.startswith(prefix):
-            return value.replace(prefix, "", 1)
+            return strip_manifest_hash(value.replace(prefix, "", 1))
 
     while value.startswith("../"):
         value = value[3:]
@@ -1302,7 +1318,7 @@ def clean_static_path(value):
     if value.startswith("/"):
         value = value[1:]
 
-    return value
+    return strip_manifest_hash(value)
 
 
 def safe_int(value):
