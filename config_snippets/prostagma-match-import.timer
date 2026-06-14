@@ -3,7 +3,7 @@ Description=Run Prostagma ranked match importer on a schedule
 
 [Timer]
 OnBootSec=2min
-OnUnitActiveSec=5min
+OnUnitActiveSec=30min
 Unit=prostagma-match-import.service
 
 [Install]

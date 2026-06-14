@@ -119,6 +119,9 @@ if DATABASES["default"]["ENGINE"] == "django.db.backends.sqlite3":
     DATABASES["default"].pop("HOST", None)
     DATABASES["default"].pop("PORT", None)
     DATABASES["default"].pop("OPTIONS", None)
+else:
+    DATABASES["default"]["CONN_MAX_AGE"] = env_int("DB_CONN_MAX_AGE", 300)
+    DATABASES["default"]["CONN_HEALTH_CHECKS"] = env_bool("DB_CONN_HEALTH_CHECKS", True)
 
 # Password validation
 
