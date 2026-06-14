@@ -15,6 +15,7 @@ from .leaderboard import (
     normalize_match_detail_for_player,
     normalize_personal_stat_record,
     normalize_recent_match_history_record,
+    resolve_curl_path,
     search_leaderboard,
 )
 from .leaderboard_metadata import (
@@ -104,6 +105,28 @@ class LeaderboardSearchTests(SimpleTestCase):
             [101, 202],
         )
         self.assertTrue(all(match["confidence"] == "exact" for match in result["matches"]))
+
+
+class CurlResolutionTests(SimpleTestCase):
+    @patch("lobbies.leaderboard.shutil.which")
+    @patch("lobbies.leaderboard.os.access")
+    @patch("lobbies.leaderboard.os.path.exists")
+    def test_resolve_curl_path_falls_back_to_common_binary_locations(
+        self,
+        exists_mock,
+        access_mock,
+        which_mock,
+    ):
+        def which_side_effect(value):
+            if value == "curl":
+                return None
+            return None
+
+        which_mock.side_effect = which_side_effect
+        exists_mock.side_effect = lambda path: path == "/usr/bin/curl"
+        access_mock.side_effect = lambda path, mode: path == "/usr/bin/curl"
+
+        self.assertEqual(resolve_curl_path(), "/usr/bin/curl")
 
 
 class RecentMatchHistoryNormalizationTests(SimpleTestCase):

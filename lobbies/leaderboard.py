@@ -1,6 +1,7 @@
 import base64
 import gzip
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -37,6 +38,26 @@ COMMUNITY_RECENT_MATCH_HISTORY_URL = "https://athens-live-api.worldsedgelink.com
 
 AVATAR_STAT_FOR_PROFILE_URL = "https://athens-live-api.worldsedgelink.com/community/leaderboard/GetAvatarStatForProfile"
 PERSONAL_STAT_URL = "https://athens-live-api.worldsedgelink.com/community/leaderboard/GetPersonalStat"
+
+COMMON_CURL_PATHS = [
+    "/usr/bin/curl",
+    "/bin/curl",
+    "/usr/local/bin/curl",
+]
+
+
+def resolve_curl_path() -> str | None:
+    curl_path = shutil.which("curl")
+    if curl_path:
+        return curl_path
+
+    for candidate in COMMON_CURL_PATHS:
+        if shutil.which(candidate):
+            return candidate
+        if os.path.exists(candidate) and os.access(candidate, os.X_OK):
+            return candidate
+
+    return None
 
 
 def normalize_platform_profile_name(platform: str, platform_id: str) -> str:
@@ -489,7 +510,7 @@ def post_json_with_curl(
     label: str,
     timeout_seconds: int = 30,
 ) -> dict[str, Any]:
-    curl_path = shutil.which("curl")
+    curl_path = resolve_curl_path()
     if not curl_path:
         return {
             "transport": "curl",
@@ -576,7 +597,7 @@ def get_json_with_curl(
     label: str,
     timeout_seconds: int = 30,
 ) -> dict[str, Any]:
-    curl_path = shutil.which("curl")
+    curl_path = resolve_curl_path()
     if not curl_path:
         return {
             "transport": "curl",
