@@ -7,7 +7,10 @@ from asgiref.sync import async_to_sync
 from django.test import SimpleTestCase
 
 from .leaderboard import (
+    COMMUNITY_RECENT_MATCH_HISTORY_URL,
     build_source_meta,
+    build_personal_stat_params,
+    build_recent_match_history_params,
     get_match_type_filter_ids,
     normalize_match_detail_for_player,
     normalize_personal_stat_record,
@@ -55,6 +58,10 @@ class PersonalStatNormalizationTests(SimpleTestCase):
         self.assertEqual(normalized["platform"], "steam")
         self.assertEqual(normalized["platform_id"], "76561199052679921")
 
+    def test_personal_stat_params_keep_profile_ids_numeric(self):
+        params = build_personal_stat_params(profile_ids=[1075470702, "208"])
+        self.assertEqual(json.loads(params["profile_ids"]), [1075470702, 208])
+
 
 class LeaderboardSearchTests(SimpleTestCase):
     @patch("lobbies.leaderboard.fetch_leaderboard_raw")
@@ -100,6 +107,16 @@ class LeaderboardSearchTests(SimpleTestCase):
 
 
 class RecentMatchHistoryNormalizationTests(SimpleTestCase):
+    def test_recent_match_history_params_keep_profile_ids_numeric(self):
+        params = build_recent_match_history_params(profile_ids=[1075470702, "208"])
+        self.assertEqual(json.loads(params["profile_ids"]), [1075470702, 208])
+
+    def test_recent_match_history_uses_athens_endpoint(self):
+        self.assertEqual(
+            COMMUNITY_RECENT_MATCH_HISTORY_URL,
+            "https://athens-live-api.worldsedgelink.com/community/Leaderboard/getRecentMatchHistory",
+        )
+
     def test_recent_history_decodes_payloads_and_normalizes_map(self):
         row = {
             "id": 555,

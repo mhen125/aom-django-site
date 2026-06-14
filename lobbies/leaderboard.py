@@ -32,7 +32,7 @@ FULL_STATS_URL = "https://api.ageofempires.com/api/GameStats/AgeMyth/GetFullStat
 MATCH_LIST_URL = "https://api.ageofempires.com/api/GameStats/AgeMyth/GetMatchList"
 MATCH_DETAIL_URL = "https://api.ageofempires.com/api/GameStats/AgeMyth/GetMatchDetail"
 COMMUNITY_LEADERBOARD2_URL = "https://andromeda-live-release18-api.worldsedgelink.com/community/leaderboard/getLeaderboard2"
-COMMUNITY_RECENT_MATCH_HISTORY_URL = "https://andromeda-live-release18-api.worldsedgelink.com/community/leaderboard/getRecentMatchHistory"
+COMMUNITY_RECENT_MATCH_HISTORY_URL = "https://athens-live-api.worldsedgelink.com/community/Leaderboard/getRecentMatchHistory"
 
 
 AVATAR_STAT_FOR_PROFILE_URL = "https://athens-live-api.worldsedgelink.com/community/leaderboard/GetAvatarStatForProfile"
@@ -1115,7 +1115,11 @@ def build_personal_stat_params(
     }
 
     if profile_ids:
-        params["profile_ids"] = json.dumps([str(value) for value in profile_ids if value not in (None, "")])
+        params["profile_ids"] = json.dumps([
+            int(value) if to_int_or_none(value) is not None else str(value)
+            for value in profile_ids
+            if value not in (None, "")
+        ])
 
     if profile_names:
         params["profile_names"] = json.dumps([str(value) for value in profile_names if value not in (None, "")])
@@ -1946,7 +1950,11 @@ def build_recent_match_history_params(
     }
 
     if profile_ids:
-        params["profile_ids"] = json.dumps([str(value) for value in profile_ids if value not in (None, "")])
+        params["profile_ids"] = json.dumps([
+            int(value) if to_int_or_none(value) is not None else str(value)
+            for value in profile_ids
+            if value not in (None, "")
+        ])
 
     if profile_names:
         params["profile_names"] = json.dumps([str(value) for value in profile_names if value not in (None, "")])
