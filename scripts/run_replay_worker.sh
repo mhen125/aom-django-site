@@ -4,10 +4,16 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+PYTHON_BIN="python3"
 
 if [[ -f "${PROJECT_ROOT}/.venv/bin/activate" ]]; then
   # shellcheck disable=SC1091
   source "${PROJECT_ROOT}/.venv/bin/activate"
+  PYTHON_BIN="${PROJECT_ROOT}/.venv/bin/python"
+elif [[ -x "${PROJECT_ROOT}/venv/bin/python" ]]; then
+  PYTHON_BIN="${PROJECT_ROOT}/venv/bin/python"
+elif [[ -x "${PROJECT_ROOT}/.venv/bin/python" ]]; then
+  PYTHON_BIN="${PROJECT_ROOT}/.venv/bin/python"
 fi
 
 cd "${PROJECT_ROOT}"
@@ -19,7 +25,7 @@ POLL_SECONDS="${PROSTAGMA_REPLAY_POLL_SECONDS:-300}"
 SUPPORTED_BUILDS="${PROSTAGMA_REPLAY_SUPPORTED_BUILDS:-${REPLAY_SUPPORTED_BUILDS:-}}"
 
 COMMAND=(
-  python manage.py run_replay_pipeline
+  "${PYTHON_BIN}" manage.py run_replay_pipeline
   --ranked-only
   --match-type "${MATCH_TYPE}"
   --1v1-only

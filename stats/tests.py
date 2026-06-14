@@ -5,6 +5,7 @@ from unittest.mock import patch
 import zipfile
 
 from django.core.management import call_command
+from django.db import OperationalError
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -194,6 +195,54 @@ class StatsImporterTests(TestCase):
         replay_parse.refresh_from_db()
         self.assertEqual(replay_parse.status, ReplayParse.STATUS_PARSED)
         self.assertEqual(replay_parse.parsed_json, {"ok": True})
+
+    def test_importer_retries_once_after_mysql_disconnect(self):
+        detail_match = {
+            "match_type": 1,
+            "match_type_label": "1v1 Supremacy",
+            "map": "Ghost Lake",
+            "date_time": "2026-06-01T12:00:00",
+            "players": [
+                {
+                    "profile_id": 11,
+                    "name": "Alpha",
+                    "team": 1,
+                    "slot": 1,
+                    "result": "win",
+                    "god": "Zeus",
+                    "elo": 1200,
+                    "match_replay_available": True,
+                }
+            ],
+        }
+        match_row = {
+            "match_id": "retry-1",
+            "map": "Ghost Lake",
+            "date_time": "2026-06-01T12:00:00",
+        }
+
+        original_update_or_create = Match.objects.update_or_create
+        call_counter = {"count": 0}
+
+        def flaky_update_or_create(*args, **kwargs):
+            call_counter["count"] += 1
+            if call_counter["count"] == 1:
+                raise OperationalError("MySQL server has gone away (SSLEOFError)")
+            return original_update_or_create(*args, **kwargs)
+
+        with patch("stats.importers.Match.objects.update_or_create", side_effect=flaky_update_or_create):
+            match, participant_count = _upsert_match_with_participants(
+                external_match_id="retry-1",
+                requested_match_type=1,
+                match_row=match_row,
+                detail_match=detail_match,
+                detail_raw={},
+                dry_run=False,
+            )
+
+        self.assertIsNotNone(match)
+        self.assertEqual(participant_count, 1)
+        self.assertEqual(call_counter["count"], 2)
 
     def test_backfill_replay_parses_creates_missing_rows_for_existing_matches(self):
         match = Match.objects.create(

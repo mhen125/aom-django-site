@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 from asgiref.sync import async_to_sync
-from django.db import transaction
+from django.db import OperationalError, close_old_connections, transaction
 
 from lobbies.leaderboard import (
     fetch_community_leaderboard2,
@@ -16,6 +16,11 @@ from lobbies.leaderboard_metadata import get_match_type_label, get_match_type_me
 
 from .models import Match, MatchParticipant, Player, ReplayParse
 from .replay_filters import ReplayPipelineFilters, apply_match_filters
+
+
+def _is_retryable_mysql_disconnect(error: Exception) -> bool:
+    message = str(error or "").casefold()
+    return "server has gone away" in message or "ssleoferror" in message
 
 
 def parse_upstream_datetime(value: Any):
@@ -325,91 +330,101 @@ def _upsert_match_with_participants(
         participants = detail_match.get("players") or []
         return None, len(participants) if participants else 1
 
-    with transaction.atomic():
-        match, _created = Match.objects.update_or_create(
-            external_match_id=str(external_match_id),
-            defaults=defaults,
-        )
-
-        participants = detail_match.get("players") or []
-        imported_participants = 0
-
-        if participants:
-            for index, participant in enumerate(participants):
-                participant_profile_id = participant.get("profile_id") or participant.get("user_id")
-                player = _upsert_player_from_identity(
-                    profile_id=participant_profile_id,
-                    alias=participant.get("name") or "",
-                    display_name=participant.get("name") or "",
-                    avatar_url=participant.get("avatar_url") or "",
-                    raw_identity=participant,
-                    dry_run=dry_run,
+    for attempt in range(2):
+        close_old_connections()
+        try:
+            with transaction.atomic():
+                match, _created = Match.objects.update_or_create(
+                    external_match_id=str(external_match_id),
+                    defaults=defaults,
                 )
 
-                result_value = str(participant.get("result") or "").casefold()
-                if result_value == "win":
-                    result = MatchParticipant.RESULT_WIN
-                    won = True
-                elif result_value == "loss":
-                    result = MatchParticipant.RESULT_LOSS
-                    won = False
+                participants = detail_match.get("players") or []
+                imported_participants = 0
+
+                if participants:
+                    for index, participant in enumerate(participants):
+                        participant_profile_id = participant.get("profile_id") or participant.get("user_id")
+                        player = _upsert_player_from_identity(
+                            profile_id=participant_profile_id,
+                            alias=participant.get("name") or "",
+                            display_name=participant.get("name") or "",
+                            avatar_url=participant.get("avatar_url") or "",
+                            raw_identity=participant,
+                            dry_run=dry_run,
+                        )
+
+                        result_value = str(participant.get("result") or "").casefold()
+                        if result_value == "win":
+                            result = MatchParticipant.RESULT_WIN
+                            won = True
+                        elif result_value == "loss":
+                            result = MatchParticipant.RESULT_LOSS
+                            won = False
+                        else:
+                            result = MatchParticipant.RESULT_UNKNOWN
+                            won = None
+
+                        slot_value = participant.get("slot")
+                        if slot_value in (None, ""):
+                            slot_value = index + 1
+
+                        MatchParticipant.objects.update_or_create(
+                            match=match,
+                            team=participant.get("team"),
+                            slot=slot_value,
+                            defaults={
+                                "player": player,
+                                "profile_id": int(participant_profile_id) if participant_profile_id not in (None, "") else None,
+                                "alias": participant.get("name") or "",
+                                "civilization": participant.get("god") or "",
+                                "faction": "",
+                                "result": result,
+                                "won": won,
+                                "rating": participant.get("elo"),
+                                "rating_change": participant.get("rating_change"),
+                                "raw_payload": participant,
+                            },
+                        )
+                        imported_participants += 1
                 else:
-                    result = MatchParticipant.RESULT_UNKNOWN
-                    won = None
+                    current_profile_id = detail_match.get("current_player", {}).get("profile_id")
+                    player = _upsert_player_from_identity(
+                        profile_id=current_profile_id,
+                        alias=detail_match.get("current_player", {}).get("name") or "",
+                        display_name=detail_match.get("current_player", {}).get("name") or "",
+                        raw_identity=detail_match.get("current_player") or {},
+                        dry_run=dry_run,
+                    )
+                    MatchParticipant.objects.update_or_create(
+                        match=match,
+                        team=1,
+                        slot=1,
+                        defaults={
+                            "player": player,
+                            "profile_id": current_profile_id,
+                            "alias": detail_match.get("current_player", {}).get("name") or "",
+                            "civilization": detail_match.get("civilization") or "",
+                            "faction": "",
+                            "result": MatchParticipant.RESULT_UNKNOWN,
+                            "won": None,
+                            "rating": detail_match.get("rating"),
+                            "rating_change": detail_match.get("rating_change"),
+                            "raw_payload": detail_match.get("current_player") or {},
+                        },
+                    )
+                    imported_participants = 1
 
-                slot_value = participant.get("slot")
-                if slot_value in (None, ""):
-                    slot_value = index + 1
+                _seed_replay_parse(match)
 
-                MatchParticipant.objects.update_or_create(
-                    match=match,
-                    team=participant.get("team"),
-                    slot=slot_value,
-                    defaults={
-                        "player": player,
-                        "profile_id": int(participant_profile_id) if participant_profile_id not in (None, "") else None,
-                        "alias": participant.get("name") or "",
-                        "civilization": participant.get("god") or "",
-                        "faction": "",
-                        "result": result,
-                        "won": won,
-                        "rating": participant.get("elo"),
-                        "rating_change": participant.get("rating_change"),
-                        "raw_payload": participant,
-                    },
-                )
-                imported_participants += 1
-        else:
-            current_profile_id = detail_match.get("current_player", {}).get("profile_id")
-            player = _upsert_player_from_identity(
-                profile_id=current_profile_id,
-                alias=detail_match.get("current_player", {}).get("name") or "",
-                display_name=detail_match.get("current_player", {}).get("name") or "",
-                raw_identity=detail_match.get("current_player") or {},
-                dry_run=dry_run,
-            )
-            MatchParticipant.objects.update_or_create(
-                match=match,
-                team=1,
-                slot=1,
-                defaults={
-                    "player": player,
-                    "profile_id": current_profile_id,
-                    "alias": detail_match.get("current_player", {}).get("name") or "",
-                    "civilization": detail_match.get("civilization") or "",
-                    "faction": "",
-                    "result": MatchParticipant.RESULT_UNKNOWN,
-                    "won": None,
-                    "rating": detail_match.get("rating"),
-                    "rating_change": detail_match.get("rating_change"),
-                    "raw_payload": detail_match.get("current_player") or {},
-                },
-            )
-            imported_participants = 1
+            return match, imported_participants
+        except OperationalError as error:
+            if attempt == 0 and _is_retryable_mysql_disconnect(error):
+                close_old_connections()
+                continue
+            raise
 
-        _seed_replay_parse(match)
-
-    return match, imported_participants
+    raise RuntimeError("Retry loop exhausted unexpectedly.")
 
 
 def import_recent_matches(
