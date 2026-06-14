@@ -1,5 +1,6 @@
 from io import StringIO
 import io
+import json
 import os
 from unittest.mock import patch
 import zipfile
@@ -10,7 +11,12 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from stats.importers import _upsert_match_with_participants, backfill_replay_parses, import_recent_matches
+from stats.importers import (
+    _upsert_match_with_participants,
+    backfill_player_personal_stats,
+    backfill_replay_parses,
+    import_recent_matches,
+)
 from stats.models import Match, MatchParticipant, Player, ReplayParse
 from stats.readers import get_imported_leaderboard_rows, get_imported_player_rating
 from stats.replay_acquisition import (
@@ -123,6 +129,126 @@ class StatsViewTests(TestCase):
 
 
 class StatsImporterTests(TestCase):
+    @patch("stats.importers.fetch_personal_stat_summary")
+    def test_backfill_player_personal_stats_updates_missing_rows(self, fetch_personal_stat_summary_mock):
+        Player.objects.create(
+            profile_id=107,
+            alias="Mosca",
+            display_name="Mosca",
+            raw_identity={"source": "seed"},
+        )
+        fetch_personal_stat_summary_mock.return_value = {
+            "ok": True,
+            "display_name": "Mosca",
+            "status_code": 200,
+            "shape": {"type": "personal_stat"},
+            "raw": {"leaderboardStats": []},
+            "ratings": [
+                {
+                    "name": "Mosca",
+                    "profile_id": 107,
+                    "queue_id": 1,
+                    "leaderboard_id": 1,
+                    "match_type": 1,
+                    "match_type_label": "Ranked 1v1",
+                    "rating": 1201,
+                    "highest_rating": 1210,
+                    "rank": 14,
+                    "wins": 20,
+                    "losses": 10,
+                    "games": 30,
+                    "win_rate": 66.7,
+                    "country": "us",
+                }
+            ],
+        }
+
+        summary = backfill_player_personal_stats(
+            match_type=1,
+            missing_only=True,
+            refresh=True,
+        )
+
+        self.assertTrue(summary["ok"])
+        self.assertEqual(summary["players_scanned"], 1)
+        self.assertEqual(summary["rows_updated"], 1)
+        self.assertEqual(summary["rows_failed"], 0)
+
+        player = Player.objects.get(profile_id=107)
+        self.assertEqual(player.raw_identity.get("rating"), 1201)
+        self.assertEqual(len(player.raw_identity.get("personal_stat_ratings", [])), 1)
+
+    @patch("stats.importers.fetch_personal_stat_summary")
+    def test_backfill_player_personal_stats_missing_only_skips_existing_queue_rating(self, fetch_personal_stat_summary_mock):
+        Player.objects.create(
+            profile_id=107,
+            alias="Mosca",
+            display_name="Mosca",
+            raw_identity={
+                "personal_stat_ratings": [
+                    {
+                        "profile_id": 107,
+                        "queue_id": 1,
+                        "match_type": 1,
+                        "rating": 1201,
+                    }
+                ]
+            },
+        )
+
+        summary = backfill_player_personal_stats(
+            match_type=1,
+            missing_only=True,
+            refresh=True,
+        )
+
+        self.assertTrue(summary["ok"])
+        self.assertEqual(summary["players_scanned"], 1)
+        self.assertEqual(summary["rows_skipped"], 1)
+        self.assertEqual(summary["rows_updated"], 0)
+        fetch_personal_stat_summary_mock.assert_not_called()
+
+    @patch("stats.importers.fetch_personal_stat_summary")
+    def test_backfill_player_personal_stats_command_outputs_summary(self, fetch_personal_stat_summary_mock):
+        Player.objects.create(
+            profile_id=107,
+            alias="Mosca",
+            display_name="Mosca",
+            raw_identity={},
+        )
+        fetch_personal_stat_summary_mock.return_value = {
+            "ok": True,
+            "display_name": "Mosca",
+            "status_code": 200,
+            "shape": {"type": "personal_stat"},
+            "raw": {"leaderboardStats": []},
+            "ratings": [
+                {
+                    "name": "Mosca",
+                    "profile_id": 107,
+                    "queue_id": 1,
+                    "leaderboard_id": 1,
+                    "match_type": 1,
+                    "match_type_label": "Ranked 1v1",
+                    "rating": 1201,
+                }
+            ],
+        }
+
+        stdout = StringIO()
+        call_command(
+            "backfill_player_personal_stats",
+            "--match-type", "1",
+            "--missing-only",
+            "--json",
+            stdout=stdout,
+        )
+
+        payload = json.loads(stdout.getvalue())
+        self.assertTrue(payload["ok"])
+        self.assertEqual(payload["players_scanned"], 1)
+        self.assertEqual(payload["rows_updated"], 1)
+
     @patch("stats.importers.fetch_match_detail_raw")
     @patch("stats.importers.fetch_recent_match_history")
     @patch("stats.importers.fetch_personal_stat_summary")

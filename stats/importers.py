@@ -165,7 +165,128 @@ def _hydrate_player_with_personal_stat(
         "best_rating": best_rating,
         "rating_count": len(ratings),
         "status_code": personal_stat_response.get("status_code"),
+        "payload": player_payload,
     }
+
+
+def backfill_player_personal_stats(
+    *,
+    match_type: int = 1,
+    profile_ids: list[int] | None = None,
+    limit: int | None = None,
+    ranked_only: bool = False,
+    missing_only: bool = False,
+    refresh: bool = False,
+    dry_run: bool = False,
+) -> dict[str, Any]:
+    queryset = Player.objects.exclude(profile_id__isnull=True).order_by("id")
+
+    normalized_profile_ids = [int(value) for value in (profile_ids or [])]
+    if normalized_profile_ids:
+        queryset = queryset.filter(profile_id__in=normalized_profile_ids)
+
+    if ranked_only:
+        queryset = queryset.filter(match_participations__match__is_ranked=True).distinct()
+
+    players = list(queryset[: int(limit)]) if limit is not None and int(limit) > 0 else list(queryset)
+
+    results = {
+        "ok": True,
+        "match_type": match_type,
+        "match_type_label": get_match_type_label(match_type),
+        "ranked_only": ranked_only,
+        "missing_only": missing_only,
+        "refresh": refresh,
+        "dry_run": dry_run,
+        "requested_profile_ids": normalized_profile_ids,
+        "players_scanned": 0,
+        "rows_updated": 0,
+        "rows_unchanged": 0,
+        "rows_skipped": 0,
+        "rows_failed": 0,
+        "events": [],
+    }
+
+    for player in players:
+        results["players_scanned"] += 1
+
+        existing_queue_rating = None
+        raw_identity = player.raw_identity if isinstance(player.raw_identity, dict) else {}
+        personal_stat_ratings = raw_identity.get("personal_stat_ratings") if isinstance(raw_identity.get("personal_stat_ratings"), list) else []
+        for rating in personal_stat_ratings:
+            if not isinstance(rating, dict):
+                continue
+            queue_id = rating.get("queue_id") or rating.get("match_type") or rating.get("leaderboard_id")
+            if int(queue_id or 0) == int(match_type):
+                existing_queue_rating = rating
+                break
+
+        if missing_only and existing_queue_rating is not None:
+            results["rows_skipped"] += 1
+            results["events"].append(
+                {
+                    "profile_id": int(player.profile_id),
+                    "player": player.alias or player.display_name or "",
+                    "stage": "skipped_existing_queue_rating",
+                }
+            )
+            continue
+
+        before_payload = dict(raw_identity)
+        try:
+            hydration = _hydrate_player_with_personal_stat(
+                profile_id=int(player.profile_id),
+                player_name=player.alias or player.display_name or "",
+                match_type=match_type,
+                refresh=refresh,
+                dry_run=dry_run,
+            )
+        except Exception as error:
+            results["rows_failed"] += 1
+            results["events"].append(
+                {
+                    "profile_id": int(player.profile_id),
+                    "player": player.alias or player.display_name or "",
+                    "stage": "failed",
+                    "error": str(error),
+                }
+            )
+            continue
+
+        if hydration is None:
+            results["rows_failed"] += 1
+            results["events"].append(
+                {
+                    "profile_id": int(player.profile_id),
+                    "player": player.alias or player.display_name or "",
+                    "stage": "no_personal_stat_rating",
+                }
+            )
+            continue
+
+        after_payload = _normalize_player_payload(before_payload, hydration["payload"])
+        changed = after_payload != before_payload
+
+        if changed:
+            results["rows_updated"] += 1
+        else:
+            results["rows_unchanged"] += 1
+
+        best_rating = hydration.get("best_rating") or {}
+        results["events"].append(
+            {
+                "profile_id": int(player.profile_id),
+                "player": best_rating.get("name") or player.alias or player.display_name or "",
+                "stage": "hydrated",
+                "changed": changed,
+                "rating": best_rating.get("rating"),
+                "rank": best_rating.get("rank"),
+                "rating_count": hydration.get("rating_count"),
+                "dry_run": dry_run,
+            }
+        )
+
+    return results
 
 
 def _build_match_defaults(
