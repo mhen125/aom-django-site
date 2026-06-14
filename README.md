@@ -208,6 +208,7 @@ node --check agora/static/js/agora.js
 ## Deployment Notes
 
 - Replay worker `systemd` setup: `docs/REPLAY_WORKER_SYSTEMD.md`
+- Match importer `systemd` setup: `docs/MATCH_IMPORTER_SYSTEMD.md`
 
 ## Project Status
 

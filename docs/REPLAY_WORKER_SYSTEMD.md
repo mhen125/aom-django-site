@@ -193,11 +193,8 @@ Check these first:
 - `RESTORATION_BINARY_PATH` points to a real executable
 - the service user has permission to run the parser binary
 
-## Suggested Next Improvement
+## Pair It With The Importer
 
-Once this is running stably, the next ops upgrade should be a second scheduled command for:
+To keep the worker fed automatically, pair this with the scheduled importer documented in:
 
-- `import_recent_matches`
-- then replay worker processing
-
-That gives the VPS a full ingest-to-parse loop instead of only the parse side.
+- `docs/MATCH_IMPORTER_SYSTEMD.md`

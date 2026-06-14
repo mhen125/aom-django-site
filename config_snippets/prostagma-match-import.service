@@ -1,0 +1,12 @@
+[Unit]
+Description=Prostagma ranked match importer
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=mark
+Group=mark
+WorkingDirectory=/srv/prostagma/current
+EnvironmentFile=/srv/prostagma/current/.env
+ExecStart=/srv/prostagma/current/scripts/run_match_importer.sh
