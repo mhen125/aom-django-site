@@ -1,4 +1,5 @@
 import json
+from unittest.mock import patch
 
 from django.core.management import call_command
 from django.contrib.auth import get_user_model
@@ -6,7 +7,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from builds.models import BuildOrder, MajorGod, Pantheon
-from builds.views import clean_static_path, static_relative_path, strip_manifest_hash
+from builds.views import clean_static_path, safe_static_url, static_relative_path, strip_manifest_hash
 
 
 class BuildAssetPathNormalizationTests(TestCase):
@@ -31,6 +32,10 @@ class BuildAssetPathNormalizationTests(TestCase):
             static_relative_path("assets/images/score_age_2.abcdef123456.png"),
             "assets/images/score_age_2.png",
         )
+
+    def test_safe_static_url_returns_empty_string_for_missing_manifest_entry(self):
+        with patch("builds.views.static", side_effect=ValueError("Missing staticfiles manifest entry")):
+            self.assertEqual(safe_static_url("assets/images/missing.png"), "")
 
 
 class BuildSaveEndpointTests(TestCase):

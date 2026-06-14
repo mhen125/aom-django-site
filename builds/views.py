@@ -531,6 +531,18 @@ def strip_manifest_hash(path):
     return f"{head}{separator}{cleaned_tail}"
 
 
+def safe_static_url(path):
+    value = str(path or "").strip()
+
+    if not value:
+        return ""
+
+    try:
+        return static(value)
+    except ValueError:
+        return ""
+
+
 def asset_url(path, fallback=""):
     value = str(path or "").strip()
 
@@ -549,7 +561,7 @@ def asset_url(path, fallback=""):
     while value.startswith("../"):
         value = value[3:]
 
-    return static(strip_manifest_hash(value).lstrip("/"))
+    return safe_static_url(strip_manifest_hash(value).lstrip("/"))
 
 
 def static_relative_path(path):
@@ -603,7 +615,7 @@ def resolve_static_asset_path(path):
 
 def static_asset_url(path):
     relative_path = resolve_static_asset_path(path)
-    return static(relative_path) if relative_path else ""
+    return safe_static_url(relative_path) if relative_path else ""
 
 
 def optimized_static_asset_url(path, variant=""):
@@ -618,7 +630,7 @@ def optimized_static_asset_url(path, variant=""):
     if not (settings.BASE_DIR / "static" / optimized_path).exists():
         return ""
 
-    return static(optimized_path)
+    return safe_static_url(optimized_path)
 
 
 def god_portrait_url(god_slug):
