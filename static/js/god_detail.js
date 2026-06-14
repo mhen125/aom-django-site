@@ -81,7 +81,8 @@ function optimizedAssetPath(path, variant = "") {
     return "";
   }
 
-  const extensionless = relativePath.replace(/\.png$/i, "");
+  const unhashedRelativePath = relativePath.replace(/\.([0-9a-f]{12})\.png$/i, ".png");
+  const extensionless = unhashedRelativePath.replace(/\.png$/i, "");
   const optimizedPath = extensionless.replace("assets/images/", "assets/optimized/images/");
 
   return staticPath(`${optimizedPath}${variant}.webp`);
