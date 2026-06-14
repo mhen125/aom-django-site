@@ -364,6 +364,57 @@
   padding-top: 0.3rem;
 }
 
+.player-stats-story-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.1rem;
+}
+
+.player-stats-story-card {
+  min-height: 100%;
+  border: 1px solid rgba(226, 193, 122, 0.16);
+  background:
+    radial-gradient(circle at top left, rgba(226, 193, 122, 0.12), transparent 45%),
+    linear-gradient(180deg, rgba(16, 28, 45, 0.9), rgba(8, 17, 31, 0.9));
+}
+
+.player-stats-verdict-panel {
+  position: relative;
+  overflow: hidden;
+}
+
+.player-stats-verdict-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 0.22rem;
+  background: linear-gradient(90deg, #f3d18a, #d86844, #7aa6d9);
+  opacity: 0.95;
+}
+
+.player-stats-verdict-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.35rem;
+}
+
+.player-stats-verdict-body {
+  margin: 1rem 0 0;
+  max-width: 64ch;
+  color: rgba(241, 232, 214, 0.92);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.player-stats-verdict-evidence {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin-top: 1rem;
+}
+
 .leaderboards-stat-grid,
 .leaderboards-list-grid {
   display: grid;
@@ -594,6 +645,11 @@
   .player-stats-banner {
     align-items: flex-start;
   }
+
+  .player-stats-story-strip,
+  .player-stats-verdict-evidence {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 620px) {
@@ -631,6 +687,10 @@
     width: 3.4rem;
     height: 3.4rem;
     font-size: 1.08rem;
+  }
+
+  .player-stats-story-strip {
+    margin-top: 0.8rem;
   }
 }
 

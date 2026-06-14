@@ -39,8 +39,8 @@
         <p class="leaderboards-kicker">Player Record</p>
         <h1 id="playerStatsPageTitle">Player Stats Hub</h1>
         <p id="playerStatsLead">
-          Look up a player by name or profile ID, then inspect ladder rows, deeper recent match history,
-          god selection, and map rotation from a dedicated profile view.
+          Load a real Prostagma player profile with queue-specific ratings, form reads, signature gods,
+          and recent match evidence that is actually easy to scan.
         </p>
         <a class="leaderboards-ghost-link" href="{% url 'lobbies:leaderboard_home' %}">
           Back to leaderboards
@@ -72,6 +72,24 @@
           Search for a player to load a dedicated profile.
         </p>
       </form>
+    </section>
+
+    <section class="player-stats-story-strip" aria-label="Player profile goals">
+      <article class="leaderboards-list-card player-stats-story-card">
+        <span>Profile read</span>
+        <strong>Fast verdicts first</strong>
+        <p>Recent form, queue strength, and signature tendencies should be obvious before you ever hit the tables.</p>
+      </article>
+      <article class="leaderboards-list-card player-stats-story-card">
+        <span>What to study</span>
+        <strong>Gods, maps, and streaks</strong>
+        <p>Track what this player actually queues, what they win with, and whether they are climbing or cooling off.</p>
+      </article>
+      <article class="leaderboards-list-card player-stats-story-card">
+        <span>Where this goes</span>
+        <strong>Replay-backed profiles</strong>
+        <p>This page is the staging ground for strategy tags, build reads, and replay-derived study links.</p>
+      </article>
     </section>
 
     <section id="playerStatsSearchResultsPanel" class="leaderboards-search-results leaderboards-panel" hidden>
@@ -144,6 +162,32 @@
         </div>
 
         <div id="playerStatsCards" class="leaderboards-stat-grid"></div>
+      </article>
+
+      <article class="leaderboards-profile-overview leaderboards-panel player-stats-verdict-panel">
+        <div class="leaderboards-section-head">
+          <div>
+            <p class="leaderboards-kicker">Prostagma Read</p>
+            <h2 id="playerStatsVerdictTitle">Load a player to generate a profile read</h2>
+          </div>
+          <span id="playerStatsVerdictMeta" class="leaderboards-meta-note">Bold summary, supported by current queue data.</span>
+        </div>
+
+        <div id="playerStatsVerdictBadges" class="player-stats-verdict-badges">
+          <span class="player-stats-badge">Awaiting data</span>
+        </div>
+
+        <p id="playerStatsVerdictBody" class="player-stats-verdict-body">
+          This panel will call out recent form, ladder strength, signature gods, and the clearest story from the returned profile data.
+        </p>
+
+        <div id="playerStatsVerdictEvidence" class="player-stats-verdict-evidence">
+          <article class="leaderboards-list-card">
+            <span>Recent form</span>
+            <strong>Waiting for profile</strong>
+            <p>Load a player to turn recent results into a readable story.</p>
+          </article>
+        </div>
       </article>
 
       <article class="leaderboards-profile-overview leaderboards-panel">

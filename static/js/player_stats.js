@@ -40,6 +40,11 @@
   const queueChips = document.getElementById("playerStatsQueueChips");
   const ratingsBody = document.getElementById("playerStatsRatingsBody");
   const profileCards = document.getElementById("playerStatsCards");
+  const verdictTitle = document.getElementById("playerStatsVerdictTitle");
+  const verdictMeta = document.getElementById("playerStatsVerdictMeta");
+  const verdictBody = document.getElementById("playerStatsVerdictBody");
+  const verdictBadges = document.getElementById("playerStatsVerdictBadges");
+  const verdictEvidence = document.getElementById("playerStatsVerdictEvidence");
   const matchesMeta = document.getElementById("playerStatsMatchesMeta");
   const prevMatchesButton = document.getElementById("playerStatsPrevMatches");
   const nextMatchesButton = document.getElementById("playerStatsNextMatches");
@@ -235,6 +240,157 @@
           <article class="leaderboards-stat-card">
             <span>${escapeHtml(card.label)}</span>
             <strong>${escapeHtml(card.value)}</strong>
+          </article>
+        `,
+      )
+      .join("");
+  }
+
+  function sumRecentRatingChange(matches, limit = 8) {
+    return matches
+      .slice(0, limit)
+      .reduce((total, match) => {
+        const value = Number(match?.rating_change);
+        return Number.isFinite(value) ? total + value : total;
+      }, 0);
+  }
+
+  function countRecentResolved(matches, limit = 10) {
+    const sample = matches.slice(0, limit);
+    const wins = sample.filter((match) => String(match?.result || "").toLowerCase() === "win").length;
+    const losses = sample.filter((match) => String(match?.result || "").toLowerCase() === "loss").length;
+    return {
+      sample,
+      wins,
+      losses,
+      resolved: wins + losses,
+      winRate: wins + losses > 0 ? (wins / (wins + losses)) * 100 : 0,
+    };
+  }
+
+  function buildVerdict(summaryPayload, statsPayload, ratingPayload) {
+    const ratings = Array.isArray(summaryPayload?.ratings) ? summaryPayload.ratings.filter((item) => item?.rating) : [];
+    const primaryRatingBucket = ratings.find((item) => Number(item.match_type) === Number(state.activeMatchType));
+    const ratingPayloadRecord = getRatingQueueId(ratingPayload?.rating) === Number(state.activeMatchType) ? ratingPayload?.rating : null;
+    const primaryRating = primaryRatingBucket?.rating || ratingPayloadRecord || null;
+    const matches = Array.isArray(state.loadedMatches) ? state.loadedMatches : [];
+    const gods = Array.isArray(statsPayload?.gods) ? statsPayload.gods : [];
+    const maps = Array.isArray(statsPayload?.maps) ? statsPayload.maps : [];
+    const recent = countRecentResolved(matches, 10);
+    const queueLabel = getQueueLabel(state.activeMatchType);
+    const displayName = summaryPayload?.display_name || state.loadedProfile?.player || "This player";
+    const rating = Number(primaryRating?.rating);
+    const games = Number(primaryRating?.games);
+    const topGod = gods[0] || null;
+    const topMap = maps[0] || null;
+    const trend = sumRecentRatingChange(matches, 8);
+
+    const badges = [];
+
+    if (Number.isFinite(rating) && rating >= 1400) {
+      badges.push("LADDER THREAT");
+    } else if (Number.isFinite(rating) && rating >= 1200) {
+      badges.push("COMPETITIVE");
+    } else if (Number.isFinite(rating) && rating < 1000) {
+      badges.push("DEVELOPING");
+    }
+
+    if (recent.resolved >= 6 && recent.winRate >= 70) {
+      badges.push("HEATING UP");
+    } else if (recent.resolved >= 6 && recent.winRate <= 35) {
+      badges.push("SLIPPING");
+    }
+
+    if (trend >= 40) {
+      badges.push("RISING");
+    } else if (trend <= -40) {
+      badges.push("FALLING");
+    }
+
+    if (topGod && Number(topGod.percent) >= 50 && Number(topGod.count) >= 5) {
+      badges.push(`${String(topGod.name || "GOD").toUpperCase()} SPECIALIST`);
+    } else if (topGod && Number(topGod.percent) <= 30 && gods.length >= 3) {
+      badges.push("WIDE GOD POOL");
+    }
+
+    if (topMap && Number(topMap.percent) >= 40 && Number(topMap.count) >= 4) {
+      badges.push("MAP LOYALIST");
+    }
+
+    if (Number.isFinite(games) && games >= 200) {
+      badges.push("GRINDER");
+    }
+
+    const uniqueBadges = [...new Set(badges)].slice(0, 4);
+
+    let titleText = `${displayName} is still taking shape in ${queueLabel}.`;
+    let bodyText = `${displayName} does not yet have a dominant current-queue signal, so the page leans on recent form, god choice, and map habits.`;
+
+    if (recent.resolved >= 6 && recent.winRate >= 70 && trend >= 20) {
+      titleText = `${displayName} is climbing in ${queueLabel}.`;
+      bodyText = `The recent sample points to real momentum: wins are stacking up, rating is moving in the right direction, and this queue looks live for them right now.`;
+    } else if (recent.resolved >= 6 && recent.winRate <= 35 && trend <= -20) {
+      titleText = `${displayName} is in a rough stretch in ${queueLabel}.`;
+      bodyText = `Recent results and rating movement both point the same way. This profile is cooling off right now, not quietly holding steady.`;
+    } else if (topGod && Number(topGod.percent) >= 55 && Number(topGod.count) >= 5) {
+      titleText = `${displayName} is leaning hard on ${topGod.name}.`;
+      bodyText = `${topGod.name} is not just the most-played god here. It is the center of gravity for this player’s recent queue sample.`;
+    } else if (Number.isFinite(rating) && rating >= 1400) {
+      titleText = `${displayName} looks dangerous in ${queueLabel}.`;
+      bodyText = `The rating profile puts this player in serious ladder territory, and the page has enough recent evidence to treat this as a real queue presence.`;
+    } else if (Number.isFinite(games) && games >= 200) {
+      titleText = `${displayName} is a real ladder regular in ${queueLabel}.`;
+      bodyText = `This is not a one-week blip profile. There is enough volume here to trust the general shape of the queue record.`;
+    }
+
+    const evidence = [
+      {
+        label: "Recent form",
+        strong: recent.resolved ? `${recent.wins}-${recent.losses} in last ${recent.resolved}` : "No resolved sample",
+        body: recent.resolved ? `${formatPercent(recent.winRate)} win rate across the latest resolved matches.` : "There are not enough recent wins and losses returned to call the trend yet.",
+      },
+      {
+        label: "Queue strength",
+        strong: Number.isFinite(rating) ? `${formatNumber(rating)} ELO in ${queueLabel}` : `No returned ${queueLabel} rating`,
+        body: primaryRating?.rank ? `Current listed rank: #${formatNumber(primaryRating.rank)}.` : "Rank data was not returned for this queue snapshot.",
+      },
+      {
+        label: "Signature god",
+        strong: topGod ? `${topGod.name} in ${formatPercent(topGod.percent)}` : "No god read yet",
+        body: topGod ? `${formatNumber(topGod.count)} recent matches with ${topGod.name} at ${formatPercent(topGod.win_rate)} win rate.` : "Recent god usage was not rich enough to isolate a signature pick.",
+      },
+      {
+        label: "Map habit",
+        strong: topMap ? `${topMap.name} at ${formatPercent(topMap.percent)}` : "No map read yet",
+        body: topMap ? `${formatNumber(topMap.count)} recent games on ${topMap.name}.` : "The returned match slice did not produce a strong map tendency.",
+      },
+    ];
+
+    return {
+      badges: uniqueBadges.length ? uniqueBadges : ["PROFILE LOADING"],
+      titleText,
+      bodyText,
+      evidence,
+      metaText: `Built from ${queueLabel} ladder data, recent matches, and returned profile breakdowns.`,
+    };
+  }
+
+  function renderVerdict(summaryPayload, statsPayload, ratingPayload) {
+    const verdict = buildVerdict(summaryPayload, statsPayload, ratingPayload);
+
+    verdictTitle.textContent = verdict.titleText;
+    verdictMeta.textContent = verdict.metaText;
+    verdictBody.textContent = verdict.bodyText;
+    verdictBadges.innerHTML = verdict.badges
+      .map((badge) => `<span class="player-stats-badge">${escapeHtml(badge)}</span>`)
+      .join("");
+    verdictEvidence.innerHTML = verdict.evidence
+      .map(
+        (item) => `
+          <article class="leaderboards-list-card">
+            <span>${escapeHtml(item.label)}</span>
+            <strong>${escapeHtml(item.strong)}</strong>
+            <p>${escapeHtml(item.body)}</p>
           </article>
         `,
       )
@@ -514,6 +670,7 @@
     state.matchesPage = 1;
     syncQueueChips();
     renderCards(summaryPayload, statsPayload, ratingPayload);
+    renderVerdict(summaryPayload, statsPayload, ratingPayload);
     renderRatingsTable(summaryPayload, ratingPayload);
     renderMatches();
     renderGods(statsPayload);
@@ -565,6 +722,17 @@
     queueBadge.textContent = "Queue";
     sourceBadge.textContent = "Source";
     identityLine.textContent = "Profile view for ladder tracking, recent results, and queue comparisons.";
+    verdictTitle.textContent = "Load a player to generate a profile read";
+    verdictMeta.textContent = "Bold summary, supported by current queue data.";
+    verdictBody.textContent = "This panel will call out recent form, ladder strength, signature gods, and the clearest story from the returned profile data.";
+    verdictBadges.innerHTML = '<span class="player-stats-badge">Awaiting data</span>';
+    verdictEvidence.innerHTML = `
+      <article class="leaderboards-list-card">
+        <span>Recent form</span>
+        <strong>Waiting for profile</strong>
+        <p>Load a player to turn recent results into a readable story.</p>
+      </article>
+    `;
     matchesMeta.textContent = "Recent matches";
     matchesPageLabel.textContent = "Page 1";
     prevMatchesButton.disabled = true;

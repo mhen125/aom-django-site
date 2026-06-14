@@ -126,6 +126,7 @@ class StatsViewTests(TestCase):
         response = self.client.get(reverse("stats:player_profile", args=[1075470702]))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "1075470702")
+        self.assertContains(response, "Prostagma Read")
 
 
 class StatsImporterTests(TestCase):
