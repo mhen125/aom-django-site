@@ -192,9 +192,20 @@
 .leaderboards-primary-button,
 .leaderboards-secondary-button,
 .leaderboards-ghost-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
   padding: 0.75rem 1.05rem;
   cursor: pointer;
   text-transform: uppercase;
+}
+
+.leaderboards-button-icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  object-fit: contain;
+  flex: 0 0 auto;
 }
 
 .leaderboards-primary-button {

@@ -10,7 +10,6 @@
 
   const state = {
     browseMatchType: Number(defaultQueues[0]?.id || 1),
-    profileMatchType: Number(defaultQueues[0]?.id || 1),
     browsePage: 1,
     browseCount: 25,
   };
@@ -29,18 +28,8 @@
   const searchResultsPanel = document.getElementById("leaderboardSearchResultsPanel");
   const searchResultsMeta = document.getElementById("leaderboardSearchResultsMeta");
   const searchResultsBody = document.getElementById("leaderboardSearchResultsBody");
-  const profilePanel = document.getElementById("leaderboardProfilePanel");
-  const profileName = document.getElementById("leaderboardProfileName");
-  const profileMeta = document.getElementById("leaderboardProfileMeta");
-  const fullProfileLink = document.getElementById("leaderboardFullProfileLink");
-  const profileCards = document.getElementById("leaderboardProfileCards");
-  const godsMeta = document.getElementById("leaderboardGodsMeta");
-  const godsList = document.getElementById("leaderboardGodsList");
-  const mapsList = document.getElementById("leaderboardMapsList");
-  const matchesBody = document.getElementById("leaderboardRecentMatchesBody");
   state.loadedProfile = null;
   state.browseRequestId = 0;
-  state.profileRequestId = 0;
 
   function escapeHtml(value) {
     return String(value ?? "")
@@ -100,8 +89,8 @@
       if (player) {
         url.searchParams.set("player", player);
       }
-      if (state.profileMatchType) {
-        url.searchParams.set("match_type", String(state.profileMatchType));
+      if (state.browseMatchType) {
+        url.searchParams.set("match_type", String(state.browseMatchType));
       }
       return url.toString();
     }
@@ -109,23 +98,12 @@
     return buildUrl(config.playerStatsUrl || "/stats/player/", {
       profile_id: profileId,
       player,
-      match_type: state.profileMatchType,
+      match_type: state.browseMatchType,
     });
   }
 
-  function updateFullProfileLink(profile) {
-    if (!fullProfileLink) {
-      return;
-    }
-
-    if (!profile?.profileId && !profile?.player) {
-      fullProfileLink.hidden = true;
-      fullProfileLink.removeAttribute("href");
-      return;
-    }
-
-    fullProfileLink.hidden = false;
-    fullProfileLink.href = buildProfileUrl(profile);
+  function openPlayerProfile({ player, profileId }) {
+    window.location.assign(buildProfileUrl({ player, profileId }));
   }
 
   async function fetchJson(url) {
@@ -240,7 +218,7 @@
             <td>
               <div class="leaderboards-player-cell">
                 <strong>${escapeHtml(row.name || "Unknown")}</strong>
-                <small>${escapeHtml(row.country ? String(row.country).toUpperCase() : getQueueLabel(state.profileMatchType))}</small>
+                <small>${escapeHtml(row.country ? String(row.country).toUpperCase() : getQueueLabel(state.browseMatchType))}</small>
               </div>
             </td>
             <td>${escapeHtml(row.profile_id || "-")}</td>
@@ -268,14 +246,12 @@
         <td colspan="5" class="leaderboards-table-empty">Loading matching profiles...</td>
       </tr>
     `;
-    profilePanel.hidden = true;
     state.loadedProfile = null;
-    updateFullProfileLink(null);
 
     const payload = await fetchJson(
       buildUrl(config.browseUrl, {
         player: query,
-        match_type: state.profileMatchType,
+        match_type: state.browseMatchType,
         page: 1,
         count: 25,
       }),
@@ -331,194 +307,6 @@
     }
   }
 
-  function renderProfileCards(summaryPayload, statsPayload, ratingPayload) {
-    const ratings = Array.isArray(summaryPayload?.ratings) ? summaryPayload.ratings.filter((item) => item?.rating) : [];
-    const primaryRatingBucket = ratings.find((item) => Number(item.match_type) === Number(state.profileMatchType));
-    const ratingPayloadRecord = getRatingQueueId(ratingPayload?.rating) === Number(state.profileMatchType) ? ratingPayload?.rating : null;
-    const primaryRating = primaryRatingBucket?.rating || ratingPayloadRecord || null;
-    const summary = statsPayload?.summary || {};
-
-    const cards = [
-      { label: "Current ELO", value: primaryRating?.rating ?? "-" },
-      { label: "Rank", value: primaryRating?.rank ? `#${primaryRating.rank}` : "-" },
-      { label: "Peak", value: primaryRating?.highest_rating ?? "-" },
-      { label: "Games", value: primaryRating?.games ?? "-" },
-      { label: "Win Rate", value: formatPercent(primaryRating?.win_rate) },
-      { label: "Wins", value: formatNumber(primaryRating?.wins ?? summary.wins) },
-      { label: "Losses", value: formatNumber(primaryRating?.losses ?? summary.losses) },
-    ];
-
-    profileCards.innerHTML = cards
-      .map(
-        (card) => `
-          <article class="leaderboards-stat-card">
-            <span>${escapeHtml(card.label)}</span>
-            <strong>${escapeHtml(card.value)}</strong>
-          </article>
-        `,
-      )
-      .join("");
-  }
-
-  function renderGods(statsPayload) {
-    const gods = Array.isArray(statsPayload?.gods) ? statsPayload.gods.slice(0, 6) : [];
-    godsMeta.textContent = `${formatNumber(statsPayload?.total_matches || 0)} recent matches returned`;
-
-    if (!gods.length) {
-      godsList.innerHTML = `<article class="leaderboards-list-card"><strong>No recent god data</strong><p>Try another player or queue.</p></article>`;
-      return;
-    }
-
-    godsList.innerHTML = gods
-      .map(
-        (god) => `
-          <article class="leaderboards-list-card">
-            <span>${escapeHtml(god.name)}</span>
-            <strong>${escapeHtml(formatNumber(god.count))} matches</strong>
-            <p>${escapeHtml(formatPercent(god.win_rate))} win rate · ${escapeHtml(formatPercent(god.percent))} of returned recent matches</p>
-          </article>
-        `,
-      )
-      .join("");
-  }
-
-  function renderMaps(statsPayload) {
-    const maps = Array.isArray(statsPayload?.maps) ? statsPayload.maps.slice(0, 6) : [];
-
-    if (!maps.length) {
-      mapsList.innerHTML = `<article class="leaderboards-list-card"><strong>No recent map data</strong><p>Try another player or queue.</p></article>`;
-      return;
-    }
-
-    mapsList.innerHTML = maps
-      .map(
-        (map) => `
-          <article class="leaderboards-list-card">
-            <span>${escapeHtml(map.name)}</span>
-            <strong>${escapeHtml(formatNumber(map.count))} matches</strong>
-            <p>${escapeHtml(formatPercent(map.percent))} of returned recent matches</p>
-          </article>
-        `,
-      )
-      .join("");
-  }
-
-  function renderMatches(summaryPayload) {
-    const matches = Array.isArray(summaryPayload?.recent_matches?.matches)
-      ? summaryPayload.recent_matches.matches.slice(0, 12)
-      : [];
-
-    if (!matches.length) {
-      matchesBody.innerHTML = `
-        <tr>
-          <td colspan="6" class="leaderboards-table-empty">No recent matches were returned for this player.</td>
-        </tr>
-      `;
-      return;
-    }
-
-    matchesBody.innerHTML = matches
-      .map((match) => {
-        const result = String(match.result || "-");
-        const resultClass = result.toLowerCase() === "win" ? " is-win" : result.toLowerCase() === "loss" ? " is-loss" : "";
-        const queueLabel = getDisplayText(match.match_type_label || (match.match_type ? getQueueLabel(match.match_type) : ""), "-");
-        const civilization = getDisplayText(match.civilization, "-");
-        const mapName = getDisplayText(match.map, "-");
-        const eloValue = Number(match.rating_change);
-        const eloText = Number.isFinite(eloValue) && eloValue !== 0
-          ? `${formatNumber(match.rating)} (${eloValue > 0 ? "+" : ""}${formatNumber(eloValue)})`
-          : formatNumber(match.rating);
-
-        return `
-          <tr>
-            <td>${escapeHtml(formatDate(match.date_time))}</td>
-            <td>${escapeHtml(queueLabel)}</td>
-            <td>${escapeHtml(civilization)}</td>
-            <td>${escapeHtml(mapName)}</td>
-            <td><span class="leaderboards-result-pill${resultClass}">${escapeHtml(result)}</span></td>
-            <td>${escapeHtml(eloText)}</td>
-          </tr>
-        `;
-      })
-      .join("");
-  }
-
-  async function loadPlayerProfile({ player, profileId, matchType }) {
-    const requestId = ++state.profileRequestId;
-    if (searchResultsPanel) {
-      searchResultsPanel.hidden = true;
-    }
-    profilePanel.hidden = false;
-    searchFeedback.textContent = state.loadedProfile ? "Refreshing player profile..." : "Loading player profile...";
-    profileName.textContent = state.loadedProfile ? profileName.textContent : "Loading...";
-    profileMeta.textContent = "Fetching rating and match history";
-    if (!state.loadedProfile) {
-      profileCards.innerHTML = "";
-      godsList.innerHTML = "";
-      mapsList.innerHTML = "";
-      matchesBody.innerHTML = `
-        <tr>
-          <td colspan="6" class="leaderboards-table-empty">Loading recent matches...</td>
-        </tr>
-      `;
-    }
-
-    let ratingPayload = null;
-
-    if (player || profileId) {
-      ratingPayload = await fetchJson(
-        buildUrl(config.ratingUrl, {
-          player,
-          profile_id: profileId,
-          match_type: matchType,
-        }),
-      );
-    }
-
-    const resolvedProfileId = Number(ratingPayload?.rating?.profile_id || profileId || 0);
-    const resolvedPlayer = ratingPayload?.rating?.name || player || ratingPayload?.player || "Unknown player";
-
-    if (!resolvedProfileId) {
-      throw new Error(ratingPayload?.reason || "No usable profile ID was returned.");
-    }
-
-    const [summaryPayload, statsPayload] = await Promise.all([
-      fetchJson(
-        buildUrl(config.summaryUrl, {
-          profile_id: resolvedProfileId,
-          player: resolvedPlayer,
-          recent_match_type: matchType,
-          recent_count: 12,
-        }),
-      ),
-      fetchJson(
-        buildUrl(config.godStatsUrl, {
-          profile_id: resolvedProfileId,
-          player: resolvedPlayer,
-          recent_count: 25,
-          match_type: matchType,
-        }),
-      ),
-    ]);
-
-    if (requestId !== state.profileRequestId) {
-      return;
-    }
-
-    profileName.textContent = summaryPayload?.display_name || resolvedPlayer;
-    profileMeta.textContent = `Profile ID ${resolvedProfileId} · ${getQueueLabel(matchType)}`;
-    renderProfileCards(summaryPayload, statsPayload, ratingPayload);
-    renderGods(statsPayload);
-    renderMaps(statsPayload);
-    renderMatches(summaryPayload);
-    searchFeedback.textContent = `Loaded ${summaryPayload?.display_name || resolvedPlayer}.`;
-    state.loadedProfile = {
-      player: resolvedPlayer,
-      profileId: String(resolvedProfileId),
-    };
-    updateFullProfileLink(state.loadedProfile);
-  }
-
   function handleQueueChipClick(event) {
     const chip = event.target.closest("[data-match-type]");
     if (!chip) {
@@ -537,8 +325,6 @@
     const isNumericLookup = /^\d+$/.test(lookup);
     const player = isNumericLookup ? "" : lookup;
     const profileId = isNumericLookup ? lookup : "";
-    const matchType = Number(state.profileMatchType || state.browseMatchType || 1);
-    state.profileMatchType = matchType;
     renderQueueOptions();
 
     if (!lookup) {
@@ -551,10 +337,10 @@
         if (searchResultsPanel) {
           searchResultsPanel.hidden = true;
         }
-        await loadPlayerProfile({ player, profileId, matchType });
+        openPlayerProfile({ player, profileId });
       } else {
         await loadPlayerCandidates(player);
-        searchFeedback.textContent = "Select a matching profile to load ratings, recent matches, and god usage.";
+        searchFeedback.textContent = "Select a matching profile to open player stats.";
       }
     } catch (error) {
       searchFeedback.textContent = error instanceof Error ? error.message : "Unable to load that player right now.";
@@ -564,13 +350,11 @@
 
   function handleReset() {
     searchForm.reset();
-    searchFeedback.textContent = "Search for a player to load ratings, recent matches, and god usage.";
-    profilePanel.hidden = true;
+    searchFeedback.textContent = "Search for a player to open player stats.";
     if (searchResultsPanel) {
       searchResultsPanel.hidden = true;
     }
     state.loadedProfile = null;
-    updateFullProfileLink(null);
   }
 
   function handleCandidateRowClick(event) {
@@ -586,15 +370,9 @@
       lookupInput.value = player || profileId;
     }
 
-    state.profileMatchType = Number(state.profileMatchType || state.browseMatchType || 1);
-
-    loadPlayerProfile({
+    openPlayerProfile({
       player,
       profileId,
-      matchType: state.profileMatchType,
-    }).catch((error) => {
-      searchFeedback.textContent = error instanceof Error ? error.message : "Unable to load that player right now.";
-      console.error(error);
     });
   }
 
@@ -611,16 +389,11 @@
       lookupInput.value = player || profileId;
     }
 
-    state.profileMatchType = state.browseMatchType;
     renderQueueOptions();
 
-    loadPlayerProfile({
+    openPlayerProfile({
       player,
       profileId,
-      matchType: state.profileMatchType,
-    }).catch((error) => {
-      searchFeedback.textContent = error instanceof Error ? error.message : "Unable to load that player right now.";
-      console.error(error);
     });
   }
 
@@ -644,6 +417,5 @@
     loadBrowseLeaderboard().catch((error) => console.error(error));
   });
   renderQueueOptions();
-  updateFullProfileLink(null);
   loadBrowseLeaderboard().catch((error) => console.error(error));
 })();

@@ -51,7 +51,6 @@
   const matchesPageLabel = document.getElementById("playerStatsMatchesPageLabel");
   const godsMeta = document.getElementById("playerStatsGodsMeta");
   const godsList = document.getElementById("playerStatsGodsList");
-  const mapsList = document.getElementById("playerStatsMapsList");
   const matchesBody = document.getElementById("playerStatsMatchesBody");
 
   function escapeHtml(value) {
@@ -275,14 +274,12 @@
     const primaryRating = primaryRatingBucket?.rating || ratingPayloadRecord || null;
     const matches = Array.isArray(state.loadedMatches) ? state.loadedMatches : [];
     const gods = Array.isArray(statsPayload?.gods) ? statsPayload.gods : [];
-    const maps = Array.isArray(statsPayload?.maps) ? statsPayload.maps : [];
     const recent = countRecentResolved(matches, 10);
     const queueLabel = getQueueLabel(state.activeMatchType);
     const displayName = summaryPayload?.display_name || state.loadedProfile?.player || "This player";
     const rating = Number(primaryRating?.rating);
     const games = Number(primaryRating?.games);
     const topGod = gods[0] || null;
-    const topMap = maps[0] || null;
     const trend = sumRecentRatingChange(matches, 8);
 
     const badges = [];
@@ -311,10 +308,6 @@
       badges.push(`${String(topGod.name || "GOD").toUpperCase()} SPECIALIST`);
     } else if (topGod && Number(topGod.percent) <= 30 && gods.length >= 3) {
       badges.push("WIDE GOD POOL");
-    }
-
-    if (topMap && Number(topMap.percent) >= 40 && Number(topMap.count) >= 4) {
-      badges.push("MAP LOYALIST");
     }
 
     if (Number.isFinite(games) && games >= 200) {
@@ -358,11 +351,6 @@
         label: "Signature god",
         strong: topGod ? `${topGod.name} in ${formatPercent(topGod.percent)}` : "Mixed god pool",
         body: topGod ? `${formatNumber(topGod.count)} recent matches with ${topGod.name} at ${formatPercent(topGod.win_rate)} win rate.` : "No single god is dominating this profile view.",
-      },
-      {
-        label: "Map habit",
-        strong: topMap ? `${topMap.name} at ${formatPercent(topMap.percent)}` : "Mixed map spread",
-        body: topMap ? `${formatNumber(topMap.count)} recent games on ${topMap.name}.` : "No single map stands out in this profile view.",
       },
     ];
 
@@ -449,27 +437,6 @@
             <span>${escapeHtml(god.name)}</span>
             <strong>${escapeHtml(formatNumber(god.count))} matches</strong>
             <p>${escapeHtml(formatPercent(god.win_rate))} win rate · ${escapeHtml(formatPercent(god.percent))} of returned recent matches</p>
-          </article>
-        `,
-      )
-      .join("");
-  }
-
-  function renderMaps(statsPayload) {
-    const maps = Array.isArray(statsPayload?.maps) ? statsPayload.maps.slice(0, 8) : [];
-
-    if (!maps.length) {
-      mapsList.innerHTML = `<article class="leaderboards-list-card"><strong>No recent map data</strong><p>Try another player or queue.</p></article>`;
-      return;
-    }
-
-    mapsList.innerHTML = maps
-      .map(
-        (map) => `
-          <article class="leaderboards-list-card">
-            <span>${escapeHtml(map.name)}</span>
-            <strong>${escapeHtml(formatNumber(map.count))} matches</strong>
-            <p>${escapeHtml(formatPercent(map.percent))} of returned recent matches</p>
           </article>
         `,
       )
@@ -602,7 +569,6 @@
     if (!state.loadedProfile) {
       profileCards.innerHTML = "";
       godsList.innerHTML = "";
-      mapsList.innerHTML = "";
       ratingsBody.innerHTML = `
         <tr>
           <td colspan="5" class="leaderboards-table-empty">Loading ladder rows...</td>
@@ -674,7 +640,6 @@
     renderRatingsTable(summaryPayload, ratingPayload);
     renderMatches();
     renderGods(statsPayload);
-    renderMaps(statsPayload);
     feedback.textContent = `Loaded ${summaryPayload?.display_name || resolvedPlayer}.`;
 
     state.loadedProfile = {
@@ -701,7 +666,7 @@
         await loadProfile({ player, profileId, matchType: state.activeMatchType });
       } else {
         await loadPlayerCandidates(player);
-        feedback.textContent = "Select a matching profile to load the dedicated stats view.";
+        feedback.textContent = "Select a matching profile to open player stats.";
       }
     } catch (error) {
       feedback.textContent = error instanceof Error ? error.message : "Unable to load that player right now.";

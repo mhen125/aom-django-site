@@ -64,8 +64,14 @@
         </p>
 
         <div class="leaderboards-search-actions">
-          <button class="leaderboards-primary-button" type="submit">Search profiles</button>
-          <button id="playerStatsReset" class="leaderboards-secondary-button" type="button">Reset</button>
+          <button class="leaderboards-primary-button" type="submit">
+            <img class="leaderboards-button-icon" src="{% static 'assets/images/ui/icon_MPLobby_Join.png' %}" alt="" aria-hidden="true">
+            <span>Search profiles</span>
+          </button>
+          <button id="playerStatsReset" class="leaderboards-secondary-button" type="button">
+            <img class="leaderboards-button-icon" src="{% static 'assets/images/ui/delete.png' %}" alt="" aria-hidden="true">
+            <span>Reset</span>
+          </button>
         </div>
 
         <p id="playerStatsFeedback" class="leaderboards-feedback" aria-live="polite">
@@ -249,9 +255,15 @@
         </div>
 
         <div class="leaderboards-pagination">
-          <button id="playerStatsPrevMatches" class="leaderboards-ghost-button" type="button">Previous</button>
+          <button id="playerStatsPrevMatches" class="leaderboards-ghost-button" type="button">
+            <img class="leaderboards-button-icon" src="{% static 'assets/images/ui/BackButton_Default.png' %}" alt="" aria-hidden="true">
+            <span>Previous</span>
+          </button>
           <span id="playerStatsMatchesPageLabel" class="leaderboards-meta-note">Page 1</span>
-          <button id="playerStatsNextMatches" class="leaderboards-ghost-button" type="button">Next</button>
+          <button id="playerStatsNextMatches" class="leaderboards-ghost-button" type="button">
+            <span>Next</span>
+            <img class="leaderboards-button-icon" src="{% static 'assets/images/ui/ForwardButton_Default.png' %}" alt="" aria-hidden="true">
+          </button>
         </div>
       </article>
 
@@ -265,17 +277,6 @@
         </div>
 
         <div id="playerStatsGodsList" class="leaderboards-list-grid"></div>
-      </article>
-
-      <article class="leaderboards-profile-maps leaderboards-panel">
-        <div class="leaderboards-section-head">
-          <div>
-            <p class="leaderboards-kicker">Map Rotation</p>
-            <h2>Most played maps</h2>
-          </div>
-        </div>
-
-        <div id="playerStatsMapsList" class="leaderboards-list-grid"></div>
       </article>
     </section>
   </main>

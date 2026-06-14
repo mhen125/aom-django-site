@@ -37,7 +37,7 @@
         <h1>Leaderboards &amp; Player Stats</h1>
         <p>
           Browse live-ranked ladders, pivot across queue formats, and drill into a player’s recent gods,
-          maps, and results without leaving Prostagma.
+          ratings, and results on Prostagma.
         </p>
       </div>
 
@@ -49,16 +49,22 @@
 
         <label class="leaderboards-field">
           <span>Player</span>
-          <input id="leaderboardLookupInput" name="player_lookup" type="text" placeholder="crazydarnfoo or 1075470702">
+          <input id="leaderboardLookupInput" name="player_lookup" type="text" placeholder="Player name or profile ID">
         </label>
 
         <p class="leaderboards-search-note">
-          Queue is chosen from the leaderboard table or player profile after lookup.
+          Search by ladder name or paste a numeric profile ID.
         </p>
 
         <div class="leaderboards-search-actions">
-          <button class="leaderboards-primary-button" type="submit">Search profiles</button>
-          <button id="leaderboardSearchReset" class="leaderboards-secondary-button" type="button">Reset</button>
+          <button class="leaderboards-primary-button" type="submit">
+            <img class="leaderboards-button-icon" src="{% static 'assets/images/ui/icon_MPLobby_Join.png' %}" alt="" aria-hidden="true">
+            <span>Search profiles</span>
+          </button>
+          <button id="leaderboardSearchReset" class="leaderboards-secondary-button" type="button">
+            <img class="leaderboards-button-icon" src="{% static 'assets/images/ui/delete.png' %}" alt="" aria-hidden="true">
+            <span>Reset</span>
+          </button>
         </div>
 
         <p id="leaderboardSearchFeedback" class="leaderboards-feedback" aria-live="polite">
@@ -104,7 +110,10 @@
         </div>
         <div class="leaderboards-browse-actions">
           <span id="leaderboardBrowseMeta" class="leaderboards-meta-note">Loading rankings...</span>
-          <button id="leaderboardRefreshBrowse" class="leaderboards-ghost-button" type="button">Refresh</button>
+          <button id="leaderboardRefreshBrowse" class="leaderboards-ghost-button" type="button">
+            <img class="leaderboards-button-icon" src="{% static 'assets/images/ui/Icon_Sort_Off.png' %}" alt="" aria-hidden="true">
+            <span>Refresh</span>
+          </button>
         </div>
       </div>
 
@@ -130,83 +139,18 @@
       </div>
 
       <div class="leaderboards-pagination" aria-label="Leaderboard pages">
-        <button id="leaderboardPrevPage" class="leaderboards-ghost-button" type="button">Previous</button>
+        <button id="leaderboardPrevPage" class="leaderboards-ghost-button" type="button">
+          <img class="leaderboards-button-icon" src="{% static 'assets/images/ui/BackButton_Default.png' %}" alt="" aria-hidden="true">
+          <span>Previous</span>
+        </button>
         <span id="leaderboardPageLabel" class="leaderboards-meta-note">Page 1</span>
-        <button id="leaderboardNextPage" class="leaderboards-ghost-button" type="button">Next</button>
+        <button id="leaderboardNextPage" class="leaderboards-ghost-button" type="button">
+          <span>Next</span>
+          <img class="leaderboards-button-icon" src="{% static 'assets/images/ui/ForwardButton_Default.png' %}" alt="" aria-hidden="true">
+        </button>
       </div>
     </section>
 
-    <section id="leaderboardProfilePanel" class="leaderboards-profile-grid" hidden>
-      <article class="leaderboards-profile-overview leaderboards-panel">
-        <div class="leaderboards-section-head">
-          <div>
-            <p class="leaderboards-kicker">Player Overview</p>
-            <h2 id="leaderboardProfileName">Player</h2>
-          </div>
-          <div class="leaderboards-profile-head-actions">
-            <span id="leaderboardProfileMeta" class="leaderboards-meta-note">Waiting for search</span>
-            <a id="leaderboardFullProfileLink" class="leaderboards-ghost-link" href="{% url 'stats:player_stats_home' %}" hidden>
-              Open dedicated stats
-              <span aria-hidden="true">›</span>
-            </a>
-          </div>
-        </div>
-
-        <div id="leaderboardProfileCards" class="leaderboards-stat-grid"></div>
-      </article>
-
-      <article class="leaderboards-profile-gods leaderboards-panel">
-        <div class="leaderboards-section-head">
-          <div>
-            <p class="leaderboards-kicker">Recent God Usage</p>
-            <h2>Major gods</h2>
-          </div>
-          <span id="leaderboardGodsMeta" class="leaderboards-meta-note">Recent matches</span>
-        </div>
-
-        <div id="leaderboardGodsList" class="leaderboards-list-grid"></div>
-      </article>
-
-      <article class="leaderboards-profile-maps leaderboards-panel">
-        <div class="leaderboards-section-head">
-          <div>
-            <p class="leaderboards-kicker">Map Rotation</p>
-            <h2>Most played maps</h2>
-          </div>
-        </div>
-
-        <div id="leaderboardMapsList" class="leaderboards-list-grid"></div>
-      </article>
-
-      <article class="leaderboards-profile-matches leaderboards-panel">
-        <div class="leaderboards-section-head">
-          <div>
-            <p class="leaderboards-kicker">Recent Matches</p>
-            <h2>Latest results</h2>
-          </div>
-        </div>
-
-        <div class="leaderboards-table-wrap">
-          <table class="leaderboards-table leaderboards-matches-table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Queue</th>
-                <th>God</th>
-                <th>Map</th>
-                <th>Result</th>
-                <th>ELO</th>
-              </tr>
-            </thead>
-            <tbody id="leaderboardRecentMatchesBody">
-              <tr>
-                <td colspan="6" class="leaderboards-table-empty">Search for a player to load recent matches.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </article>
-    </section>
   </main>
 {% endblock %}
 
