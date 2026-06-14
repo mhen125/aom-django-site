@@ -23,10 +23,53 @@ def _player_name(player_row: Player) -> str:
     )
 
 
-def _rating_row_from_identity(player_row: Player) -> dict[str, Any]:
+def _get_personal_stat_ratings(player_row: Player) -> list[dict[str, Any]]:
+    raw = player_row.raw_identity or {}
+    if not isinstance(raw, dict):
+        return []
+
+    ratings = raw.get("personal_stat_ratings")
+    if not isinstance(ratings, list):
+        return []
+
+    return [item for item in ratings if isinstance(item, dict)]
+
+
+def _get_queue_rating_from_identity(player_row: Player, match_type: int) -> dict[str, Any] | None:
+    leaderboard_id = get_match_type_meta(match_type).get("leaderboard_id") if get_match_type_meta(match_type) else None
+
+    for item in _get_personal_stat_ratings(player_row):
+        queue_id = item.get("queue_id") or item.get("leaderboard_id") or item.get("match_type")
+        if leaderboard_id is not None and int(queue_id or 0) == int(leaderboard_id):
+            return item
+
+    return None
+
+
+def _rating_row_from_identity(player_row: Player, match_type: int | None = None) -> dict[str, Any]:
     raw = player_row.raw_identity or {}
     if not isinstance(raw, dict):
         raw = {}
+
+    if match_type is not None:
+        queue_rating = _get_queue_rating_from_identity(player_row, match_type)
+        if queue_rating:
+            return {
+                "rank": queue_rating.get("rank"),
+                "rank_total": queue_rating.get("rank_total"),
+                "rating": queue_rating.get("rating"),
+                "elo": queue_rating.get("elo"),
+                "highest_rating": queue_rating.get("highest_rating"),
+                "wins": queue_rating.get("wins"),
+                "losses": queue_rating.get("losses"),
+                "games": queue_rating.get("games"),
+                "win_rate": queue_rating.get("win_rate"),
+                "streak": queue_rating.get("streak"),
+                "country": queue_rating.get("country") or raw.get("country"),
+                "region": queue_rating.get("region") or raw.get("region"),
+                "avatar_url": queue_rating.get("avatar_url") or raw.get("avatar_url"),
+                "raw": queue_rating.get("raw") if isinstance(queue_rating.get("raw"), dict) else queue_rating,
+            }
 
     return {
         "rank": raw.get("rank"),
@@ -47,6 +90,9 @@ def _rating_row_from_identity(player_row: Player) -> dict[str, Any]:
 
 
 def _player_matches_queue(player_row: Player, match_type: int) -> bool:
+    if _get_queue_rating_from_identity(player_row, match_type):
+        return True
+
     raw = player_row.raw_identity or {}
     if not isinstance(raw, dict):
         return False
@@ -60,6 +106,9 @@ def _player_matches_queue(player_row: Player, match_type: int) -> bool:
 
 
 def _player_has_imported_ladder_row(player_row: Player) -> bool:
+    if _get_personal_stat_ratings(player_row):
+        return True
+
     raw = player_row.raw_identity or {}
     if not isinstance(raw, dict):
         return False
@@ -93,7 +142,7 @@ def get_imported_leaderboard_rows(
             {
                 "name": name,
                 "profile_id": item.profile_id,
-                **_rating_row_from_identity(item),
+                **_rating_row_from_identity(item, match_type),
                 "source": "imported_stats",
                 "raw": raw,
             }
@@ -160,7 +209,7 @@ def get_imported_player_rating(
         return None
 
     raw = player_row.raw_identity if player_row and isinstance(player_row.raw_identity, dict) else {}
-    rating_row = _rating_row_from_identity(player_row) if player_row else {}
+    rating_row = _rating_row_from_identity(player_row, match_type) if player_row else {}
 
     derived_rating = latest_participant.rating if latest_participant and latest_participant.rating is not None else None
     derived_games = participant_qs.count()
@@ -211,6 +260,31 @@ def _collect_imported_player_ratings(
     profile_id: int,
     player: str = "",
 ) -> list[dict[str, Any]]:
+    player_row = Player.objects.filter(profile_id=profile_id).first()
+    if player_row is not None:
+        personal_stat_ratings = _get_personal_stat_ratings(player_row)
+        if personal_stat_ratings:
+            rows: list[dict[str, Any]] = []
+            seen_match_types: set[int] = set()
+            for rating in personal_stat_ratings:
+                match_type = int(rating.get("match_type") or rating.get("queue_id") or 0)
+                if match_type <= 0 or match_type in seen_match_types:
+                    continue
+                seen_match_types.add(match_type)
+                rows.append(
+                    {
+                        "match_type": match_type,
+                        "match_type_label": rating.get("match_type_label") or rating.get("queue_label") or get_match_type_label(match_type),
+                        "ok": rating.get("rating") is not None,
+                        "source": "imported_stats",
+                        "rating": rating,
+                        "reason": None if rating.get("rating") is not None else "No rating returned.",
+                    }
+                )
+            if rows:
+                rows.sort(key=lambda item: item["match_type"])
+                return rows
+
     ratings: list[dict[str, Any]] = []
 
     for match_type in get_ranked_match_type_ids():

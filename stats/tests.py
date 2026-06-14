@@ -10,8 +10,9 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from stats.importers import _upsert_match_with_participants, backfill_replay_parses
-from stats.models import Match, MatchParticipant, ReplayParse
+from stats.importers import _upsert_match_with_participants, backfill_replay_parses, import_recent_matches
+from stats.models import Match, MatchParticipant, Player, ReplayParse
+from stats.readers import get_imported_leaderboard_rows, get_imported_player_rating
 from stats.replay_acquisition import (
     backfill_replay_sources,
     extract_replay_url_from_match_payload,
@@ -122,6 +123,172 @@ class StatsViewTests(TestCase):
 
 
 class StatsImporterTests(TestCase):
+    @patch("stats.importers.fetch_match_detail_raw")
+    @patch("stats.importers.fetch_recent_match_history")
+    @patch("stats.importers.fetch_personal_stat_summary")
+    @patch("stats.importers.fetch_community_leaderboard2")
+    def test_importer_hydrates_players_with_personal_stat_ratings(
+        self,
+        fetch_community_leaderboard2_mock,
+        fetch_personal_stat_summary_mock,
+        fetch_recent_match_history_mock,
+        fetch_match_detail_raw_mock,
+    ):
+        fetch_community_leaderboard2_mock.return_value = {
+            "ok": True,
+            "matches": [
+                {
+                    "profile_id": 107,
+                    "name": "Mosca",
+                    "avatar_url": "",
+                    "country": "us",
+                    "rating": 1201,
+                    "rank": 14,
+                }
+            ],
+        }
+        fetch_personal_stat_summary_mock.return_value = {
+            "ok": True,
+            "display_name": "Mosca",
+            "status_code": 200,
+            "shape": {"type": "personal_stat"},
+            "raw": {"leaderboardStats": []},
+            "ratings": [
+                {
+                    "name": "Mosca",
+                    "profile_id": 107,
+                    "queue_id": 1,
+                    "leaderboard_id": 1,
+                    "match_type": 1,
+                    "match_type_label": "Ranked 1v1",
+                    "rating": 1201,
+                    "highest_rating": 1210,
+                    "rank": 14,
+                    "rank_total": 1000,
+                    "wins": 20,
+                    "losses": 10,
+                    "games": 30,
+                    "win_rate": 66.7,
+                    "country": "us",
+                    "platform": "steam",
+                    "platform_id": "76561198000000000",
+                    "raw": {"leaderboard_stats": {"leaderboard_id": 1}},
+                }
+            ],
+        }
+        fetch_recent_match_history_mock.return_value = {
+            "ok": True,
+            "matches": [
+                {
+                    "match_id": "m-1",
+                    "map": "Ghost Lake",
+                    "date_time": "2026-06-01T12:00:00",
+                }
+            ],
+        }
+        fetch_match_detail_raw_mock.return_value = {
+            "ok": True,
+            "raw": {},
+        }
+
+        with patch("stats.importers.normalize_match_detail_for_player") as normalize_detail_mock:
+            normalize_detail_mock.return_value = {
+                "match_type": 1,
+                "match_type_label": "1v1 Supremacy",
+                "map": "Ghost Lake",
+                "date_time": "2026-06-01T12:00:00",
+                "players": [
+                    {
+                        "profile_id": 107,
+                        "name": "Mosca",
+                        "team": 1,
+                        "slot": 1,
+                        "result": "win",
+                        "god": "Zeus",
+                        "elo": 1201,
+                    },
+                    {
+                        "profile_id": 108,
+                        "name": "Divine",
+                        "team": 2,
+                        "slot": 1,
+                        "result": "loss",
+                        "god": "Ra",
+                        "elo": 1188,
+                    },
+                ],
+            }
+            summary = import_recent_matches(
+                match_type=1,
+                leaderboard_pages=1,
+                leaderboard_count=1,
+                player_limit=1,
+                recent_count=1,
+                refresh=True,
+            )
+
+        self.assertTrue(summary["ok"])
+        player = Player.objects.get(profile_id=107)
+        self.assertEqual(player.platform, Player.PLATFORM_STEAM)
+        self.assertEqual(player.platform_id, "76561198000000000")
+        self.assertEqual(player.raw_identity.get("personal_stat_ok"), True)
+        self.assertEqual(len(player.raw_identity.get("personal_stat_ratings", [])), 1)
+        self.assertEqual(player.raw_identity.get("rank"), 14)
+        self.assertEqual(player.raw_identity.get("rating"), 1201)
+
+    def test_imported_leaderboard_rows_use_queue_specific_personal_stat_ratings(self):
+        Player.objects.create(
+            profile_id=107,
+            alias="Mosca",
+            display_name="Mosca",
+            raw_identity={
+                "personal_stat_ratings": [
+                    {
+                        "name": "Mosca",
+                        "profile_id": 107,
+                        "queue_id": 1,
+                        "leaderboard_id": 1,
+                        "match_type": 1,
+                        "match_type_label": "Ranked 1v1",
+                        "rating": 1201,
+                        "highest_rating": 1210,
+                        "rank": 14,
+                        "wins": 20,
+                        "losses": 10,
+                        "games": 30,
+                        "win_rate": 66.7,
+                        "country": "us",
+                    },
+                    {
+                        "name": "Mosca",
+                        "profile_id": 107,
+                        "queue_id": 2,
+                        "leaderboard_id": 2,
+                        "match_type": 2,
+                        "match_type_label": "Ranked Teams",
+                        "rating": 1325,
+                        "highest_rating": 1331,
+                        "rank": 8,
+                        "wins": 50,
+                        "losses": 18,
+                        "games": 68,
+                        "win_rate": 73.5,
+                        "country": "us",
+                    },
+                ]
+            },
+        )
+
+        one_v_one_rows = get_imported_leaderboard_rows(match_type=1, page=1, count=25)
+        team_rows = get_imported_leaderboard_rows(match_type=2, page=1, count=25)
+        team_rating = get_imported_player_rating(profile_id=107, match_type=2)
+
+        self.assertEqual(one_v_one_rows["matches"][0]["rating"], 1201)
+        self.assertEqual(team_rows["matches"][0]["rating"], 1325)
+        self.assertEqual(team_rows["matches"][0]["rank"], 8)
+        self.assertIsNotNone(team_rating)
+        self.assertEqual(team_rating["rating"]["rating"], 1325)
+
     def test_importer_seeds_replay_parse_without_overwriting_existing_parse(self):
         detail_match = {
             "match_type": 1,

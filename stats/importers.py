@@ -8,6 +8,7 @@ from django.db import OperationalError, close_old_connections, transaction
 from lobbies.leaderboard import (
     fetch_community_leaderboard2,
     fetch_match_detail_raw,
+    fetch_personal_stat_summary,
     fetch_recent_match_history,
     fetch_player_match_list,
     normalize_match_detail_for_player,
@@ -85,9 +86,15 @@ def _upsert_player_from_identity(
         raw_identity or {},
     )
 
+    platform = ""
+    platform_id = ""
+    if isinstance(raw_identity, dict):
+        platform = str(raw_identity.get("platform") or "").strip()
+        platform_id = str(raw_identity.get("platform_id") or "").strip()
+
     defaults = {
-        "platform": Player.PLATFORM_UNKNOWN,
-        "platform_id": "",
+        "platform": platform or (existing.platform if existing and existing.platform else Player.PLATFORM_UNKNOWN),
+        "platform_id": platform_id or (existing.platform_id if existing else ""),
         "alias": alias or display_name or "",
         "display_name": display_name or alias or "",
         "avatar_url": avatar_url or "",
@@ -100,6 +107,65 @@ def _upsert_player_from_identity(
         defaults=defaults,
     )
     return player
+
+
+def _hydrate_player_with_personal_stat(
+    *,
+    profile_id: int,
+    player_name: str,
+    match_type: int,
+    refresh: bool,
+    dry_run: bool,
+) -> dict[str, Any] | None:
+    personal_stat_response = async_to_sync(fetch_personal_stat_summary)(
+        profile_id=profile_id,
+        player=player_name,
+        requested_match_type=match_type,
+        refresh=refresh,
+    )
+
+    ratings = personal_stat_response.get("ratings", []) if isinstance(personal_stat_response, dict) else []
+    if not personal_stat_response.get("ok") or not ratings:
+        return None
+
+    best_rating = next(
+        (
+            item for item in ratings
+            if int(item.get("queue_id") or item.get("match_type") or 0) == int(match_type)
+            and item.get("rating") is not None
+        ),
+        None,
+    ) or next((item for item in ratings if item.get("rating") is not None), None)
+
+    if best_rating is None:
+        return None
+
+    player_payload = {
+        **best_rating,
+        "personal_stat_ok": True,
+        "personal_stat_ratings": ratings,
+        "personal_stat_status_code": personal_stat_response.get("status_code"),
+        "personal_stat_shape": personal_stat_response.get("shape"),
+        "personal_stat_display_name": personal_stat_response.get("display_name") or player_name,
+        "personal_stat_raw": personal_stat_response.get("raw") if isinstance(personal_stat_response.get("raw"), dict) else {},
+    }
+
+    player = _upsert_player_from_identity(
+        profile_id=profile_id,
+        alias=best_rating.get("name") or player_name,
+        display_name=personal_stat_response.get("display_name") or best_rating.get("name") or player_name,
+        avatar_url=best_rating.get("avatar_url") or "",
+        country_code=best_rating.get("country") or "",
+        raw_identity=player_payload,
+        dry_run=dry_run,
+    )
+
+    return {
+        "player": player,
+        "best_rating": best_rating,
+        "rating_count": len(ratings),
+        "status_code": personal_stat_response.get("status_code"),
+    }
 
 
 def _build_match_defaults(
@@ -523,6 +589,25 @@ def import_recent_matches(
                 "dry_run": dry_run,
             }
         )
+
+        personal_stat_hydration = _hydrate_player_with_personal_stat(
+            profile_id=profile_id,
+            player_name=player_name,
+            match_type=match_type,
+            refresh=refresh,
+            dry_run=dry_run,
+        )
+        if personal_stat_hydration is not None:
+            events.append(
+                {
+                    "stage": "player_personal_stat_hydrated",
+                    "profile_id": profile_id,
+                    "player": player_name,
+                    "rating_count": personal_stat_hydration["rating_count"],
+                    "status_code": personal_stat_hydration["status_code"],
+                    "dry_run": dry_run,
+                }
+            )
 
         profile_names = []
         raw_name = leaderboard_row.get("raw_name") or leaderboard_row.get("platform_name")
